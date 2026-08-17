@@ -12,8 +12,9 @@ test('Linux packages use an RPM-safe identity and a valid maintainer', async () 
   }
 
   assert.match(builderConfig, /^executableName: pilot-harness$/m)
-  assert.match(builderConfig, /^  packageName: pilot-harness$/m)
   assert.match(builderConfig, /^  syncDesktopName: true$/m)
+  assert.match(builderConfig, /^deb:\n  packageName: pilot-harness$/m)
+  assert.match(builderConfig, /^rpm:\n  packageName: pilot-harness$/m)
   assert.equal(packageJson.author?.name, 'Pilot Harness Contributors')
   assert.match(packageJson.author?.email ?? '', /@users\.noreply\.github\.com$/)
 })
