@@ -42,11 +42,11 @@ Pilot Harness 不替换 DeepSeek Harness 的 agent loop、Session 日志、工�
 
 请从 [GitHub Releases](https://github.com/op7418/guizang-dsh-desktop/releases/latest) 下载适合你系统的安装包：
 
-| 平台 | 选择这个安装包 |
+| 平台 | 直接下载 |
 |---|---|
-| macOS（Apple Silicon） | 使用 <code>.dmg</code> 安装，或下载 <code>.zip</code> 便携版 |
-| Windows | <code>.exe</code> 安装程序 |
-| Linux | <code>.AppImage</code>、<code>.deb</code> 或 <code>.rpm</code> |
+| macOS（Apple Silicon） | [DMG 安装包](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-macOS-arm64.dmg) · [ZIP 应用](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-macOS-arm64.zip) |
+| Windows（x64） | [EXE 安装程序](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Windows-x64.exe) |
+| Linux（x64） | [AppImage](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Linux-x86_64.AppImage) · [DEB](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Linux-amd64.deb) · [RPM](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Linux-x86_64.rpm) |
 
 安装后打开 Pilot Harness，选择工作区，再前往**设置 → 服务商**连接服务商，并选择它提供的模型。桌面客户端无需另外安装 DeepSeek Harness。
 

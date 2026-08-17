@@ -24,8 +24,10 @@ permissions:
   contents: read
 
 concurrency:
-  group: desktop-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name != 'push' }}
+  # A branch push followed by a release tag on the same commit should share
+  # one build instead of spending three runners on identical work twice.
+  group: desktop-${{ github.workflow }}-${{ github.sha }}
+  cancel-in-progress: true
 
 jobs:
   native-package:
@@ -81,7 +83,13 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: pilot-harness-${{ runner.os }}
-          path: apps/desktop/release/**
+          path: |
+            apps/desktop/release/*.dmg
+            apps/desktop/release/*.zip
+            apps/desktop/release/*.exe
+            apps/desktop/release/*.AppImage
+            apps/desktop/release/*.deb
+            apps/desktop/release/*.rpm
           if-no-files-found: error
 
   plugin-bundles:
@@ -145,15 +153,26 @@ jobs:
           path: release-assets
           merge-multiple: true
 
+      - name: Give desktop installers stable download names
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          mv "release-assets/Pilot Harness-${version}-arm64.dmg" "release-assets/Pilot-Harness-macOS-arm64.dmg"
+          mv "release-assets/Pilot Harness-${version}-arm64.zip" "release-assets/Pilot-Harness-macOS-arm64.zip"
+          mv "release-assets/Pilot Harness.Setup.${version}.exe" "release-assets/Pilot-Harness-Windows-x64.exe"
+          mv "release-assets/Pilot Harness-${version}-x86_64.AppImage" "release-assets/Pilot-Harness-Linux-x86_64.AppImage"
+          mv "release-assets/Pilot Harness-${version}-amd64.deb" "release-assets/Pilot-Harness-Linux-amd64.deb"
+          mv "release-assets/Pilot Harness-${version}-x86_64.rpm" "release-assets/Pilot-Harness-Linux-x86_64.rpm"
+
       - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
           fail_on_unmatched_files: true
           files: |
-            release-assets/**/*.dmg
-            release-assets/**/*.zip
-            release-assets/**/*.exe
-            release-assets/**/*.AppImage
-            release-assets/**/*.deb
-            release-assets/**/*.rpm
-            release-assets/**/*.tgz
+            release-assets/Pilot-Harness-*.dmg
+            release-assets/Pilot-Harness-*.zip
+            release-assets/Pilot-Harness-*.exe
+            release-assets/Pilot-Harness-*.AppImage
+            release-assets/Pilot-Harness-*.deb
+            release-assets/Pilot-Harness-*.rpm
+            release-assets/deepseek-ai-*.tgz

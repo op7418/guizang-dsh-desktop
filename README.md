@@ -42,11 +42,11 @@ Pilot Harness does not replace the DeepSeek Harness agent loop, Session log, too
 
 Download the installer for your system from [GitHub Releases](https://github.com/op7418/guizang-dsh-desktop/releases/latest):
 
-| Platform | Choose this package |
+| Platform | Download |
 |---|---|
-| macOS (Apple Silicon) | <code>.dmg</code> for installation or <code>.zip</code> for a portable app |
-| Windows | <code>.exe</code> installer |
-| Linux | <code>.AppImage</code>, <code>.deb</code>, or <code>.rpm</code> |
+| macOS (Apple Silicon) | [DMG installer](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-macOS-arm64.dmg) · [ZIP app](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-macOS-arm64.zip) |
+| Windows (x64) | [EXE installer](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Windows-x64.exe) |
+| Linux (x64) | [AppImage](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Linux-x86_64.AppImage) · [DEB](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Linux-amd64.deb) · [RPM](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Linux-x86_64.rpm) |
 
 After installation, open Pilot Harness, select a Workspace, then go to **Settings → Providers** to connect a provider and choose one of its available models. No separate DeepSeek Harness installation is required for the desktop app.
 
