@@ -54,6 +54,7 @@ async function inspectState(page, selectors) {
       return [name, {
         selector,
         box: { x: box.x, y: box.y, width: box.width, height: box.height },
+        client: { width: element.clientWidth, height: element.clientHeight },
         background: style.backgroundColor,
         backgroundImage: style.backgroundImage,
         color: style.color,
@@ -205,16 +206,38 @@ try {
   }, repoRoot)
 
   const addWorkspace = page.getByRole('button', { name: /add workspace/i }).last()
-  await addWorkspace.click()
-  try {
-    await page.getByRole('treeitem').filter({ hasText: repoName }).waitFor()
-  } catch (error) {
-    const workspaceState = await page.evaluate(() => ({
-      body: document.body.innerText,
-      rows: [...document.querySelectorAll('[role="treeitem"]')].map(node => node.textContent),
-    })).catch(() => undefined)
-    throw new Error(`selected workspace did not enter the sidebar: ${JSON.stringify({ repoRoot, repoName, workspaceState, pageErrors, pageWarnings })}\n${String(error)}`)
+  const directoryBrowser = page.getByRole('dialog', { name: 'Select Workspace Directory', exact: true })
+  async function addWorkspacePath(path, expectedName = basename(path)) {
+    await electronApp.evaluate((_, selectedPath) => { globalThis.__pilotHarnessE2EPath = selectedPath }, path)
+    await addWorkspace.click()
+
+    // Linux intentionally uses the in-app directory browser instead of the
+    // native bridge. Exercise that real fallback; macOS and Windows resolve
+    // directly through the test IPC handler and never render this dialog.
+    await directoryBrowser.waitFor({ timeout: 1_500 }).catch(() => undefined)
+    if (await directoryBrowser.isVisible().catch(() => false)) {
+      await directoryBrowser.getByRole('button', { name: 'Edit path', exact: true }).click()
+      const pathEditor = directoryBrowser.getByRole('textbox', { name: 'Edit path', exact: true })
+      await pathEditor.fill(path)
+      await pathEditor.press('Enter')
+      await pathEditor.waitFor({ state: 'detached' })
+      await directoryBrowser.getByRole('button', { name: 'Open', exact: true }).click()
+    }
+
+    const row = page.getByRole('treeitem').filter({ hasText: expectedName }).first()
+    try {
+      await row.waitFor()
+    } catch (error) {
+      const workspaceState = await page.evaluate(() => ({
+        body: document.body.innerText,
+        rows: [...document.querySelectorAll('[role="treeitem"]')].map(node => node.textContent),
+      })).catch(() => undefined)
+      throw new Error(`selected workspace did not enter the sidebar: ${JSON.stringify({ path, expectedName, workspaceState, pageErrors, pageWarnings })}\n${String(error)}`)
+    }
+    return row
   }
+
+  const rootProject = await addWorkspacePath(repoRoot, repoName)
 
   // First-run onboarding starts only after the project has been accepted. It
   // is intentionally blocking from this point; complete the notice and take
@@ -230,12 +253,7 @@ try {
     await page.getByRole('dialog').waitFor({ state: 'detached' })
   }
 
-  await electronApp.evaluate((_, path) => { globalThis.__pilotHarnessE2EPath = path }, appRoot)
-  await addWorkspace.click()
-  const desktopProject = page.getByRole('treeitem').filter({ hasText: 'desktop' }).first()
-  await desktopProject.waitFor()
-
-  const rootProject = page.getByRole('treeitem').filter({ hasText: repoName }).first()
+  const desktopProject = await addWorkspacePath(appRoot, 'desktop')
   await desktopProject.click()
   try {
     await page.waitForFunction(() => document.querySelector('[role="treeitem"][aria-current="true"]')?.textContent?.includes('desktop'), undefined, { timeout: 5_000 })
@@ -480,7 +498,11 @@ try {
   if (generalOptionsBox === undefined || generalCard === null || generalCard === undefined) {
     throw new Error('General settings card geometry is unavailable')
   }
-  const optionsCenter = generalOptionsBox.x + generalOptionsBox.width / 2
+  // Classic Windows scrollbars consume inline layout width. Center against
+  // the scrollport's client box, not its border box, so the assertion follows
+  // the surface users actually see on every platform.
+  const optionsCenter = generalOptionsBox.x
+    + (runtimeAudit.states.general.elements.settingsOptions?.client?.width ?? generalOptionsBox.width) / 2
   const cardCenter = generalCard.box.x + generalCard.box.width / 2
   if (Math.abs(optionsCenter - cardCenter) > 2) {
     throw new Error('General settings card is not centered inside the content column')
@@ -517,10 +539,7 @@ try {
   // The Worktree feature is mounted as one ordinary DSH plugin. Exercise its
   // Host and browser faces against a disposable workspace, including a safe
   // mutation, without touching the source checkout.
-  await electronApp.evaluate((_, path) => { globalThis.__pilotHarnessE2EPath = path }, worktreeFixture)
-  await addWorkspace.click()
-  const fixtureProject = page.getByRole('treeitem').filter({ hasText: 'worktree-fixture' }).first()
-  await fixtureProject.waitFor()
+  const fixtureProject = await addWorkspacePath(worktreeFixture, 'worktree-fixture')
   await fixtureProject.click()
   // Header utilities belong to a real conversation, so create a disposable
   // Session in the fixture rather than relying on the removed sidebar entry.
