@@ -587,8 +587,10 @@ try {
   if (worktreeBox === null || conversationClosedBox === null || conversationOpenBox === null) {
     throw new Error('right-sidebar geometry is unavailable')
   }
-  if (Math.abs(worktreeBox.x + worktreeBox.width - chatWidth) > 1 || worktreeBox.y !== 0 || Math.abs(worktreeBox.height - chatHeight) > 1) {
-    throw new Error(`Files must render as a flush, full-height right sidebar: ${JSON.stringify({ worktreeBox, chatWidth, chatHeight })}`)
+  if (Math.abs(worktreeBox.x + worktreeBox.width - chatWidth) > 1
+    || Math.abs(worktreeBox.y - conversationOpenBox.y) > 1
+    || Math.abs(worktreeBox.height - conversationOpenBox.height) > 1) {
+    throw new Error(`Files must render as a flush, full-height right sidebar: ${JSON.stringify({ worktreeBox, conversationOpenBox, chatWidth })}`)
   }
   if (conversationOpenBox.width >= conversationClosedBox.width) {
     throw new Error('opening Files must narrow the conversation layout column')

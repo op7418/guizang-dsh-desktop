@@ -1,5 +1,6 @@
 appId: com.codepilot.pilotharness
 productName: Pilot Harness
+executableName: pilot-harness
 # DSH materializes profile plugin links back to package directories. Those
 # links must target real filesystem paths; an asar archive is not traversable
 # through an operating-system symlink.
