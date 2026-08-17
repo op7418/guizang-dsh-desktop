@@ -112,7 +112,7 @@ jobs:
         shell: bash
         run: |
           export DSH_HOME="$RUNNER_TEMP/pilot-plugin-profile"
-          pnpm dsh plugin --profile web add release/plugins/*.tgz
+          pnpm dsh plugin --profile web add "$GITHUB_WORKSPACE"/release/plugins/*.tgz
           pnpm dsh --profile web --dump-config > "$RUNNER_TEMP/pilot-plugin-config.yml"
           grep -q 'id: codepilot-theme' "$RUNNER_TEMP/pilot-plugin-config.yml"
           grep -q 'id: pilot-worktree' "$RUNNER_TEMP/pilot-plugin-config.yml"
