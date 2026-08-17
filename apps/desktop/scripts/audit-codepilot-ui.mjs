@@ -233,7 +233,7 @@ if (runtimeArgument !== undefined) {
   const expectedSettingsViewport = runtime.expected?.settingsViewport
   const runtimeChecks = [
     check('runtime', 'chat-viewport', '聊天审计使用请求的同尺寸视口', chat?.viewport?.width === expectedChatViewport?.width && chat?.viewport?.height === expectedChatViewport?.height, JSON.stringify({ actual: chat?.viewport, expected: expectedChatViewport })),
-    check('runtime', 'mac-body-inset', 'macOS 实际内容无伪标题栏上内边距', chat?.body?.paddingTop === '0px', String(chat?.body?.paddingTop)),
+    check('runtime', 'platform-body-inset', '客户端内容区遵循平台原生标题栏 inset', chat?.body?.paddingTop === runtime.expected?.chatBodyPaddingTop, JSON.stringify({ actual: chat?.body?.paddingTop, expected: runtime.expected?.chatBodyPaddingTop })),
     check('runtime', 'window-drag-strip', '窗口顶部与可见侧栏标题行均可拖动', chat?.body?.dragStrip === 'drag' && chat?.elements?.titlebar?.appRegion === 'drag', JSON.stringify({ body: chat?.body?.dragStrip, titlebar: chat?.elements?.titlebar?.appRegion })),
     check('runtime', 'sidebar-width', '侧栏实际渲染宽度为 240px', near(chat?.elements?.sidebar?.box?.width, 240), `${String(chat?.elements?.sidebar?.box?.width)}px`),
     check('runtime', 'composer-geometry', '输入区不超过 768px 上限并保持 14px 圆角', Number(chat?.elements?.composer?.box?.width) > 0 && Number(chat?.elements?.composer?.box?.width) <= 768.5 && chat?.elements?.composer?.borderRadius === '14px', JSON.stringify(chat?.elements?.composer)),

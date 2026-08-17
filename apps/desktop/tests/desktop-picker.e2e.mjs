@@ -22,6 +22,7 @@ const runtimeAudit = {
   expected: {
     chatViewport: { width: chatWidth, height: chatHeight },
     settingsViewport: { width: chatWidth, height: settingsHeight },
+    chatBodyPaddingTop: process.platform === 'win32' ? '44px' : '0px',
   },
   states: {},
 }
