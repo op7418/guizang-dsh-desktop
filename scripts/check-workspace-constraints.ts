@@ -47,7 +47,7 @@ const repositoryUrl = 'git+https://github.com/deepseek-harness/deepseek-harness.
  * their trusted publishing against the repository that runs the workflow.
  */
 const publishedRepositoryUrl = 'git+https://github.com/deepseek-ai/deepseek-harness.git'
-const pilotHarnessRepositoryUrl = 'git+https://github.com/op7418/guizang-dsh-desktop.git'
+const pilotHarnessRepositoryUrl = 'git+https://github.com/op7418/pilot-harness.git'
 const pilotHarnessReleaseMembers = new Set([
   '@deepseek-ai/dsh-desktop',
   '@deepseek-ai/dsh-client-ui-codepilot-theme',

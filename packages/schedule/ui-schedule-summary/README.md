@@ -9,7 +9,7 @@ The browser half registers one ordered entry in `sidebar.workspaces.session.deta
 The Pilot Harness desktop profile composes the upstream `@deepseek-ai/dsh-time-context` and `@deepseek-ai/dsh-schedule` rows plus this presentation row. Install the same prebuilt bundle in a local DeepSeek Harness Web profile with:
 
 ```sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-ui-schedule-summary-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-ui-schedule-summary-0.1.0-rc.5.tgz
 ```
 
 Restart the Web profile, then confirm `pilot-schedule-summary` with `dsh --profile web --dump-config`. Remove it with `dsh plugin --profile web remove @deepseek-ai/dsh-ui-schedule-summary`. The browser must connect through loopback and expose `sidebar.workspaces.session.detail`; Pilot Harness v0.1.0 includes that contract, while older upstream releases cannot render the optional summary row.

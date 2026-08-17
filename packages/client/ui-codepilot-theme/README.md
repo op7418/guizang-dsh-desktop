@@ -13,7 +13,7 @@ The plugin also owns the Pilot Harness product mark used by the empty conversati
 Install the prebuilt bundle into a local DeepSeek Harness Web profile:
 
 ```sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-client-ui-codepilot-theme-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-client-ui-codepilot-theme-0.1.0-rc.5.tgz
 ```
 
 Restart the Web profile, then confirm `codepilot-theme` with `dsh --profile web --dump-config`. Remove the package with `dsh plugin --profile web remove @deepseek-ai/dsh-client-ui-codepilot-theme` to restore the stock presentation.

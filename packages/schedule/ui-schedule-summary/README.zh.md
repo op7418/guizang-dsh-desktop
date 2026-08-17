@@ -9,7 +9,7 @@
 Pilot Harness 桌面 profile 会组合上游 `@deepseek-ai/dsh-time-context`、`@deepseek-ai/dsh-schedule` 与本呈现条目。使用下面的命令把同一个预构建 bundle 安装到本地 DeepSeek Harness Web profile：
 
 ```sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-ui-schedule-summary-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-ui-schedule-summary-0.1.0-rc.5.tgz
 ```
 
 重启 Web profile，再用 `dsh --profile web --dump-config` 确认 `pilot-schedule-summary`。执行 `dsh plugin --profile web remove @deepseek-ai/dsh-ui-schedule-summary` 即可移除。浏览器必须通过 loopback 连接，并公开 `sidebar.workspaces.session.detail`；Pilot Harness v0.1.0 已包含该契约，较旧的上游版本无法呈现这个可选摘要行。

@@ -20,7 +20,7 @@ Host 下载端点会在 `readRaw` 前 flush 活动的根 Session，因此斜杠�
 ## 安装
 
 ```sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-session-log-export-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-session-log-export-0.1.0-rc.5.tgz
 ```
 
 重启 Web profile，再用 `dsh --profile web --dump-config` 确认 `session-log-download`。执行 `dsh plugin --profile web remove @deepseek-ai/dsh-session-log-export` 即可移除。Web bundle 将本包与 `dsh-host-apiproxy`、`dsh-commands`、`dsh-client-ui-commands` 和 `dsh-client-ui-trajectory` 一起挂载。本包把单 Session 导出按钮和弹窗贡献到 `conversation.trajectory.toolbar`，让会话页头只负责导航和会话标识。

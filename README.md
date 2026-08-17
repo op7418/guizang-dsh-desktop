@@ -38,15 +38,15 @@ Pilot Harness does not replace the DeepSeek Harness agent loop, Session log, too
 
 ## Quick Start
 
-<p align="center"><a href="https://github.com/op7418/guizang-dsh-desktop/releases/latest"><strong>Download Pilot Harness</strong></a></p>
+<p align="center"><a href="https://github.com/op7418/pilot-harness/releases/latest"><strong>Download Pilot Harness</strong></a></p>
 
-Download the installer for your system from [GitHub Releases](https://github.com/op7418/guizang-dsh-desktop/releases/latest):
+Download the installer for your system from [GitHub Releases](https://github.com/op7418/pilot-harness/releases/latest):
 
 | Platform | Download |
 |---|---|
-| macOS (Apple Silicon) | [DMG installer](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-macOS-arm64.dmg) · [ZIP app](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-macOS-arm64.zip) |
-| Windows (x64) | [EXE installer](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Windows-x64.exe) |
-| Linux (x64) | [AppImage](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Linux-x86_64.AppImage) · [DEB](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Linux-amd64.deb) · [RPM](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Linux-x86_64.rpm) |
+| macOS (Apple Silicon) | [DMG installer](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.dmg) · [ZIP app](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.zip) |
+| Windows (x64) | [EXE installer](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Windows-x64.exe) |
+| Linux (x64) | [AppImage](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-x86_64.AppImage) · [DEB](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-amd64.deb) · [RPM](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-x86_64.rpm) |
 
 After installation, open Pilot Harness, select a Workspace, then go to **Settings → Providers** to connect a provider and choose one of its available models. No separate DeepSeek Harness installation is required for the desktop app.
 
@@ -72,7 +72,7 @@ The desktop client already includes every plugin below. If you use a local DeepS
 ### CodePilot theme
 
 ~~~sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-client-ui-codepilot-theme-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-client-ui-codepilot-theme-0.1.0-rc.5.tgz
 ~~~
 
 Applies the Pilot Harness visual system and product mark. Removing the plugin restores the stock Harness presentation. See [theme details](packages/client/ui-codepilot-theme/README.md).
@@ -80,7 +80,7 @@ Applies the Pilot Harness visual system and product mark. Removing the plugin re
 ### Files sidebar
 
 ~~~sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-ui-worktree-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-ui-worktree-0.1.0-rc.5.tgz
 ~~~
 
 Adds the Workspace-confined right file sidebar, file count, branch summary, row actions, and <code>@path</code> insertion. See [Files plugin details](packages/workspace/ui-worktree/README.md).
@@ -88,7 +88,7 @@ Adds the Workspace-confined right file sidebar, file count, branch summary, row 
 ### Reminder summary
 
 ~~~sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-ui-schedule-summary-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-ui-schedule-summary-0.1.0-rc.5.tgz
 ~~~
 
 Adds active-reminder metadata to Session hover details while the upstream Schedule plugin remains the reminder authority. See [reminder plugin details](packages/schedule/ui-schedule-summary/README.md).
@@ -96,7 +96,7 @@ Adds active-reminder metadata to Session hover details while the upstream Schedu
 ### Session-log export
 
 ~~~sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-session-log-export-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-session-log-export-0.1.0-rc.5.tgz
 ~~~
 
 Adds per-Session ZIP export to the **Trajectory** toolbar and the <code>/export</code> command. See [export plugin details](packages/session-query/session-log-export/README.md).
@@ -114,8 +114,8 @@ dsh plugin --profile web remove @deepseek-ai/dsh-ui-worktree
 ## Development
 
 ~~~sh
-git clone https://github.com/op7418/guizang-dsh-desktop.git
-cd guizang-dsh-desktop
+git clone https://github.com/op7418/pilot-harness.git
+cd pilot-harness
 pnpm install
 pnpm run desktop:dev
 ~~~

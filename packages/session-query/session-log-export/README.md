@@ -20,7 +20,7 @@ The modal reports preparation, download start, or failure. Closing it does not c
 ## Installation
 
 ```sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-session-log-export-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-session-log-export-0.1.0-rc.5.tgz
 ```
 
 Restart the Web profile, then confirm `session-log-download` with `dsh --profile web --dump-config`. Remove it with `dsh plugin --profile web remove @deepseek-ai/dsh-session-log-export`. The Web bundle mounts the package beside `dsh-host-apiproxy`, `dsh-commands`, `dsh-client-ui-commands`, and `dsh-client-ui-trajectory`. The package contributes its per-Session export button and modal to `conversation.trajectory.toolbar`; the conversation header stays focused on navigation and identity.

@@ -13,7 +13,7 @@
 把预构建 bundle 安装到本地 DeepSeek Harness Web profile：
 
 ```sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-client-ui-codepilot-theme-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-client-ui-codepilot-theme-0.1.0-rc.5.tgz
 ```
 
 重启 Web profile，再用 `dsh --profile web --dump-config` 确认 `codepilot-theme`。执行 `dsh plugin --profile web remove @deepseek-ai/dsh-client-ui-codepilot-theme` 即可移除本包并恢复原始界面。

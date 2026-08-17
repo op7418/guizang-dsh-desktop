@@ -7,7 +7,7 @@ Worktree 是一个同时包含 Host 与浏览器两面的 DeepSeek Harness 插�
 插件不依赖 Electron。使用一条命令把预构建 bundle 安装到本地 DeepSeek Harness Web profile：
 
 ```sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-ui-worktree-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-ui-worktree-0.1.0-rc.5.tgz
 ```
 
 重启 Web profile，再用 `dsh --profile web --dump-config` 确认 `pilot-worktree`。执行 `dsh plugin --profile web remove @deepseek-ai/dsh-ui-worktree` 即可移除。

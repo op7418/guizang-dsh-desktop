@@ -7,12 +7,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/op7418/guizang-dsh-desktop.git",
+    "url": "git+https://github.com/op7418/pilot-harness.git",
     "directory": "apps/desktop"
   },
-  "homepage": "https://github.com/op7418/guizang-dsh-desktop#readme",
+  "homepage": "https://github.com/op7418/pilot-harness#readme",
   "bugs": {
-    "url": "https://github.com/op7418/guizang-dsh-desktop/issues"
+    "url": "https://github.com/op7418/pilot-harness/issues"
   },
   "type": "module",
   "main": "dist/main.cjs",

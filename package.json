@@ -3,13 +3,13 @@
   "version": "0.1.0-rc.5",
   "license": "MIT",
   "private": true,
-  "homepage": "https://github.com/op7418/guizang-dsh-desktop#readme",
+  "homepage": "https://github.com/op7418/pilot-harness#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/op7418/guizang-dsh-desktop.git"
+    "url": "git+https://github.com/op7418/pilot-harness.git"
   },
   "bugs": {
-    "url": "https://github.com/op7418/guizang-dsh-desktop/issues"
+    "url": "https://github.com/op7418/pilot-harness/issues"
   },
   "type": "module",
   "packageManager": "pnpm@11.7.0",

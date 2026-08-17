@@ -5,7 +5,7 @@
   "publishConfig": { "access": "public" },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/op7418/guizang-dsh-desktop.git",
+    "url": "git+https://github.com/op7418/pilot-harness.git",
     "directory": "packages/session-query/session-log-export"
   },
   "type": "module",

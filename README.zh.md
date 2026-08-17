@@ -38,15 +38,15 @@ Pilot Harness 不替换 DeepSeek Harness 的 agent loop、Session 日志、工�
 
 ## 快速开始
 
-<p align="center"><a href="https://github.com/op7418/guizang-dsh-desktop/releases/latest"><strong>下载 Pilot Harness</strong></a></p>
+<p align="center"><a href="https://github.com/op7418/pilot-harness/releases/latest"><strong>下载 Pilot Harness</strong></a></p>
 
-请从 [GitHub Releases](https://github.com/op7418/guizang-dsh-desktop/releases/latest) 下载适合你系统的安装包：
+请从 [GitHub Releases](https://github.com/op7418/pilot-harness/releases/latest) 下载适合你系统的安装包：
 
 | 平台 | 直接下载 |
 |---|---|
-| macOS（Apple Silicon） | [DMG 安装包](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-macOS-arm64.dmg) · [ZIP 应用](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-macOS-arm64.zip) |
-| Windows（x64） | [EXE 安装程序](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Windows-x64.exe) |
-| Linux（x64） | [AppImage](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Linux-x86_64.AppImage) · [DEB](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Linux-amd64.deb) · [RPM](https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/Pilot-Harness-Linux-x86_64.rpm) |
+| macOS（Apple Silicon） | [DMG 安装包](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.dmg) · [ZIP 应用](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.zip) |
+| Windows（x64） | [EXE 安装程序](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Windows-x64.exe) |
+| Linux（x64） | [AppImage](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-x86_64.AppImage) · [DEB](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-amd64.deb) · [RPM](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-x86_64.rpm) |
 
 安装后打开 Pilot Harness，选择工作区，再前往**设置 → 服务商**连接服务商，并选择它提供的模型。桌面客户端无需另外安装 DeepSeek Harness。
 
@@ -72,7 +72,7 @@ Pilot Harness 不替换 DeepSeek Harness 的 agent loop、Session 日志、工�
 ### CodePilot 主题
 
 ~~~sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-client-ui-codepilot-theme-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-client-ui-codepilot-theme-0.1.0-rc.5.tgz
 ~~~
 
 应用 Pilot Harness 视觉系统与产品图标。移除插件后会恢复 Harness 原始界面。详见[主题说明](packages/client/ui-codepilot-theme/README.md)。
@@ -80,7 +80,7 @@ dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/relea
 ### 文件侧栏
 
 ~~~sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-ui-worktree-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-ui-worktree-0.1.0-rc.5.tgz
 ~~~
 
 增加限制在工作区内的右侧文件栏、文件数、分支摘要、条目操作与 <code>@路径</code> 插入。详见[文件插件说明](packages/workspace/ui-worktree/README.md)。
@@ -88,7 +88,7 @@ dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/relea
 ### 提醒摘要
 
 ~~~sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-ui-schedule-summary-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-ui-schedule-summary-0.1.0-rc.5.tgz
 ~~~
 
 在 Session 悬浮详情中增加活动提醒元数据，上游 Schedule 插件仍然是提醒状态权威。详见[提醒插件说明](packages/schedule/ui-schedule-summary/README.md)。
@@ -96,7 +96,7 @@ dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/relea
 ### Session 日志导出
 
 ~~~sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-session-log-export-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-session-log-export-0.1.0-rc.5.tgz
 ~~~
 
 在**轨迹**工具栏和 <code>/export</code> 命令中增加单 Session ZIP 导出。详见[导出插件说明](packages/session-query/session-log-export/README.md)。
@@ -114,8 +114,8 @@ dsh plugin --profile web remove @deepseek-ai/dsh-ui-worktree
 ## 开发
 
 ~~~sh
-git clone https://github.com/op7418/guizang-dsh-desktop.git
-cd guizang-dsh-desktop
+git clone https://github.com/op7418/pilot-harness.git
+cd pilot-harness
 pnpm install
 pnpm run desktop:dev
 ~~~

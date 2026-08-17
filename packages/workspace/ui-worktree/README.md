@@ -7,7 +7,7 @@ Worktree is a dual-face DeepSeek Harness plugin. Its browser half contributes on
 The plugin contains no Electron dependency. Install its prebuilt bundle into a local DeepSeek Harness Web profile with one command:
 
 ```sh
-dsh plugin --profile web add https://github.com/op7418/guizang-dsh-desktop/releases/latest/download/deepseek-ai-dsh-ui-worktree-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-ui-worktree-0.1.0-rc.5.tgz
 ```
 
 Restart the Web profile, then confirm `pilot-worktree` with `dsh --profile web --dump-config`. Remove it with `dsh plugin --profile web remove @deepseek-ai/dsh-ui-worktree`.
