@@ -699,7 +699,10 @@ try {
   await contextTrigger.click()
   const contextCard = page.locator('[data-beautifului="context-card"]')
   await contextCard.waitFor()
-  if (await contextCard.locator('[data-beautifului="context-stats"]').count() === 0) {
+  const contextStats = contextCard.locator('[data-beautifului="context-stats"]')
+  try {
+    await contextStats.waitFor({ timeout: 15_000 })
+  } catch {
     throw new Error('conversation statistics are not integrated into the Context card')
   }
   await capture(page, '10-chat-context.png')
