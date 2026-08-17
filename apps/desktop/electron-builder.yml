@@ -33,6 +33,8 @@ nsis:
   deleteAppDataOnUninstall: false
 linux:
   category: Development
+  packageName: pilot-harness
+  syncDesktopName: true
   icon: assets/icons
   artifactName: "${productName}-${version}-${arch}.${ext}"
   desktop:
