@@ -286,6 +286,12 @@ html[data-codepilot-theme] [data-pilot-sidebar='header'] {
   padding: 0 12px;
   -webkit-app-region: drag;
 }
+/* The wide header uses an inner inset for its wordmark and trailing action,
+ * but the 56px rail already supplies the canonical 10px centering gutter.
+ * Do not add the header's 12px a second time. */
+html[data-codepilot-theme] [data-sidebar-collapsed] [data-pilot-sidebar='header'] {
+  padding-inline: 0;
+}
 /* Keep the sidebar affordance outside the native traffic-light hit area.
  * When the rail is collapsed its 56px width cannot hold a horizontal inset,
  * so the control moves below the titlebar instead. */

@@ -194,17 +194,27 @@ try {
   }))
   if (bridge.pickDirectory !== 'function') throw new Error('desktop directory bridge is unavailable')
 
-  await electronApp.evaluate(({ dialog }, path) => {
+  // Replace the application IPC boundary rather than monkey-patching
+  // Electron's native dialog module. The latter is not writable consistently
+  // on every Linux runner and can leave an unseen system chooser blocking the
+  // test even though the product bridge itself is healthy.
+  await electronApp.evaluate(({ ipcMain }, path) => {
     globalThis.__pilotHarnessE2EPath = path
-    dialog.showOpenDialog = async () => ({
-      canceled: false,
-      filePaths: [globalThis.__pilotHarnessE2EPath],
-    })
+    ipcMain.removeHandler('pilot-harness:pick-directory')
+    ipcMain.handle('pilot-harness:pick-directory', () => globalThis.__pilotHarnessE2EPath)
   }, repoRoot)
 
   const addWorkspace = page.getByRole('button', { name: /add workspace/i }).last()
   await addWorkspace.click()
-  await page.getByRole('treeitem').filter({ hasText: repoName }).waitFor()
+  try {
+    await page.getByRole('treeitem').filter({ hasText: repoName }).waitFor()
+  } catch (error) {
+    const workspaceState = await page.evaluate(() => ({
+      body: document.body.innerText,
+      rows: [...document.querySelectorAll('[role="treeitem"]')].map(node => node.textContent),
+    })).catch(() => undefined)
+    throw new Error(`selected workspace did not enter the sidebar: ${JSON.stringify({ repoRoot, repoName, workspaceState, pageErrors, pageWarnings })}\n${String(error)}`)
+  }
 
   // First-run onboarding starts only after the project has been accepted. It
   // is intentionally blocking from this point; complete the notice and take
@@ -539,6 +549,14 @@ try {
 
   const filesToggle = page.getByRole('button', { name: 'Files', exact: true })
   await filesToggle.waitFor({ timeout: 15_000 })
+  // At the minimum desktop viewport the layout solver protects the 640px
+  // conversation floor by conceding the right dock before the left sidebar.
+  // Collapse the left sidebar explicitly so the 320px Files dock can be
+  // exercised without weakening that production layout contract.
+  await sidebarToggleButton.click()
+  await page.locator('[data-sidebar-collapsed]').waitFor()
+  await page.locator("[data-pilot-workspaces='rail']").waitFor()
+  await inspectStableState(page, { sidebar: "[data-pilot-sidebar='root']" })
   const conversationColumn = page.locator("[class*='_centerCol']").first()
   const conversationClosedBox = await conversationColumn.boundingBox()
   await filesToggle.click()
@@ -606,6 +624,10 @@ try {
   }
   await capture(page, '09-worktree-plugin.png')
   await closeFiles.click()
+  await sidebarToggleButton.click()
+  await page.locator('[data-sidebar-collapsed]').waitFor({ state: 'detached' })
+  await page.locator("[data-pilot-workspaces='wide']").waitFor()
+  await inspectStableState(page, { sidebar: "[data-pilot-sidebar='root']" })
 
   // Create one local Session so the merged title/tab header, integrated
   // composer context, and Trajectory-owned export utility all render.

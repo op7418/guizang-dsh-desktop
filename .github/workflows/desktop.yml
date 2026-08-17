@@ -37,6 +37,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       DSH_TELEMETRY_DISABLED: '1'
+      # GitHub's macOS runner exposes a 1024x677 Electron content area. Keep
+      # one identical viewport on all three platforms so geometry assertions
+      # compare the application rather than each host's desktop work area.
+      PILOT_HARNESS_E2E_WIDTH: '1024'
+      PILOT_HARNESS_E2E_HEIGHT: '677'
+      PILOT_HARNESS_E2E_SETTINGS_HEIGHT: '677'
     steps:
       - uses: actions/checkout@v6
         with:
