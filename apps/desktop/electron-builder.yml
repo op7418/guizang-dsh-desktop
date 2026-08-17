@@ -1,0 +1,46 @@
+appId: com.codepilot.pilotharness
+productName: Pilot Harness
+# DSH materializes profile plugin links back to package directories. Those
+# links must target real filesystem paths; an asar archive is not traversable
+# through an operating-system symlink.
+asar: false
+npmRebuild: false
+directories:
+  output: release
+files:
+  - dist/**/*
+  - package.json
+mac:
+  category: public.app-category.developer-tools
+  identity: null
+  icon: assets/icon.icns
+  artifactName: "${productName}-${version}-${arch}.${ext}"
+  target:
+    - dmg
+    - zip
+win:
+  icon: assets/icon.ico
+  artifactName: "${productName}.Setup.${version}.${ext}"
+  target:
+    - nsis
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  deleteAppDataOnUninstall: false
+linux:
+  category: Development
+  icon: assets/icons
+  artifactName: "${productName}-${version}-${arch}.${ext}"
+  desktop:
+    entry:
+      Name: Pilot Harness
+      Comment: Desktop client for DeepSeek Harness
+      Categories: Development;IDE;
+      StartupWMClass: pilot-harness
+  target:
+    - AppImage
+    - deb
+    - rpm

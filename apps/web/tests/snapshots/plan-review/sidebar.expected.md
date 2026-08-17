@@ -1,0 +1,3 @@
+- 'treeitem "Plan awaiting review Plan a small change: add now Session actions for Plan a small change: add" [selected]':
+  - text: "Plan awaiting review Plan a small change: add now"
+  - 'button "Session actions for Plan a small change: add"'

@@ -1,0 +1,55 @@
+# Pilot Harness desktop model profile.
+#
+# Keep DeepSeek Harness's adapter contract and settings hot-reload intact, but
+# replace the single-vendor route with the configurable pi-ai provider plugin.
+# The route starts dormant until the user connects a provider on the Providers
+# page; image-capable models then flow through llm-pi-ai + attachment-local.
+
+- id: llm-deepseek
+  disabled: true
+
+# The desktop profile does not pretend that a vendor route exists before the
+# user connects one. `session.models` replaces this sentinel with the first
+# actually advertised model for a blank session and persists that selection.
+- id: agent-default-model
+  config:
+    provider: pilot-harness
+    model: setup-required
+
+# Desktop development restarts the local child explicitly. The generic HMR
+# plugin depends on Node internal flags that Electron-as-Node does not expose
+# consistently across Windows and Linux.
+- id: hmr
+  disabled: true
+
+# Keep the configurable multi-provider adapter mounted, but leave it dormant.
+# Provider routes and models enter the picker only after the user connects a
+# real service on the Providers page; the desktop profile must not manufacture
+# an unusable Anthropic route merely to fill the empty state.
+- id: llm-pi-ai
+
+# Additive dual-face plugin: Host-confined file operations plus the Client
+# toggle/panel. It stays outside Harness core so upstream Web updates can be
+# adopted by updating dependencies while keeping this row.
+- insert:
+    - id: codepilot-theme
+      # Client-owned theme: visible in plugin inventory and fully reversible
+      # when this profile row is disabled or removed.
+      name: '@deepseek-ai/dsh-client-ui-codepilot-theme'
+    - id: pilot-worktree
+      # Shipped as an ordinary in-box plugin dependency so both its Host and
+      # Client faces are discovered by the same package name. A browser-only
+      # Harness uses this identical row after `dsh plugin install`.
+      name: '@deepseek-ai/dsh-ui-worktree'
+    - id: time-context
+      # Schedule uses the ordinary Harness time context; no desktop-only
+      # reminder engine is introduced by this profile.
+      name: '@deepseek-ai/dsh-time-context'
+    - id: schedule
+      # Durable reminder logic remains the upstream Harness plugin. The
+      # sidebar contribution below is intentionally read-only.
+      name: '@deepseek-ai/dsh-schedule'
+    - id: pilot-schedule-summary
+      # Optional sidebar metadata: folds the Schedule plugin's persisted event
+      # stream and contributes one owner-styled row to a Session hover card.
+      name: '@deepseek-ai/dsh-ui-schedule-summary'

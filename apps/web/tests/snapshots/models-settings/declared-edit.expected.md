@@ -1,0 +1,55 @@
+- dialog "设置":
+  - navigation:
+    - text: 设置
+    - button "返回"
+    - button "通用设置"
+    - button "服务商"
+    - button "插件"
+    - button "模型"
+    - button "Agent 预设"
+    - button "关于"
+  - heading "服务商" [level=2]
+  - paragraph: 连接模型服务、管理凭据，并自定义服务地址。
+  - list:
+    - listitem:
+      - text: minimax-cn
+      - img "API 密钥已配置"
+      - button "编辑 minimax-cn": 编辑
+      - button "删除 minimax-cn": 删除
+    - listitem:
+      - text: Acme Gateway 自定义
+      - button "编辑 Acme Gateway (acme-gateway)": 编辑
+      - button "删除 Acme Gateway (acme-gateway)": 删除
+      - text: Acme Gateway acme-gateway API 密钥
+      - textbox "API 密钥":
+        - /placeholder: 输入 API 密钥，或留空使用环境认证
+      - group:
+        - text: 自定义设置 显示名称
+        - textbox "显示名称":
+          - /placeholder: acme-gateway
+          - text: Acme Gateway
+        - text: API 地址
+        - textbox "API 地址":
+          - /placeholder: https://gateway.acme.example/v1
+          - text: https://gateway.acme.example/v1
+        - text: API 协议
+        - combobox "API 协议":
+          - option "openai-completions" [selected]
+          - option "openai-responses"
+          - option "anthropic-messages"
+        - region "模型目录":
+          - text: 模型目录 已自定义模型目录
+          - button "恢复默认模型"
+          - button "获取可用模型"
+          - textbox "模型 ID 1":
+            - /placeholder: 模型 ID
+            - text: acme-large
+          - textbox "显示名称 1":
+            - /placeholder: 显示名称
+          - button "模型能力 1"
+          - button "删除模型 1"
+          - button "添加模型"
+      - button "取消"
+      - button "保存"
+  - button "添加服务商"
+  - button "添加自定义服务商"

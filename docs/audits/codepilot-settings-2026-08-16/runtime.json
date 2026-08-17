@@ -1,0 +1,488 @@
+{
+  "generatedAt": "2026-08-16T08:43:42.826Z",
+  "states": {
+    "chat": {
+      "viewport": {
+        "width": 1152,
+        "height": 845,
+        "devicePixelRatio": 2
+      },
+      "body": {
+        "paddingTop": "0px",
+        "background": "rgba(0, 0, 0, 0)",
+        "fontFamily": "-apple-system, \"system-ui\", \"SF Pro Text\", \"Helvetica Neue\", \"PingFang SC\", sans-serif"
+      },
+      "tokens": {
+        "--pilot-radius-base": "1rem",
+        "--pilot-composer-radius": "24px",
+        "--pilot-nav-radius": "12px",
+        "--pilot-input-radius": "28px",
+        "--pilot-menu-radius": "14px",
+        "--pilot-sidebar-width": "240px",
+        "--pilot-background": "oklch(1 0 0)",
+        "--pilot-foreground": "oklch(0.147 0.004 49.25)",
+        "--pilot-border": "oklch(0.923 0.003 48.717)",
+        "--pilot-shadow-diffuse": "0 12px 40px -8px rgb(0 0 0 / 10%), 0 4px 12px -4px rgb(0 0 0 / 4%)"
+      },
+      "elements": {
+        "frame": null,
+        "sidebar": {
+          "selector": "[class*='_sidebarCol']",
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 240,
+            "height": 845
+          },
+          "background": "rgba(0, 0, 0, 0)",
+          "borderRadius": "0px",
+          "boxShadow": "none",
+          "padding": "0px"
+        },
+        "sidebarToggle": {
+          "selector": "[class*='_logoRow'] [class*='_toggle']",
+          "box": {
+            "x": 96,
+            "y": 11,
+            "width": 30,
+            "height": 30
+          },
+          "background": "rgba(0, 0, 0, 0)",
+          "borderRadius": "12px",
+          "boxShadow": "none",
+          "padding": "0px"
+        },
+        "composer": {
+          "selector": "[class*='_composerHero'] [class*='_card']",
+          "box": {
+            "x": 308,
+            "y": 679,
+            "width": 768,
+            "height": 118
+          },
+          "background": "oklch(1 0 0)",
+          "borderRadius": "24px",
+          "boxShadow": "rgba(0, 0, 0, 0.1) 0px 12px 40px -8px, rgba(0, 0, 0, 0.04) 0px 4px 12px -4px",
+          "padding": "10px 0px 0px"
+        },
+        "workspaceRow": {
+          "selector": "[class*='_composerHero'] [class*='_heroWorkspaceRow']",
+          "box": {
+            "x": 296,
+            "y": 807,
+            "width": 792,
+            "height": 30
+          },
+          "background": "rgba(0, 0, 0, 0)",
+          "borderRadius": "0px",
+          "boxShadow": "none",
+          "padding": "0px 12px"
+        },
+        "projectRow": {
+          "selector": "[class*='_projectRow']",
+          "box": {
+            "x": 12,
+            "y": 127,
+            "width": 216,
+            "height": 34
+          },
+          "background": "rgba(0, 0, 0, 0)",
+          "borderRadius": "12px",
+          "boxShadow": "none",
+          "padding": "0px 8px"
+        }
+      }
+    },
+    "collapsedSidebar": {
+      "viewport": {
+        "width": 1152,
+        "height": 845,
+        "devicePixelRatio": 2
+      },
+      "body": {
+        "paddingTop": "0px",
+        "background": "rgba(0, 0, 0, 0)",
+        "fontFamily": "-apple-system, \"system-ui\", \"SF Pro Text\", \"Helvetica Neue\", \"PingFang SC\", sans-serif"
+      },
+      "tokens": {
+        "--pilot-radius-base": "1rem",
+        "--pilot-composer-radius": "24px",
+        "--pilot-nav-radius": "12px",
+        "--pilot-input-radius": "28px",
+        "--pilot-menu-radius": "14px",
+        "--pilot-sidebar-width": "240px",
+        "--pilot-background": "oklch(1 0 0)",
+        "--pilot-foreground": "oklch(0.147 0.004 49.25)",
+        "--pilot-border": "oklch(0.923 0.003 48.717)",
+        "--pilot-shadow-diffuse": "0 12px 40px -8px rgb(0 0 0 / 10%), 0 4px 12px -4px rgb(0 0 0 / 4%)"
+      },
+      "elements": {
+        "sidebarToggle": {
+          "selector": "[class*='_logoRow'] [class*='_toggle']",
+          "box": {
+            "x": 17.963581085205078,
+            "y": 61,
+            "width": 30,
+            "height": 30
+          },
+          "background": "rgba(0, 0, 0, 0)",
+          "borderRadius": "12px",
+          "boxShadow": "none",
+          "padding": "0px"
+        }
+      }
+    },
+    "providers": {
+      "viewport": {
+        "width": 1152,
+        "height": 845,
+        "devicePixelRatio": 2
+      },
+      "body": {
+        "paddingTop": "0px",
+        "background": "rgba(0, 0, 0, 0)",
+        "fontFamily": "-apple-system, \"system-ui\", \"SF Pro Text\", \"Helvetica Neue\", \"PingFang SC\", sans-serif"
+      },
+      "tokens": {
+        "--pilot-radius-base": "1rem",
+        "--pilot-composer-radius": "24px",
+        "--pilot-nav-radius": "12px",
+        "--pilot-input-radius": "28px",
+        "--pilot-menu-radius": "14px",
+        "--pilot-sidebar-width": "240px",
+        "--pilot-background": "oklch(1 0 0)",
+        "--pilot-foreground": "oklch(0.147 0.004 49.25)",
+        "--pilot-border": "oklch(0.923 0.003 48.717)",
+        "--pilot-shadow-diffuse": "0 12px 40px -8px rgb(0 0 0 / 10%), 0 4px 12px -4px rgb(0 0 0 / 4%)"
+      },
+      "elements": {
+        "settingsPanel": {
+          "selector": "[class*='_panel']:has(> [class*='_nav'] [class*='_navTitle'])",
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 1152,
+            "height": 845
+          },
+          "background": "oklch(1 0 0)",
+          "borderRadius": "0px",
+          "boxShadow": "none",
+          "padding": "0px"
+        },
+        "settingsNav": {
+          "selector": "[class*='_panel'] > [class*='_nav']:has([class*='_navTitle'])",
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 240,
+            "height": 845
+          },
+          "background": "rgba(0, 0, 0, 0)",
+          "borderRadius": "0px",
+          "boxShadow": "none",
+          "padding": "48px 8px 0px"
+        },
+        "settingsOptions": {
+          "selector": "[class*='_options']",
+          "box": {
+            "x": 240,
+            "y": 40,
+            "width": 912,
+            "height": 805
+          },
+          "background": "rgba(0, 0, 0, 0)",
+          "borderRadius": "0px",
+          "boxShadow": "none",
+          "padding": "32px 32px 24px"
+        },
+        "providerAction": {
+          "selector": "[class*='_options'] [class*='_addButton']",
+          "box": {
+            "x": 272,
+            "y": 166,
+            "width": 355,
+            "height": 44
+          },
+          "background": "rgba(0, 0, 0, 0)",
+          "borderRadius": "12px",
+          "boxShadow": "none",
+          "padding": "0px 14px"
+        }
+      }
+    },
+    "providerPicker": {
+      "viewport": {
+        "width": 1152,
+        "height": 845,
+        "devicePixelRatio": 2
+      },
+      "body": {
+        "paddingTop": "0px",
+        "background": "rgba(0, 0, 0, 0)",
+        "fontFamily": "-apple-system, \"system-ui\", \"SF Pro Text\", \"Helvetica Neue\", \"PingFang SC\", sans-serif"
+      },
+      "tokens": {
+        "--pilot-radius-base": "1rem",
+        "--pilot-composer-radius": "24px",
+        "--pilot-nav-radius": "12px",
+        "--pilot-input-radius": "28px",
+        "--pilot-menu-radius": "14px",
+        "--pilot-sidebar-width": "240px",
+        "--pilot-background": "oklch(1 0 0)",
+        "--pilot-foreground": "oklch(0.147 0.004 49.25)",
+        "--pilot-border": "oklch(0.923 0.003 48.717)",
+        "--pilot-shadow-diffuse": "0 12px 40px -8px rgb(0 0 0 / 10%), 0 4px 12px -4px rgb(0 0 0 / 4%)"
+      },
+      "elements": {
+        "picker": {
+          "selector": "[class*='_providerPicker']",
+          "box": {
+            "x": 272,
+            "y": 166,
+            "width": 720,
+            "height": 1398
+          },
+          "background": "oklch(1 0 0)",
+          "borderRadius": "16px",
+          "boxShadow": "rgba(0, 0, 0, 0.04) 0px 4px 14px 0px",
+          "padding": "18px"
+        },
+        "search": {
+          "selector": "[class*='_providerSearch']",
+          "box": {
+            "x": 291,
+            "y": 243,
+            "width": 682,
+            "height": 36
+          },
+          "background": "oklch(0.985 0.001 106.423)",
+          "borderRadius": "18px",
+          "boxShadow": "color(srgb 0.142731 0.142766 0.142769 / 0.1) 0px 0px 0px 2px",
+          "padding": "0px 12px"
+        },
+        "providerChoice": {
+          "selector": "button[class*='_providerChoice']",
+          "box": {
+            "x": 291,
+            "y": 293,
+            "width": 337,
+            "height": 62
+          },
+          "background": "oklch(0.985 0.001 106.423)",
+          "borderRadius": "12px",
+          "boxShadow": "none",
+          "padding": "10px 12px"
+        },
+        "providerIcon": {
+          "selector": "[class*='_providerChoiceIcon']",
+          "box": {
+            "x": 304,
+            "y": 306,
+            "width": 36,
+            "height": 36
+          },
+          "background": "oklch(1 0 0)",
+          "borderRadius": "12px",
+          "boxShadow": "none",
+          "padding": "0px"
+        }
+      }
+    },
+    "models": {
+      "viewport": {
+        "width": 1152,
+        "height": 845,
+        "devicePixelRatio": 2
+      },
+      "body": {
+        "paddingTop": "0px",
+        "background": "rgba(0, 0, 0, 0)",
+        "fontFamily": "-apple-system, \"system-ui\", \"SF Pro Text\", \"Helvetica Neue\", \"PingFang SC\", sans-serif"
+      },
+      "tokens": {
+        "--pilot-radius-base": "1rem",
+        "--pilot-composer-radius": "24px",
+        "--pilot-nav-radius": "12px",
+        "--pilot-input-radius": "28px",
+        "--pilot-menu-radius": "14px",
+        "--pilot-sidebar-width": "240px",
+        "--pilot-background": "oklch(1 0 0)",
+        "--pilot-foreground": "oklch(0.147 0.004 49.25)",
+        "--pilot-border": "oklch(0.923 0.003 48.717)",
+        "--pilot-shadow-diffuse": "0 12px 40px -8px rgb(0 0 0 / 10%), 0 4px 12px -4px rgb(0 0 0 / 4%)"
+      },
+      "elements": {
+        "modelToolbar": {
+          "selector": "[class*='_options'] [class*='_toolbar']",
+          "box": {
+            "x": 272,
+            "y": 142,
+            "width": 820,
+            "height": 36
+          },
+          "background": "rgba(0, 0, 0, 0)",
+          "borderRadius": "0px",
+          "boxShadow": "none",
+          "padding": "0px"
+        },
+        "modelSearch": {
+          "selector": "[class*='_options'] [class*='_toolbar'] [class*='_search']",
+          "box": {
+            "x": 272,
+            "y": 142,
+            "width": 600.6328125,
+            "height": 36
+          },
+          "background": "oklch(1 0 0)",
+          "borderRadius": "28px",
+          "boxShadow": "none",
+          "padding": "0px 11px"
+        },
+        "modelGroup": {
+          "selector": "[class*='_options'] [class*='_group']",
+          "box": {
+            "x": 272,
+            "y": 196,
+            "width": 820,
+            "height": 5067
+          },
+          "background": "rgba(0, 0, 0, 0)",
+          "borderRadius": "16px",
+          "boxShadow": "none",
+          "padding": "0px"
+        },
+        "modelRow": {
+          "selector": "[class*='_options'] [class*='_modelRow']",
+          "box": {
+            "x": 273,
+            "y": 246,
+            "width": 818,
+            "height": 44
+          },
+          "background": "rgba(0, 0, 0, 0)",
+          "borderRadius": "0px",
+          "boxShadow": "none",
+          "padding": "6px 13px 6px 48px"
+        }
+      }
+    },
+    "about": {
+      "viewport": {
+        "width": 1152,
+        "height": 845,
+        "devicePixelRatio": 2
+      },
+      "body": {
+        "paddingTop": "0px",
+        "background": "rgba(0, 0, 0, 0)",
+        "fontFamily": "-apple-system, \"system-ui\", \"SF Pro Text\", \"Helvetica Neue\", \"PingFang SC\", sans-serif"
+      },
+      "tokens": {
+        "--pilot-radius-base": "1rem",
+        "--pilot-composer-radius": "24px",
+        "--pilot-nav-radius": "12px",
+        "--pilot-input-radius": "28px",
+        "--pilot-menu-radius": "14px",
+        "--pilot-sidebar-width": "240px",
+        "--pilot-background": "oklch(1 0 0)",
+        "--pilot-foreground": "oklch(0.147 0.004 49.25)",
+        "--pilot-border": "oklch(0.923 0.003 48.717)",
+        "--pilot-shadow-diffuse": "0 12px 40px -8px rgb(0 0 0 / 10%), 0 4px 12px -4px rgb(0 0 0 / 4%)"
+      },
+      "elements": {
+        "hero": {
+          "selector": "[class*='_heroCard']",
+          "box": {
+            "x": 272,
+            "y": 146,
+            "width": 820,
+            "height": 146
+          },
+          "background": "oklch(1 0 0)",
+          "borderRadius": "16px",
+          "boxShadow": "none",
+          "padding": "20px"
+        },
+        "brand": {
+          "selector": "[class*='_brandMark']",
+          "box": {
+            "x": 293,
+            "y": 167,
+            "width": 48,
+            "height": 48
+          },
+          "background": "oklch(0.985 0.001 106.423)",
+          "borderRadius": "16px",
+          "boxShadow": "none",
+          "padding": "0px"
+        },
+        "infoCard": {
+          "selector": "[class*='_infoCard']",
+          "box": {
+            "x": 272,
+            "y": 312,
+            "width": 820,
+            "height": 247
+          },
+          "background": "oklch(1 0 0)",
+          "borderRadius": "16px",
+          "boxShadow": "none",
+          "padding": "18px 20px"
+        }
+      }
+    },
+    "general": {
+      "viewport": {
+        "width": 1152,
+        "height": 845,
+        "devicePixelRatio": 2
+      },
+      "body": {
+        "paddingTop": "0px",
+        "background": "rgba(0, 0, 0, 0)",
+        "fontFamily": "-apple-system, \"system-ui\", \"SF Pro Text\", \"Helvetica Neue\", \"PingFang SC\", sans-serif"
+      },
+      "tokens": {
+        "--pilot-radius-base": "1rem",
+        "--pilot-composer-radius": "24px",
+        "--pilot-nav-radius": "12px",
+        "--pilot-input-radius": "28px",
+        "--pilot-menu-radius": "14px",
+        "--pilot-sidebar-width": "240px",
+        "--pilot-background": "oklch(1 0 0)",
+        "--pilot-foreground": "oklch(0.147 0.004 49.25)",
+        "--pilot-border": "oklch(0.923 0.003 48.717)",
+        "--pilot-shadow-diffuse": "0 12px 40px -8px rgb(0 0 0 / 10%), 0 4px 12px -4px rgb(0 0 0 / 4%)"
+      },
+      "elements": {
+        "configRow": {
+          "selector": "[class*='_row']:has([class*='_copy'])",
+          "box": {
+            "x": 272,
+            "y": 519,
+            "width": 848,
+            "height": 74
+          },
+          "background": "rgba(0, 0, 0, 0)",
+          "borderRadius": "0px",
+          "boxShadow": "none",
+          "padding": "16px 0px"
+        },
+        "configIcon": {
+          "selector": "[class*='_row'] [class*='_icon']",
+          "box": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0
+          },
+          "background": "rgba(0, 0, 0, 0)",
+          "borderRadius": "4px",
+          "boxShadow": "none",
+          "padding": "0px"
+        }
+      }
+    }
+  },
+  "pageErrors": []
+}

@@ -1,0 +1,154 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border: 0;
+  border-left: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 0;
+  color: var(--dsw-alias-label-primary);
+  background: var(--dsw-specific-sidebar-fill);
+  box-shadow: none;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 8px 8px 8px 12px;
+  gap: 8px;
+  background: transparent;
+}
+
+.heading { min-width: 0; flex: 1; }
+.title { font-size: 13px; line-height: 20px; font-weight: 600; }
+.subtitle { overflow: hidden; color: var(--dsw-alias-label-tertiary); font-size: 11px; line-height: 16px; text-overflow: ellipsis; white-space: nowrap; }
+
+.toolbar { display: flex; flex: none; gap: 2px; }
+.toolbar button,
+.rowAction {
+  display: inline-grid;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  color: var(--dsw-alias-label-secondary);
+  background: transparent;
+  cursor: pointer;
+}
+.toolbar button:hover:not(:disabled),
+.rowAction:hover { color: var(--dsw-alias-label-primary); background: var(--dsw-alias-interactive-bg-hover); }
+.toolbar button:disabled { color: var(--dsw-alias-label-dimmed); cursor: default; }
+
+.tree {
+  flex: 1;
+  min-height: 0;
+  padding: 8px;
+  overflow: auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding-left: calc(var(--worktree-depth) * 14px);
+  border-radius: 8px;
+  transition: background-color 140ms var(--ds-ease-in-out);
+}
+.row:hover { background: var(--dsw-alias-interactive-bg-hover); }
+.row.menuOpen { background: var(--dsw-alias-interactive-bg-hover); }
+
+.entry {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  height: 30px;
+  align-items: center;
+  padding: 0 4px;
+  gap: 6px;
+  border: 0;
+  color: var(--dsw-alias-label-primary);
+  background: transparent;
+  font: var(--dsw-font-xs-13);
+  text-align: left;
+  cursor: default;
+}
+.entry:has(.chevron:not(:empty)) { cursor: pointer; }
+.chevron { display: inline-grid; width: 14px; height: 14px; flex: none; place-items: center; color: var(--dsw-alias-label-tertiary); }
+.name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rowAction {
+  flex: none;
+  opacity: 0;
+  transition: color 140ms var(--ds-ease-in-out), background-color 140ms var(--ds-ease-in-out), opacity 140ms var(--ds-ease-in-out);
+}
+.row:hover .rowAction,
+.row.menuOpen .rowAction,
+.rowAction:focus-visible {
+  opacity: 1;
+}
+
+.createForm,
+.inlineForm {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 34px;
+  padding: 4px 6px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-layer-1);
+}
+.createForm { margin-bottom: 8px; }
+.inlineForm { margin-left: calc(var(--worktree-depth) * 14px); }
+.createForm input,
+.inlineForm input {
+  min-width: 0;
+  flex: 1;
+  height: 26px;
+  padding: 0 8px;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  outline: 0;
+  color: var(--dsw-alias-label-primary);
+  background: var(--dsw-alias-bg-base);
+  font: var(--dsw-font-xs-13);
+}
+.createForm input:focus,
+.inlineForm input:focus { border-color: var(--dsw-alias-state-business-primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--dsw-alias-state-business-primary) 14%, transparent); }
+.createForm button,
+.inlineForm button {
+  height: 26px;
+  padding: 0 7px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--dsw-alias-label-secondary);
+  background: transparent;
+  font: var(--dsw-font-xxs-12);
+  cursor: pointer;
+}
+.createForm button:hover,
+.inlineForm button:hover { color: var(--dsw-alias-label-primary); background: var(--dsw-alias-interactive-bg-hover); }
+
+.empty,
+.loading {
+  padding: 28px 20px;
+  color: var(--dsw-alias-label-tertiary);
+  font: var(--dsw-font-xs-13);
+  text-align: center;
+}
+.error {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 8px;
+  padding: 9px 10px;
+  gap: 2px;
+  border-radius: 8px;
+  color: var(--dsw-alias-state-error-primary);
+  background: color-mix(in srgb, var(--dsw-alias-state-error-primary) 8%, transparent);
+  font: var(--dsw-font-xxs-12);
+}
+.error span { overflow-wrap: anywhere; }

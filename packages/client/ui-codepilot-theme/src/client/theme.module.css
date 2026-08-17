@@ -1,0 +1,770 @@
+/* CodePilot/Luma presentation profile.
+ *
+ * DeepSeek Harness still owns every interaction and all application state.
+ * This plugin-owned sheet changes only the presentation layer's visual
+ * language and geometry, using the local CodePilot implementation as the
+ * reference instead of inventing a second brand system. */
+
+html[data-codepilot-theme] {
+  --pilot-titlebar-height: 44px;
+  /* Two radius tiers only: compact controls and containing surfaces. */
+  --pilot-radius-base: 14px;
+  --pilot-radius-sm: 8px;
+  --pilot-radius-md: 8px;
+  --pilot-radius-lg: 14px;
+  --pilot-radius-xl: 14px;
+  --pilot-radius-2xl: 14px;
+  --pilot-radius-3xl: 14px;
+  --pilot-composer-radius: 14px;
+  --pilot-nav-radius: 8px;
+  --pilot-card-radius: 14px;
+  --pilot-input-radius: 8px;
+  --pilot-menu-radius: 14px;
+  --pilot-menu-item-radius: 8px;
+  --pilot-sidebar-width: 240px;
+  --pilot-settings-content-width: 1040px;
+
+  --pilot-background: oklch(1 0 0);
+  --pilot-foreground: oklch(0.147 0.004 49.25);
+  --pilot-card: oklch(1 0 0);
+  --pilot-card-foreground: oklch(0.147 0.004 49.25);
+  --pilot-popover: oklch(1 0 0);
+  --pilot-popover-foreground: oklch(0.147 0.004 49.25);
+  --pilot-primary: oklch(0.262 0 0);
+  --pilot-primary-foreground: oklch(0.985 0.001 106.423);
+  --pilot-secondary: oklch(0.95 0.002 106.424);
+  --pilot-secondary-foreground: oklch(0.262 0 0);
+  --pilot-muted: oklch(0.95 0.002 106.424);
+  --pilot-muted-foreground: oklch(0.553 0.013 58.071);
+  --pilot-text-primary: var(--pilot-foreground);
+  --pilot-text-secondary: color-mix(in oklch, var(--pilot-foreground) 72%, transparent);
+  --pilot-text-muted: var(--pilot-muted-foreground);
+  --pilot-text-caption: color-mix(in oklch, var(--pilot-foreground) 46%, transparent);
+  --pilot-accent: oklch(0.95 0.002 106.424);
+  --pilot-accent-foreground: oklch(0.262 0 0);
+  --pilot-border: oklch(0.923 0.003 48.717);
+  --pilot-input: oklch(0.923 0.003 48.717);
+  --pilot-ring: oklch(0.262 0 0);
+  --pilot-sidebar: oklch(0.985 0.001 106.423);
+  --pilot-shadow-diffuse: 0 12px 40px -8px rgb(0 0 0 / 10%), 0 4px 12px -4px rgb(0 0 0 / 4%);
+  --pilot-platform-font-ui: Geist, Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --pilot-platform-surface-window: var(--pilot-background);
+  --pilot-platform-surface-sidebar: var(--pilot-sidebar);
+  --pilot-platform-surface-popover: var(--pilot-popover);
+  color-scheme: light;
+}
+
+html[data-codepilot-theme][data-pilot-platform='darwin'] {
+  --pilot-window-controls-inset: 84px;
+  --pilot-platform-font-ui: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue',
+    'PingFang SC', sans-serif;
+  --pilot-platform-surface-window: transparent;
+  --pilot-platform-surface-sidebar: color-mix(in oklch, var(--pilot-sidebar) 78%, transparent);
+  --pilot-platform-surface-popover: color-mix(in oklch, var(--pilot-popover) 92%, transparent);
+}
+
+html[data-codepilot-theme][data-pilot-platform='win32'] {
+  --pilot-window-controls-inset: 144px;
+}
+
+html[data-codepilot-theme] body {
+  box-sizing: border-box;
+  height: 100%;
+  padding-top: 0;
+  background: var(--pilot-platform-surface-window);
+  color: var(--pilot-foreground);
+  font-family: var(--pilot-platform-font-ui);
+  --dsw-font-family: var(--pilot-platform-font-ui);
+  --dsw-static-deepseek-50: #f7f7f7;
+  --dsw-static-deepseek-100: #f1f1f1;
+  --dsw-static-deepseek-200: #e8e8e8;
+  --dsw-static-deepseek-300: #d9d9d9;
+  --dsw-static-deepseek-400: #a3a3a3;
+  --dsw-static-deepseek-450: #737373;
+  --dsw-static-deepseek-500: #525252;
+  --dsw-static-deepseek-600: #404040;
+  --dsw-static-deepseek-800: #252525;
+  --dsw-static-deepseek-900: #171717;
+  --dsw-alias-bg-base: var(--pilot-background);
+  --dsw-alias-bg-layer-1: var(--pilot-card);
+  --dsw-alias-bg-layer-2: var(--pilot-card);
+  --dsw-alias-bg-layer-3: var(--pilot-secondary);
+  --dsw-alias-bg-mask-1: rgb(0 0 0 / 24%);
+  --dsw-alias-bg-mask-2: rgb(0 0 0 / 14%);
+  --dsw-alias-bg-mask-3: rgb(0 0 0 / 48%);
+  --dsw-alias-bg-mask-drop: rgb(255 255 255 / 82%);
+  --dsw-alias-bg-module-platform: var(--pilot-sidebar);
+  --dsw-alias-bg-multi-select: var(--pilot-muted);
+  --dsw-alias-bg-overlay: var(--pilot-popover);
+  --dsw-alias-bg-skeleton: rgb(37 37 37 / 5%);
+  --dsw-alias-border-inverted2: rgb(37 37 37 / 5%);
+  --dsw-alias-border-inverted: rgb(37 37 37 / 7%);
+  --dsw-alias-border-l1: color-mix(in oklch, var(--pilot-border) 68%, transparent);
+  --dsw-alias-border-l2-darkmode-thin: var(--pilot-border);
+  --dsw-alias-border-l2: var(--pilot-border);
+  --dsw-alias-border-l3: #d9d9d9;
+  --dsw-alias-border-l4: #bdbdbd;
+  --dsw-alias-brand-primary-invert: #fff;
+  --dsw-alias-brand-primary-new-colorprimary-new-color: var(--pilot-primary);
+  --dsw-alias-brand-primary: var(--pilot-primary);
+  --dsw-alias-brand-text: var(--pilot-foreground);
+  --dsw-alias-button-contrast-fill: #404040;
+  --dsw-alias-button-elevated-fill: var(--pilot-card);
+  --dsw-alias-button-floating-fill: var(--pilot-card);
+  --dsw-alias-button-floating-hover: var(--pilot-accent);
+  --dsw-alias-button-ghost-active-border: #a3a3a3;
+  --dsw-alias-button-ghost-active-fill: #e8e8e8;
+  --dsw-alias-button-ghost-active-hover: #d9d9d9;
+  --dsw-alias-button-info-fill: #252525;
+  --dsw-alias-button-info-hover: #404040;
+  --dsw-alias-button-primary-dimmed: #d9d9d9;
+  --dsw-alias-button-primary-fill: var(--pilot-primary);
+  --dsw-alias-button-primary-hover: #404040;
+  --dsw-alias-interactive-bg-active: var(--pilot-accent);
+  --dsw-alias-interactive-bg-hover-accent: color-mix(in oklch, var(--pilot-accent) 84%, var(--pilot-foreground));
+  --dsw-alias-interactive-bg-hover-danger: rgb(220 38 38 / 7%);
+  --dsw-alias-interactive-bg-hover-solid: var(--pilot-accent);
+  --dsw-alias-interactive-bg-hover: color-mix(in oklch, var(--pilot-foreground) 5%, transparent);
+  --dsw-alias-label-caption: var(--pilot-text-caption);
+  --dsw-alias-label-dimmed: #d9d9d9;
+  --dsw-alias-label-primary-bluish: var(--pilot-text-primary);
+  --dsw-alias-label-primary-dimmed: #737373;
+  --dsw-alias-label-primary-foreground: #fff;
+  --dsw-alias-label-primary-inverted: #fff;
+  --dsw-alias-label-primary: var(--pilot-text-primary);
+  --dsw-alias-label-secondary: var(--pilot-text-secondary);
+  --dsw-alias-label-tertiary: var(--pilot-text-muted);
+  --dsw-alias-markdown-citation: #f1f1f1;
+  --dsw-alias-markdown-code-block-banner: #f1f1f1;
+  --dsw-alias-markdown-code-block: #f7f7f7;
+  --dsw-alias-markdown-code-segment-selected: #fff;
+  --dsw-alias-markdown-code-segment-unselected: #ededed;
+  --dsw-alias-markdown-inline-code: #f1f1f1;
+  --dsw-alias-markdown-placeholder: #f7f7f7;
+  --dsw-alias-markdown-tag: #ededed;
+  --dsw-alias-scrollbar-bg-l1: #d9d9d9;
+  --dsw-alias-scrollbar-bg-l2: #c8c8c8;
+  --dsw-alias-scrollbar-hover-l1: #a3a3a3;
+  --dsw-alias-scrollbar-hover-l2: #a3a3a3;
+  --dsw-alias-state-business-primary: #252525;
+  --dsw-alias-state-business-tertiary: #ededed;
+  --dsw-alias-toast-bg: #252525;
+  --dsw-alias-tooltip-bg: #252525;
+  --dsw-specific-bubble-highlight: #e8e8e8;
+  --dsw-specific-bubble: #f1f1f1;
+  --dsw-specific-input-major: var(--pilot-card);
+  --dsw-specific-login-input: #f7f7f7;
+  --dsw-specific-menu: var(--pilot-popover);
+  --dsw-specific-selector: var(--pilot-secondary);
+  --dsw-specific-sidebar-fill: var(--pilot-platform-surface-sidebar);
+  --dsw-specific-sidebar-nav-item-active-accent: var(--pilot-accent);
+  --dsw-specific-sidebar-nav-item-active: var(--pilot-accent);
+  --dsw-specific-sidebar-nav-item-hover: var(--pilot-muted);
+  --dsw-specific-tip: #f7f7f7;
+  --dsw-shadow-lv1: 0 1px 2px rgb(0 0 0 / 4%);
+  --dsw-shadow-lv1-blur: 0 4px 14px rgb(0 0 0 / 4%);
+  --dsw-shadow-lv2: 0 2px 8px rgb(0 0 0 / 5%), 0 12px 32px rgb(0 0 0 / 6%);
+  --dsw-shadow-lv3: 0 6px 20px rgb(0 0 0 / 8%), 0 24px 64px rgb(0 0 0 / 12%);
+  --dsw-mask-blur: blur(7px);
+}
+
+html[data-codepilot-theme] body[data-ds-dark-theme] {
+  color-scheme: dark;
+  --pilot-background: oklch(0.147 0.004 49.25);
+  --pilot-foreground: oklch(0.985 0.001 106.423);
+  --pilot-card: oklch(0.216 0.006 56.043);
+  --pilot-card-foreground: oklch(0.985 0.001 106.423);
+  --pilot-popover: oklch(0.216 0.006 56.043);
+  --pilot-popover-foreground: oklch(0.985 0.001 106.423);
+  --pilot-primary: oklch(0.985 0.001 106.423);
+  --pilot-primary-foreground: oklch(0.216 0.006 56.043);
+  --pilot-secondary: oklch(0.268 0.007 34.298);
+  --pilot-secondary-foreground: oklch(0.985 0.001 106.423);
+  --pilot-muted: oklch(0.268 0.007 34.298);
+  --pilot-muted-foreground: oklch(0.709 0.01 56.259);
+  --pilot-accent: oklch(0.268 0.007 34.298);
+  --pilot-accent-foreground: oklch(0.985 0.001 106.423);
+  --pilot-border: oklch(1 0 0 / 10%);
+  --pilot-input: oklch(1 0 0 / 15%);
+  --pilot-ring: oklch(0.985 0.001 106.423);
+  --pilot-sidebar: oklch(0.216 0.006 56.043);
+  background: var(--pilot-platform-surface-window);
+  color: var(--pilot-foreground);
+  --dsw-alias-bg-base: var(--pilot-background);
+  --dsw-alias-bg-layer-1: var(--pilot-card);
+  --dsw-alias-bg-layer-2: var(--pilot-card);
+  --dsw-alias-bg-layer-3: var(--pilot-secondary);
+  --dsw-alias-bg-module-platform: var(--pilot-sidebar);
+  --dsw-alias-bg-overlay: var(--pilot-popover);
+  --dsw-alias-border-l1: rgb(255 255 255 / 6%);
+  --dsw-alias-border-l2-darkmode-thin: rgb(255 255 255 / 10%);
+  --dsw-alias-border-l2: rgb(255 255 255 / 10%);
+  --dsw-alias-border-l3: rgb(255 255 255 / 16%);
+  --dsw-alias-border-l4: rgb(255 255 255 / 24%);
+  --dsw-alias-brand-primary: var(--pilot-primary);
+  --dsw-alias-brand-text: var(--pilot-foreground);
+  --dsw-alias-button-elevated-fill: var(--pilot-card);
+  --dsw-alias-button-floating-fill: var(--pilot-card);
+  --dsw-alias-button-floating-hover: #303030;
+  --dsw-alias-button-primary-fill: var(--pilot-primary);
+  --dsw-alias-button-primary-hover: #dedede;
+  --dsw-alias-interactive-bg-active: #343434;
+  --dsw-alias-interactive-bg-hover-accent: #303030;
+  --dsw-alias-interactive-bg-hover-solid: #303030;
+  --dsw-alias-interactive-bg-hover: rgb(255 255 255 / 7%);
+  --dsw-alias-label-caption: var(--pilot-text-caption);
+  --dsw-alias-label-dimmed: #525252;
+  --dsw-alias-label-primary-bluish: var(--pilot-text-primary);
+  --dsw-alias-label-primary-dimmed: #d4d4d4;
+  --dsw-alias-label-primary-foreground: #252525;
+  --dsw-alias-label-primary-inverted: #252525;
+  --dsw-alias-label-primary: var(--pilot-text-primary);
+  --dsw-alias-label-secondary: var(--pilot-text-secondary);
+  --dsw-alias-label-tertiary: var(--pilot-text-muted);
+  --dsw-specific-bubble: #303030;
+  --dsw-specific-input-major: var(--pilot-card);
+  --dsw-specific-menu: var(--pilot-popover);
+  --dsw-specific-selector: var(--pilot-secondary);
+  --dsw-specific-sidebar-fill: var(--pilot-platform-surface-sidebar);
+  --dsw-specific-sidebar-nav-item-active: #343434;
+  --dsw-specific-sidebar-nav-item-hover: #2b2b2b;
+}
+
+html[data-codepilot-theme][data-pilot-platform='darwin'] body {
+  padding-top: 0;
+}
+
+html[data-codepilot-theme][data-pilot-platform='win32'] body {
+  padding-top: 44px;
+}
+
+html[data-codepilot-theme] #root { height: 100%; }
+html[data-codepilot-theme] ::selection { background: rgb(37 37 37 / 16%); }
+
+/* Native drag strip: Windows reserves the full caption band, while macOS
+ * only needs a slim always-available strip above the app chrome. Component
+ * headers remain draggable too, so the useful hit area is much larger than
+ * this fallback without covering interactive controls. */
+html[data-codepilot-theme][data-pilot-desktop] body::before {
+  content: '';
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 2147483000;
+  height: 8px;
+  -webkit-app-region: drag;
+}
+
+html[data-codepilot-theme][data-pilot-desktop][data-pilot-platform='win32'] body::before {
+  height: var(--pilot-titlebar-height);
+}
+
+html[data-codepilot-theme] button,
+html[data-codepilot-theme] [role='menuitem'],
+html[data-codepilot-theme] [role='menuitemradio'] {
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease,
+    box-shadow 120ms ease, transform 120ms ease, opacity 120ms ease;
+}
+
+/* Shell and sidebar ------------------------------------------------------ */
+html[data-codepilot-theme] [data-pilot-shell='frame'] { background: var(--pilot-platform-surface-window); }
+html[data-codepilot-theme] [data-pilot-shell='sidebar-column'] {
+  border-right-color: transparent;
+  background: var(--pilot-platform-surface-sidebar);
+}
+html[data-codepilot-theme] [data-pilot-sidebar='root'] {
+  background: var(--pilot-platform-surface-sidebar);
+}
+html[data-codepilot-theme] [data-pilot-shell='details-column'] {
+  border-left-color: var(--dsw-alias-border-l2);
+  background: var(--dsw-alias-bg-layer-1);
+}
+html[data-codepilot-theme] [data-pilot-sidebar='header'] {
+  justify-content: flex-start;
+  height: 40px;
+  margin-bottom: 0;
+  padding: 0 12px;
+  -webkit-app-region: drag;
+}
+/* Keep the sidebar affordance outside the native traffic-light hit area.
+ * When the rail is collapsed its 56px width cannot hold a horizontal inset,
+ * so the control moves below the titlebar instead. */
+html[data-codepilot-theme][data-pilot-platform='darwin'] [data-pilot-sidebar='header'] {
+  padding-left: var(--pilot-window-controls-inset);
+}
+html[data-codepilot-theme][data-pilot-platform='darwin'] [data-sidebar-collapsed] [data-pilot-sidebar='header'] {
+  height: 76px;
+  padding: 40px 0 0;
+}
+html[data-codepilot-theme] [data-sidebar-collapsed] [data-pilot-sidebar-rail-icon] {
+  display: none;
+}
+html[data-codepilot-theme] [data-pilot-brand-mark='rail']::before {
+  content: '';
+  width: 22px;
+  height: 22px;
+  flex: none;
+  background: var(--pilot-brand-icon) center / contain no-repeat;
+}
+html[data-codepilot-theme] [data-pilot-brand-mark='rail']:hover::before {
+  display: none;
+}
+html[data-codepilot-theme] [data-pilot-brand-mark='wordmark'] {
+  display: inline-flex;
+  gap: 8px;
+}
+html[data-codepilot-theme] [data-pilot-brand-mark='wordmark'] > svg { display: none; }
+html[data-codepilot-theme] [data-pilot-brand-mark='wordmark']::before {
+  content: '';
+  width: 24px;
+  height: 24px;
+  flex: none;
+  background: var(--pilot-brand-icon) center / contain no-repeat;
+}
+html[data-codepilot-theme] [data-pilot-brand-mark='wordmark']::after {
+  content: 'Pilot Harness';
+  overflow: hidden;
+  color: var(--dsw-alias-label-primary);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+html[data-codepilot-theme] [data-pilot-sidebar-toggle] {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--pilot-nav-radius);
+}
+/* The expanded toggle stays compact; in the rail the brand seat must use the
+ * same 36px centerline as Chat, Add Workspace, and Search. */
+html[data-codepilot-theme] [data-sidebar-collapsed] [data-pilot-sidebar-toggle] {
+  width: 36px;
+  height: 36px;
+}
+html[data-codepilot-theme] [data-pilot-nav='new-session'] {
+  justify-content: flex-start;
+  height: 34px;
+  margin: 2px 0 10px;
+  padding: 6px 10px;
+  border-color: transparent;
+  border-radius: var(--pilot-nav-radius);
+  background: transparent;
+  box-shadow: none;
+  font-size: 14px;
+  font-weight: 400;
+}
+html[data-codepilot-theme] [data-pilot-nav='new-session']:hover:not(:disabled) {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+html[data-codepilot-theme] [data-pilot-nav='new-session'] [data-pilot-nav-label] {
+  font-size: 14px;
+}
+/* The rail is a different density from the expanded sidebar. Keep these
+ * after the expanded-row rule so the shared class cannot shrink its 36px
+ * hit area or reintroduce the old 10/12px vertical gaps. */
+html[data-codepilot-theme] [data-sidebar-collapsed] [data-pilot-nav='new-session'] {
+  width: 36px;
+  height: 36px;
+  justify-content: center;
+  margin: 0 0 4px;
+  padding: 0;
+}
+html[data-codepilot-theme] [data-pilot-workspaces-header] {
+  height: 30px;
+  margin: 6px 0 3px;
+  border-radius: var(--pilot-nav-radius);
+}
+html[data-codepilot-theme] [data-sidebar-collapsed] [data-pilot-workspaces-header] {
+  width: 36px;
+  height: 36px;
+  margin: 0 0 4px;
+  padding: 0;
+}
+html[data-codepilot-theme] [data-sidebar-collapsed] [data-pilot-workspaces-header] button,
+html[data-codepilot-theme] [data-sidebar-collapsed] [data-pilot-workspaces='rail'] [data-pilot-workspaces-search-button] {
+  border-radius: var(--pilot-nav-radius);
+}
+html[data-codepilot-theme] [data-sidebar-collapsed] [data-pilot-workspaces='rail'] [data-pilot-workspaces-search] {
+  width: 36px;
+  height: 36px;
+  margin: 0 0 4px;
+  padding: 0;
+}
+html[data-codepilot-theme] [data-pilot-workspaces-label] {
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+html[data-codepilot-theme] [data-pilot-workspaces-search='expanded'] {
+  border-color: var(--dsw-alias-border-l2);
+  border-radius: var(--pilot-input-radius);
+  background: var(--pilot-card);
+}
+html[data-codepilot-theme] [data-pilot-workspace-row] {
+  min-height: 30px;
+  border-radius: var(--pilot-nav-radius);
+}
+html[data-codepilot-theme] [data-pilot-workspace-row]:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+html[data-codepilot-theme] [data-pilot-workspace-row][data-selected] {
+  background: var(--dsw-alias-interactive-bg-active);
+  box-shadow: none;
+}
+
+/* Empty conversation ---------------------------------------------------- */
+html[data-codepilot-theme] [data-pilot-conversation][data-phase='hero'] [data-conversation-scroll] {
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+html[data-codepilot-theme] [data-pilot-conversation][data-phase='hero'] [data-composer-seat] { height: 100%; }
+html[data-codepilot-theme] [data-pilot-composer='hero'] {
+  display: block;
+  align-self: stretch;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  padding: 0;
+}
+html[data-codepilot-theme] [data-pilot-hero-glow] { display: none; }
+html[data-codepilot-theme] [data-pilot-hero] {
+  position: absolute;
+  top: 36%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(520px, calc(100% - 48px));
+  transform: translate(-50%, -50%);
+  color: var(--dsw-alias-label-primary);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-align: center;
+}
+html[data-codepilot-theme] [data-pilot-brand-mark='hero'] {
+  display: grid;
+  width: 72px;
+  height: 72px;
+  place-items: center;
+  border-radius: 0;
+  background: transparent;
+}
+html[data-codepilot-theme] [data-pilot-brand-mark='hero'] > svg {
+  display: none;
+}
+/* The upstream FishLogo remains in the DOM and returns when the theme plugin
+ * unloads; this plugin-owned mark is the only active CodePilot presentation. */
+html[data-codepilot-theme] [data-pilot-brand-mark='hero']::after {
+  content: '';
+  width: 68px;
+  height: 68px;
+  background: var(--pilot-brand-icon) center / contain no-repeat;
+}
+html[data-codepilot-theme] [data-pilot-hero-title] {
+  color: var(--dsw-alias-label-primary);
+  font-size: 16px;
+  line-height: 24px;
+}
+html[data-codepilot-theme] [data-pilot-hero-subtitle] {
+  margin-top: -7px;
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 400;
+}
+html[data-codepilot-theme] [data-pilot-hero-preview] { display: none; }
+html[data-codepilot-theme] [data-pilot-composer='hero'] [data-pilot-hero-workspace-row] {
+  width: 100%;
+  min-height: 30px;
+  margin: 0;
+  padding: 0 4px;
+  overflow: visible;
+}
+html[data-codepilot-theme] [data-pilot-composer='hero'] [data-pilot-workspace-control] {
+  min-height: 28px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: var(--pilot-nav-radius);
+  background: transparent;
+  box-shadow: none;
+  font-size: 13px;
+  font-weight: 400;
+}
+html[data-codepilot-theme] [data-pilot-composer='hero'] [data-pilot-hero-workspace-row] > button:hover:not(:disabled),
+html[data-codepilot-theme] [data-pilot-composer='hero'] [data-pilot-hero-workspace-row] > button[aria-expanded='true'] {
+  background: var(--dsw-alias-interactive-bg-hover-solid);
+  color: var(--dsw-alias-label-primary);
+}
+html[data-codepilot-theme] [data-pilot-composer='hero'] [data-composer-card] {
+  position: absolute;
+  top: 52%;
+  right: 0;
+  bottom: auto;
+  left: 0;
+  width: min(768px, calc(100% - 64px));
+  min-height: 100px;
+  margin: 0 auto;
+  border-color: var(--dsw-alias-border-l2);
+  border-radius: var(--pilot-composer-radius);
+  background: var(--dsw-alias-bg-layer-1);
+  box-shadow: var(--dsw-shadow-lv1-blur);
+}
+html[data-codepilot-theme] [data-pilot-composer='hero'] [data-pilot-workspace-trigger]::after {
+  border: 0 !important;
+  box-shadow: inset 0 0 0 1px var(--dsw-alias-border-l2);
+  border-radius: var(--pilot-composer-radius);
+}
+html[data-codepilot-theme] [data-composer-seat] [data-composer-card] {
+  border-color: var(--dsw-alias-border-l2);
+  border-radius: var(--pilot-composer-radius);
+  box-shadow: var(--dsw-shadow-lv1-blur);
+}
+html[data-codepilot-theme] [data-pilot-message-bubble] {
+  padding: 9px 14px;
+  border: 0;
+  border-radius: var(--pilot-radius-xl);
+  background: var(--dsw-specific-bubble);
+}
+
+/* Conversation view switch: a containing surface (14px) with compact
+ * controls (8px). The upstream sheet used the same white surface for the
+ * track and active tab, so the selected view was only visible through a very
+ * faint shadow. Keep this presentation plugin-owned and expose no layout
+ * coupling to generated CSS module names. */
+html[data-codepilot-theme] [data-pilot-conversation-tabs] {
+  gap: 4px;
+  padding: 3px;
+  border-radius: var(--pilot-card-radius);
+  background: var(--pilot-muted);
+}
+html[data-codepilot-theme] [data-pilot-conversation-tab] {
+  min-width: 58px;
+  height: 30px;
+  border-radius: var(--pilot-nav-radius);
+  color: var(--dsw-alias-label-tertiary);
+  background: transparent;
+  box-shadow: none;
+  transition:
+    color 120ms ease,
+    background-color 120ms ease,
+    box-shadow 120ms ease;
+}
+html[data-codepilot-theme] [data-pilot-conversation-tab][data-state='active'] {
+  color: var(--dsw-alias-label-primary);
+  background: var(--pilot-card);
+  box-shadow: var(--dsw-shadow-lv1);
+}
+html[data-codepilot-theme] [data-pilot-conversation-tab][data-state='inactive']:hover {
+  color: var(--dsw-alias-label-primary);
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+html[data-codepilot-theme] [data-pilot-conversation-tab]:focus-visible {
+  outline: 2px solid var(--pilot-ring);
+  outline-offset: -2px;
+}
+
+/* CodePilot component geometry with Beautiful UI's compact Prompt Bar
+ * exception and complete open/hover states. */
+html[data-codepilot-theme] button[aria-haspopup='menu'],
+html[data-codepilot-theme] button[aria-haspopup='listbox'],
+html[data-codepilot-theme] [data-pilot-workspace-control],
+html[data-codepilot-theme] [data-pilot-crumb] {
+  border-radius: var(--pilot-nav-radius);
+}
+
+html[data-codepilot-theme] button[aria-haspopup='menu'][aria-expanded='true'],
+html[data-codepilot-theme] button[aria-haspopup='listbox'][aria-expanded='true'] {
+  background: var(--dsw-alias-interactive-bg-active);
+  color: var(--dsw-alias-label-primary);
+}
+
+@keyframes pilot-popover-in {
+  from { opacity: 0; transform: translateY(4px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+html[data-codepilot-theme] [data-state='open'][role='menu'],
+html[data-codepilot-theme] [data-state='open'][role='listbox'],
+html[data-codepilot-theme] [data-state='open'][data-radix-popper-content-wrapper] {
+  animation: pilot-popover-in 120ms cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: var(--radix-popover-content-transform-origin, top center);
+}
+html[data-codepilot-theme] [data-pilot-menu] {
+  animation: pilot-popover-in 120ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Settings -------------------------------------------------------------- */
+html[data-codepilot-theme] [data-pilot-settings='overlay'] {
+  inset: 0;
+  align-items: stretch;
+  justify-content: stretch;
+}
+html[data-codepilot-theme] [data-pilot-settings='overlay'] > [data-pilot-settings='mask'] { display: none; }
+html[data-codepilot-theme] [data-pilot-settings='panel'] {
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  border: 0;
+  border-radius: 0;
+  background: var(--dsw-alias-bg-layer-1);
+  box-shadow: none;
+}
+html[data-codepilot-theme] [data-pilot-settings='panel'] > [data-pilot-settings='nav'] {
+  width: var(--pilot-sidebar-width);
+  gap: 0;
+  padding: 48px 8px 0;
+  border-right: 0;
+  background: var(--pilot-platform-surface-sidebar);
+}
+html[data-codepilot-theme] [data-pilot-settings='title'] { display: none; }
+html[data-codepilot-theme] [data-pilot-settings='panel'] [data-pilot-settings-back] {
+  display: inline-flex;
+  flex: none;
+}
+html[data-codepilot-theme] [data-pilot-settings-back] svg {
+  display: block;
+}
+html[data-codepilot-theme] [data-pilot-settings='panel']::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 1;
+  height: 40px;
+  -webkit-app-region: drag;
+}
+html[data-codepilot-theme] [data-pilot-settings-nav-item] {
+  height: 36px;
+  padding-inline: 12px;
+  border-radius: var(--pilot-nav-radius);
+}
+html[data-codepilot-theme] [data-pilot-settings-nav-item][data-active] {
+  background: var(--dsw-alias-interactive-bg-active);
+  color: var(--dsw-alias-label-primary);
+}
+html[data-codepilot-theme] [data-pilot-dialog][role='dialog'] {
+  gap: 16px;
+  border-color: var(--dsw-alias-border-l2);
+  border-radius: var(--pilot-radius-2xl);
+  background: var(--dsw-alias-bg-layer-1);
+}
+html[data-codepilot-theme] [data-pilot-menu] {
+  border-color: var(--dsw-alias-border-l2);
+  max-width: min(320px, calc(100vw - 24px));
+  border-radius: var(--pilot-menu-radius);
+  background: var(--pilot-platform-surface-popover);
+  box-shadow: var(--dsw-shadow-lv2);
+}
+html[data-codepilot-theme] [role='menuitem'],
+html[data-codepilot-theme] [role='menuitemradio'] { border-radius: var(--pilot-menu-item-radius); }
+html[data-codepilot-theme] [role='menuitem']:hover:not(:disabled),
+html[data-codepilot-theme] [role='menuitemradio']:hover:not(:disabled) {
+  background: var(--dsw-alias-interactive-bg-hover-solid);
+}
+html[data-codepilot-theme] [data-pilot-input-wrap] {
+  height: 36px;
+  border-color: var(--dsw-alias-border-l2);
+  border-radius: var(--pilot-input-radius);
+  background: var(--dsw-alias-bg-layer-1);
+}
+html[data-codepilot-theme] [data-pilot-input-wrap]:focus-within {
+  border-color: var(--pilot-ring);
+  box-shadow: 0 0 0 3px color-mix(in oklch, var(--pilot-ring) 18%, transparent);
+}
+html[data-codepilot-theme] [data-pilot-settings-options] {
+  padding: 32px 32px 24px;
+}
+html[data-codepilot-theme] [data-pilot-settings-options] > * {
+  width: 100%;
+  max-width: var(--pilot-settings-content-width);
+  margin-inline: auto;
+}
+html[data-codepilot-theme] [data-pilot-settings-options] > [data-slot='settings.section'] > * {
+  margin-inline: auto;
+}
+html[data-codepilot-theme] [data-pilot-settings='header']:has([data-pilot-settings='actions']) {
+  height: 40px;
+  padding: 6px 14px;
+}
+html[data-codepilot-theme] [data-pilot-brand-mark='about'] {
+  border-radius: 0;
+  background: transparent;
+}
+html[data-codepilot-theme] [data-pilot-brand-mark='about'] > svg { display: none; }
+html[data-codepilot-theme] [data-pilot-brand-mark='about']::before {
+  content: '';
+  width: 48px;
+  height: 48px;
+  background: var(--pilot-brand-icon) center / contain no-repeat;
+}
+html[data-codepilot-theme] input,
+html[data-codepilot-theme] textarea,
+html[data-codepilot-theme] select,
+html[data-codepilot-theme] button { -webkit-app-region: no-drag; }
+html[data-codepilot-theme] :focus-visible {
+  outline: 2px solid color-mix(in oklch, var(--pilot-ring) 72%, transparent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--pilot-ring) 16%, transparent);
+}
+html[data-codepilot-theme] [data-pilot-provider-search] input:focus-visible {
+  box-shadow: none;
+}
+html[data-codepilot-theme] [role='tooltip'] {
+  background: var(--pilot-primary);
+  color: var(--pilot-primary-foreground);
+}
+
+/* Provider/model cards, toolbar inputs and actions share the same component
+ * tokens as the CodePilot settings surfaces. */
+html[data-codepilot-theme] [data-pilot-provider-card],
+html[data-codepilot-theme] [data-pilot-provider-editor],
+html[data-codepilot-theme] [data-pilot-model-group] { border-radius: var(--pilot-card-radius); }
+html[data-codepilot-theme] [data-pilot-model-search] {
+  border-radius: var(--pilot-input-radius);
+}
+html[data-codepilot-theme] [data-pilot-model-filters] button {
+  border-radius: var(--pilot-nav-radius);
+}
+html[data-codepilot-theme] [data-pilot-model-list] {
+  background: var(--pilot-card);
+}
+html[data-codepilot-theme] [data-pilot-model-row] {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 6px 13px 6px 48px;
+  border-radius: 0;
+  background: transparent;
+}
+html[data-codepilot-theme] [data-pilot-settings-button] { border-radius: var(--pilot-nav-radius); }
+
+html[data-codepilot-theme][data-pilot-platform='win32'] body {
+  --pilot-caption-button-width: 138px;
+}
+
+html[data-codepilot-theme][data-pilot-platform='darwin'] [data-pilot-settings='panel'] > [data-pilot-settings='nav'] {
+  padding-left: 8px;
+}
+
+html[data-codepilot-theme][data-pilot-platform='win32'] [data-pilot-settings='overlay'] {
+  inset: 44px 0 0;
+}
+
+@media (max-height: 720px) {
+  html[data-codepilot-theme] [data-pilot-hero] { top: 27%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-codepilot-theme] *,
+  html[data-codepilot-theme] *::before,
+  html[data-codepilot-theme] *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

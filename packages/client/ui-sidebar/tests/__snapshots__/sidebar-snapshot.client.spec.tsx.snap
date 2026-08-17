@@ -1,0 +1,303 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`sidebar shell snapshots > renders the collapsed rail after the crossfade settles, in place 1`] = `
+<div
+  data-slot="sidebar"
+  style="display: contents;"
+>
+  <div
+    class="root collapsed railIn quietBars"
+    data-pilot-sidebar="root"
+    style=""
+  >
+    <div
+      class="logoRow"
+      data-pilot-sidebar="header"
+    >
+      <button
+        aria-label="Open sidebar"
+        class="iconButton toggle"
+        data-pilot-brand-mark="rail"
+        data-pilot-sidebar-toggle="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="railFish"
+          data-content="965fe321"
+          data-pilot-sidebar-rail-icon="true"
+          fill="none"
+          height="17.6580310880829"
+          viewBox="0 0 23.16 17.04"
+          width="24"
+        />
+        <svg
+          aria-hidden="true"
+          class="panelIcon"
+          color="currentColor"
+          data-content="806b2694"
+          fill="none"
+          height="16"
+          viewBox="0 0 24 24"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        />
+      </button>
+    </div>
+    <button
+      aria-label="New session"
+      class="newSession"
+      data-pilot-nav="new-session"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class=""
+        color="currentColor"
+        data-content="9a6f8c5e"
+        fill="none"
+        height="16"
+        viewBox="0 0 24 24"
+        width="16"
+        xmlns="http://www.w3.org/2000/svg"
+      />
+    </button>
+    <div
+      class="regionArea"
+    >
+      <div
+        data-slot="sidebar.workspaces"
+        style="display: contents;"
+      />
+    </div>
+    <div
+      class="footArea"
+    >
+      <div
+        class="footerActions"
+      >
+        <div
+          data-slot="sidebar.footer.action"
+          style="display: contents;"
+        />
+      </div>
+      <div
+        class="settingsArea"
+      >
+        <div
+          data-slot="sidebar.settings"
+          style="display: contents;"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`sidebar shell snapshots > renders the expanded column (wordmark, capsule, empty holes) 1`] = `
+<div
+  data-slot="sidebar"
+  style="display: contents;"
+>
+  <div
+    class="root quietBars"
+    data-pilot-sidebar="root"
+    style="width: 300px;"
+  >
+    <div
+      class="logoRow"
+      data-pilot-sidebar="header"
+    >
+      <button
+        aria-label="New session"
+        class="brand wide"
+        data-pilot-brand-mark="wordmark"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          data-content="951274b9"
+          fill="none"
+          height="24"
+          viewBox="0 0 182 24"
+          width="182"
+        />
+      </button>
+      <button
+        aria-label="Collapse sidebar"
+        class="iconButton toggle"
+        data-pilot-sidebar-toggle="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="panelIcon"
+          color="currentColor"
+          data-content="806b2694"
+          fill="none"
+          height="16"
+          viewBox="0 0 24 24"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        />
+      </button>
+    </div>
+    <button
+      aria-label="New session"
+      class="newSession"
+      data-pilot-nav="new-session"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class=""
+        color="currentColor"
+        data-content="9a6f8c5e"
+        fill="none"
+        height="14"
+        viewBox="0 0 24 24"
+        width="14"
+        xmlns="http://www.w3.org/2000/svg"
+      />
+      <span
+        class="newSessionLabel wide"
+        data-pilot-nav-label="true"
+      >
+        New Session
+      </span>
+    </button>
+    <div
+      class="regionArea"
+    >
+      <div
+        data-slot="sidebar.workspaces"
+        style="display: contents;"
+      />
+    </div>
+    <div
+      class="footArea"
+    >
+      <div
+        class="footerActions"
+      >
+        <div
+          data-slot="sidebar.footer.action"
+          style="display: contents;"
+        />
+      </div>
+      <div
+        class="settingsArea"
+      >
+        <div
+          data-slot="sidebar.settings"
+          style="display: contents;"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`sidebar shell snapshots > renders the expanded column in the default locale (zh, no setLocale) 1`] = `
+<div
+  data-slot="sidebar"
+  style="display: contents;"
+>
+  <div
+    class="root quietBars"
+    data-pilot-sidebar="root"
+    style="width: 300px;"
+  >
+    <div
+      class="logoRow"
+      data-pilot-sidebar="header"
+    >
+      <button
+        aria-label="新建会话"
+        class="brand wide"
+        data-pilot-brand-mark="wordmark"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          data-content="951274b9"
+          fill="none"
+          height="24"
+          viewBox="0 0 182 24"
+          width="182"
+        />
+      </button>
+      <button
+        aria-label="收起侧边栏"
+        class="iconButton toggle"
+        data-pilot-sidebar-toggle="true"
+        type="button"
+      >
+        <svg
+          aria-hidden="true"
+          class="panelIcon"
+          color="currentColor"
+          data-content="806b2694"
+          fill="none"
+          height="16"
+          viewBox="0 0 24 24"
+          width="16"
+          xmlns="http://www.w3.org/2000/svg"
+        />
+      </button>
+    </div>
+    <button
+      aria-label="新建会话"
+      class="newSession"
+      data-pilot-nav="new-session"
+      type="button"
+    >
+      <svg
+        aria-hidden="true"
+        class=""
+        color="currentColor"
+        data-content="9a6f8c5e"
+        fill="none"
+        height="14"
+        viewBox="0 0 24 24"
+        width="14"
+        xmlns="http://www.w3.org/2000/svg"
+      />
+      <span
+        class="newSessionLabel wide"
+        data-pilot-nav-label="true"
+      >
+        新会话
+      </span>
+    </button>
+    <div
+      class="regionArea"
+    >
+      <div
+        data-slot="sidebar.workspaces"
+        style="display: contents;"
+      />
+    </div>
+    <div
+      class="footArea"
+    >
+      <div
+        class="footerActions"
+      >
+        <div
+          data-slot="sidebar.footer.action"
+          style="display: contents;"
+        />
+      </div>
+      <div
+        class="settingsArea"
+      >
+        <div
+          data-slot="sidebar.settings"
+          style="display: contents;"
+        />
+      </div>
+    </div>
+  </div>
+</div>
+`;

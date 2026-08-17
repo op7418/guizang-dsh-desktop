@@ -1,0 +1,144 @@
+{
+  "generatedAt": "2026-08-16T11:32:20.839Z",
+  "summary": {
+    "passed": 16,
+    "total": 16,
+    "percent": 100,
+    "categories": {
+      "components": {
+        "passed": 8,
+        "total": 8,
+        "percent": 100
+      },
+      "icons": {
+        "passed": 4,
+        "total": 4,
+        "percent": 100
+      },
+      "compatibility": {
+        "passed": 3,
+        "total": 3,
+        "percent": 100
+      },
+      "license": {
+        "passed": 1,
+        "total": 1,
+        "percent": 100
+      }
+    }
+  },
+  "checks": [
+    {
+      "category": "components",
+      "id": "prompt-bar",
+      "label": "Prompt Bar primitive is mounted on the real composer",
+      "pass": true,
+      "evidence": "InputBar.tsx"
+    },
+    {
+      "category": "components",
+      "id": "prompt-bar-geometry",
+      "label": "Prompt Bar uses compact 14px geometry and focus treatment",
+      "pass": true,
+      "evidence": "InputBar CSS + desktop theme"
+    },
+    {
+      "category": "components",
+      "id": "thinking",
+      "label": "Thinking disclosure uses the Beautiful UI state pattern",
+      "pass": true,
+      "evidence": "ReasoningRow"
+    },
+    {
+      "category": "components",
+      "id": "tool-chips",
+      "label": "Tool calls render as compact filled chips",
+      "pass": true,
+      "evidence": "ToolRow"
+    },
+    {
+      "category": "components",
+      "id": "context-card",
+      "label": "Composer context uses a persistent trigger and breakdown card",
+      "pass": true,
+      "evidence": "ContextMeter"
+    },
+    {
+      "category": "components",
+      "id": "code-block",
+      "label": "Code block has semantic chrome and line-number rows",
+      "pass": true,
+      "evidence": "CodeBlock"
+    },
+    {
+      "category": "components",
+      "id": "search",
+      "label": "Search results use semantic card and group states",
+      "pass": true,
+      "evidence": "SearchBlock"
+    },
+    {
+      "category": "components",
+      "id": "sidebar-nav",
+      "label": "Worktree uses the compact Sidebar Nav pattern",
+      "pass": true,
+      "evidence": "WorktreePanel"
+    },
+    {
+      "category": "icons",
+      "id": "semantic-library",
+      "label": "New controls stay on the shared HugeIcons semantic layer",
+      "pass": true,
+      "evidence": "CodePilotIcon.tsx"
+    },
+    {
+      "category": "icons",
+      "id": "composer-no-inline-svg",
+      "label": "Composer send/stop controls do not use hand-authored SVG",
+      "pass": true,
+      "evidence": "InputBar.tsx"
+    },
+    {
+      "category": "icons",
+      "id": "trajectory-no-inline-svg",
+      "label": "Trajectory ledger does not use hand-authored SVG",
+      "pass": true,
+      "evidence": "TrajectoryTable.tsx"
+    },
+    {
+      "category": "icons",
+      "id": "context-no-inline-svg",
+      "label": "Context trigger does not use a hand-authored ring SVG",
+      "pass": true,
+      "evidence": "ContextMeter.tsx"
+    },
+    {
+      "category": "compatibility",
+      "id": "no-demo-runtime",
+      "label": "Beautiful UI demo runtime and autoplay are not imported",
+      "pass": true,
+      "evidence": "adapted sources"
+    },
+    {
+      "category": "compatibility",
+      "id": "harness-contracts",
+      "label": "Harness slots and projection contracts remain the state boundary",
+      "pass": true,
+      "evidence": "Harness component contracts"
+    },
+    {
+      "category": "compatibility",
+      "id": "reduced-motion",
+      "label": "New animated context surface respects reduced motion",
+      "pass": true,
+      "evidence": "ContextMeter.module.css"
+    },
+    {
+      "category": "license",
+      "id": "source-note",
+      "label": "Beautiful UI source and MIT terms are recorded",
+      "pass": true,
+      "evidence": "adoption note"
+    }
+  ]
+}

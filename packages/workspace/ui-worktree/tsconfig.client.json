@@ -1,0 +1,30 @@
+{
+  "extends": "../../../tsconfig.base.client.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/types",
+    "tsBuildInfoFile": "lib/tsconfig.client.tsbuildinfo"
+  },
+  "files": [
+    "src/client/index.ts",
+    "src/client/WorktreePanel.tsx",
+    "src/client/WorktreeHeaderToggle.tsx",
+    "src/client/WorktreeSessionDetail.tsx",
+    "src/client/controller.ts",
+    "src/client/draft.ts",
+    "src/client/locales.ts",
+    "src/client/css-modules.d.ts",
+    "src/types.ts"
+  ],
+  "references": [
+    { "path": "../../../vendor/cordis" },
+    { "path": "../../client/connection/tsconfig.client.json" },
+    { "path": "../../client/locale" },
+    { "path": "../../client/runtime" },
+    { "path": "../../client/ui-layout" },
+    { "path": "../../client/ui-conversation" },
+    { "path": "../../client/ui-workspace" },
+    { "path": "../../client/ui-primitives" },
+    { "path": "../../client/ui-slots" }
+  ]
+}

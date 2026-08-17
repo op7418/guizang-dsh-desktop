@@ -1,0 +1,70 @@
+{
+  "name": "@deepseek-ai/dsh-desktop",
+  "description": "CodePilot-style desktop shell for DeepSeek Harness",
+  "version": "0.1.0",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/op7418/guizang-dsh-desktop.git",
+    "directory": "apps/desktop"
+  },
+  "homepage": "https://github.com/op7418/guizang-dsh-desktop#readme",
+  "bugs": {
+    "url": "https://github.com/op7418/guizang-dsh-desktop/issues"
+  },
+  "type": "module",
+  "main": "dist/main.cjs",
+  "author": "Pilot Harness Contributors",
+  "files": [
+    "dist"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "icons": "node scripts/generate-icons.mjs",
+    "dev": "pnpm run build && electron .",
+    "pack": "pnpm run build && electron-builder --config electron-builder.yml",
+    "test": "node --import tsx --test tests/*.test.ts",
+    "test:e2e": "node tests/run-desktop-e2e.mjs",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {
+    "@deepseek-ai/cordis-plugin-group": "workspace:^",
+    "@deepseek-ai/dsh": "workspace:^",
+    "@deepseek-ai/dsh-anonymous-user-id": "workspace:^",
+    "@deepseek-ai/dsh-atomic-write": "workspace:^",
+    "@deepseek-ai/dsh-bash-local": "workspace:^",
+    "@deepseek-ai/dsh-code-runtime": "workspace:^",
+    "@deepseek-ai/dsh-compaction": "workspace:^",
+    "@deepseek-ai/dsh-fs": "workspace:^",
+    "@deepseek-ai/dsh-invariants": "workspace:^",
+    "@deepseek-ai/dsh-output-retention": "workspace:^",
+    "@deepseek-ai/dsh-sandbox": "workspace:^",
+    "@deepseek-ai/dsh-scope": "workspace:^",
+    "@deepseek-ai/dsh-session-telemetry": "workspace:^",
+    "@deepseek-ai/dsh-session-title-llm": "workspace:^",
+    "@deepseek-ai/dsh-shell": "workspace:^",
+    "@deepseek-ai/dsh-spill": "workspace:^",
+    "@deepseek-ai/dsh-subagent-in-process-driver": "workspace:^",
+    "@deepseek-ai/dsh-subprocess": "workspace:^",
+    "@deepseek-ai/dsh-system-prompt": "workspace:^",
+    "@deepseek-ai/dsh-time-context": "workspace:^",
+    "@deepseek-ai/dsh-timeout": "workspace:^",
+    "@deepseek-ai/dsh-schedule": "workspace:^",
+    "@deepseek-ai/dsh-ui-schedule-summary": "workspace:^",
+    "@deepseek-ai/dsh-ui-worktree": "workspace:^",
+    "@deepseek-ai/dsh-workflow": "workspace:^"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.0",
+    "electron": "^40.10.6",
+    "electron-builder": "^26.8.1",
+    "esbuild": "^0.27.3",
+    "playwright": "^1.49.0",
+    "sharp": "^0.35.3",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
+  }
+}

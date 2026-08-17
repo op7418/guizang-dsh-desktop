@@ -1,0 +1,6 @@
+- button "Choose workspace":
+  - text: workspace
+  - img
+- button "Standard mode":
+  - text: Standard mode
+  - img

@@ -1,0 +1,140 @@
+/* Visual baseline: deepsuite `@deepseek/md` code-block.css. Highlight colors
+   stay on the existing shiki `--shiki-*` sheet (not Prism highlight.css). */
+
+.block {
+  --dsl-code-block-banner-background-color: var(--dsw-alias-markdown-code-block-banner);
+  --dsl-code-block-border-radius: 14px;
+  --dsl-code-block-banner-font: var(--dsw-font-xs-13);
+  --dsl-code-block-content-font: var(--dsw-font-markdown-code-block);
+
+  position: relative;
+  margin: 16px 0;
+  color: var(--dsw-alias-label-primary);
+  background: var(--dsw-alias-markdown-code-block);
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: var(--dsl-code-block-border-radius);
+  box-shadow: var(--dsw-shadow-lv1);
+}
+
+.block:not(:last-child) {
+  margin-bottom: 11px;
+}
+
+.bannerWrap {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background-color: var(--dsw-alias-bg-base);
+  border-top-left-radius: var(--dsl-code-block-border-radius);
+  border-top-right-radius: var(--dsl-code-block-border-radius);
+}
+
+.banner {
+  background: var(--dsl-code-block-banner-background-color);
+  padding: 8px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font: var(--dsl-code-block-banner-font);
+  border-top-left-radius: var(--dsl-code-block-border-radius);
+  border-top-right-radius: var(--dsl-code-block-border-radius);
+  border-bottom: 1px solid var(--dsw-alias-border-l1);
+}
+
+.infostring {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--dsw-alias-label-primary);
+  font-family: var(--ds-font-family-code);
+  font-size: 12px;
+  line-height: 18px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.action {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.copyButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 26px;
+  background-color: transparent;
+  border: none;
+  border-radius: 8px;
+  padding: 0 7px;
+  margin: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.copyButton:hover {
+  background: var(--dsw-alias-interactive-bg-hover-solid);
+  color: var(--dsw-alias-label-primary);
+}
+
+.block :where(pre) {
+  font: var(--dsl-code-block-content-font);
+  padding: 12px 0;
+  margin: 0 !important;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: normal;
+  background: var(--dsw-alias-markdown-code-block);
+  /* Bottom radii live on <pre>: overflow:hidden on .block would kill the
+     sticky banner, and this opaque fill otherwise squares off the wrapper. */
+  border-bottom-left-radius: var(--dsl-code-block-border-radius);
+  border-bottom-right-radius: var(--dsl-code-block-border-radius);
+}
+
+/* Shiki inlines its theme background var; route it to the repo token. */
+.block :where(pre.shiki) {
+  background: var(--dsw-alias-markdown-code-block) !important;
+}
+
+.block :where(pre) code {
+  display: block;
+  counter-reset: dsh-code-line;
+  font: inherit;
+  background: none;
+  padding: 0;
+}
+
+.line,
+.block :global(.line) {
+  display: block;
+  min-height: 22px;
+  padding: 0 14px 0 48px;
+  counter-increment: dsh-code-line;
+  position: relative;
+}
+
+.line::before,
+.block :global(.line)::before {
+  content: counter(dsh-code-line);
+  position: absolute;
+  left: 0;
+  width: 36px;
+  color: var(--dsw-alias-label-caption);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  user-select: none;
+}
+
+.line:hover,
+.block :global(.line):hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.plain {
+  color: var(--dsw-alias-label-primary);
+}

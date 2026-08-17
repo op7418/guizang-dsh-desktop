@@ -1,0 +1,35 @@
+- banner:
+  - navigation "Session hierarchy":
+    - button "Reply with a one-sentence description" [disabled]
+  - img
+  - text: Standard mode
+  - tablist:
+    - tab "Chat" [selected]
+    - tab "Trajectory"
+- text: Reply with a one-sentence description of event sourcing, then stop. {{clock}}
+- button "Copy":
+  - img
+- button "Context injection @deepseek-ai/dsh-system-prompt":
+  - img
+  - img
+  - text: Context injection @deepseek-ai/dsh-system-prompt
+- paragraph: partial
+- status: Deep diving...
+- list:
+  - listitem:
+    - text: Edited queue item
+    - button "Edit queued message":
+      - img
+    - tooltip "Edit queued message"
+    - button "Remove queued message":
+      - img
+    - button "Steer queued message":
+      - img
+- textbox "Cmd/Ctrl+Enter steers all queued messages"
+- button "Commands"
+- 'button "Access mode, current: Workspace Write"': Workspace Write
+- button "Select model, current DeepSeek-V4-Flash":
+  - text: DeepSeek-V4-Flash
+  - img
+- button "Context details"
+- button "Stop generating"

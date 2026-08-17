@@ -1,0 +1,128 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  margin-block: 3px;
+}
+
+.disclosure {
+  border-radius: 14px;
+}
+
+.disclosure[data-open] {
+  gap: 4px;
+  padding: 4px;
+  background: var(--dsw-alias-bg-module-platform);
+}
+
+.row {
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-module-platform);
+  transition:
+    border-color 140ms var(--ds-ease-in-out),
+    background-color 140ms var(--ds-ease-in-out);
+}
+
+.row:hover,
+.row:focus-visible {
+  border-color: var(--dsw-alias-border-l2);
+  background: var(--dsw-alias-interactive-bg-hover-solid);
+}
+
+.disclosure[data-open] .row,
+.disclosure[data-open] .row:hover,
+.disclosure[data-open] .row:focus-visible {
+  border: 0;
+  background-color: transparent;
+}
+
+.disclosure[data-open]:has(.row:focus-visible) {
+  box-shadow: 0 0 0 2px color-mix(
+    in srgb,
+    var(--dsw-alias-state-business-primary) 28%,
+    transparent
+  );
+}
+
+.root[data-state='running'] .row::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 300px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--dsw-alias-bg-base) 60%, transparent) 55%,
+    transparent 100%
+  );
+  animation: dsh-reasoning-row-sweep 2.6s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes dsh-reasoning-row-sweep {
+  0% { left: -300px; }
+  90%, 100% { left: 100%; }
+}
+
+.leading {
+  flex-shrink: 0;
+}
+
+.chevron {
+  color: var(--dsw-alias-label-secondary);
+}
+
+.title {
+  font-size: 12.5px;
+  line-height: 20px;
+  font-weight: 500;
+}
+
+.separator {
+  display: none;
+}
+
+.summary {
+  min-width: 0;
+  overflow: hidden;
+  flex: 1 1 auto;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-layer-3);
+  color: var(--dsw-alias-label-tertiary);
+  font-family: var(--ds-font-family-code);
+  font-size: 11.5px;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.summary[data-follow-end] {
+  text-overflow: clip;
+}
+
+.thinkBody {
+  margin: 0;
+  padding: 8px 12px 10px 28px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 13px;
+  line-height: 22px;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root[data-state='running'] .row::after {
+    animation: none;
+  }
+}

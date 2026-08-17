@@ -1,0 +1,22 @@
+- dialog "设置":
+  - navigation:
+    - text: 设置
+    - button "返回"
+    - button "通用设置"
+    - button "服务商"
+    - button "插件"
+    - button "模型"
+    - button "Agent 预设"
+    - button "关于"
+  - heading "服务商" [level=2]
+  - paragraph: 连接模型服务、管理凭据，并自定义服务地址。
+  - list:
+    - listitem:
+      - text: DeepSeek deepseek-official API 密钥
+      - textbox "API 密钥":
+        - /placeholder: 输入 API 密钥
+      - group: 自定义设置
+      - button "取消"
+      - button "保存"
+  - button "添加服务商"
+  - button "添加自定义服务商"

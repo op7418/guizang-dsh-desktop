@@ -1,0 +1,32 @@
+{
+  "extends": "../../../tsconfig.base.client.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "lib/types",
+    "tsBuildInfoFile": "lib/tsconfig.client.tsbuildinfo"
+  },
+  "files": [
+    "src/client/index.ts",
+    "src/client/directory.ts",
+    "src/client/ModelSelect.tsx",
+    "src/client/ModelSessionDetail.tsx",
+    "src/client/service.ts",
+    "src/client/slots.ts",
+    "src/client/locales.ts",
+    "src/css-modules.d.ts",
+    "src/types.ts"
+  ],
+  "references": [
+    { "path": "../../api/remotes/tsconfig.client.json" },
+    { "path": "../../../vendor/cordis" },
+    { "path": "../locale" },
+    { "path": "../runtime" },
+    { "path": "../ui-commands" },
+    { "path": "../ui-conversation" },
+    { "path": "../ui-workspace" },
+    { "path": "../ui-primitives" },
+    { "path": "../ui-input-trigger" },
+    { "path": "../ui-slots" },
+    { "path": "../../session/session-projection" }
+  ]
+}

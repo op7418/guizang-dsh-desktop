@@ -1,0 +1,6 @@
+# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
+# side as of the last confirmed-consistent state. Both languages carry equal authority;
+# after editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write .agents/notes/implemented/architecture/2026-08-16-codepilot-theme-plugin-and-ui-token-pass.md
+2026-08-16-codepilot-theme-plugin-and-ui-token-pass.md: 346fb8308ab94b2cc757c5e3b6e155e62ef0f22d
+2026-08-16-codepilot-theme-plugin-and-ui-token-pass.zh.md: 21dbfdced51883aaa4b0a0f5774f54f405c82b45

@@ -1,0 +1,13 @@
+- tree "Sessions":
+  - treeitem "Ungrouped New session in Ungrouped" [expanded]:
+    - text: Ungrouped
+    - button "New session in Ungrouped"
+  - treeitem "Use the read tool twice (2) now Session actions for Use the read tool twice (2)" [selected]:
+    - text: Use the read tool twice (2) now
+    - button "Session actions for Use the read tool twice (2)"
+  - treeitem "Use the read tool twice (1) now Session actions for Use the read tool twice (1)":
+    - text: Use the read tool twice (1) now
+    - button "Session actions for Use the read tool twice (1)"
+  - treeitem "Use the read tool twice 1min Session actions for Use the read tool twice":
+    - text: Use the read tool twice 1min
+    - button "Session actions for Use the read tool twice"

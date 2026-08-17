@@ -1,0 +1,29 @@
+- dialog "设置":
+  - navigation:
+    - text: 设置
+    - button "返回"
+    - button "通用设置"
+    - button "服务商"
+    - button "插件"
+    - button "模型"
+    - button "Agent 预设"
+    - button "关于"
+  - heading "插件" [level=2]
+  - paragraph: 配置和查看本部署已安装的插件。
+  - tablist "插件视图":
+    - tab "插件配置" [selected]
+    - tab "插件列表"
+  - tabpanel "插件配置":
+    - list:
+      - listitem:
+        - 'button "展开设置: 终端"':
+          - text: 终端 限制 agent 运行的每一条命令。
+          - img
+      - listitem:
+        - 'button "展开设置: Agent 循环"':
+          - text: Agent 循环 Agent 如何派发工具调用。
+          - img
+      - listitem:
+        - 'button "展开设置: 网页搜索"':
+          - text: 网页搜索 DeepSeek 搜索提供方。
+          - img

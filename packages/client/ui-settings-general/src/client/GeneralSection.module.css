@@ -1,0 +1,20 @@
+/* General is one CodePilot settings card. Feature rows keep ownership of
+ * their controls; this owner supplies the shared surface and separators. */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 820px;
+  padding: 0 20px;
+  box-sizing: border-box;
+  overflow: hidden;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 14px;
+  background: var(--dsw-alias-bg-layer-1);
+  box-shadow: var(--dsw-shadow-lv1);
+}
+
+.section > :global([data-slot='settings.general.item']) > :last-child {
+  border-bottom: none;
+}

@@ -1,0 +1,38 @@
+- dialog "设置":
+  - navigation:
+    - text: 设置
+    - button "返回"
+    - button "通用设置"
+    - button "服务商"
+    - button "插件"
+    - button "模型"
+    - button "Agent 预设"
+    - button "关于"
+  - text: Agent 预设 对此后新建的会话生效。运行中的会话保持它开始时的预设。
+  - button "标准模式":
+    - text: 标准模式
+    - img
+  - text: 权限 选择新会话的默认权限模式
+  - button "Workspace Write":
+    - text: Workspace Write
+    - img
+  - text: 语言
+  - button "中文":
+    - text: 中文
+    - img
+  - text: 外观
+  - button "浅色":
+    - img
+    - text: 浅色
+  - button "深色":
+    - img
+    - text: 深色
+  - button "跟随系统" [pressed]:
+    - img
+    - text: 跟随系统
+  - text: 繁忙时 Enter 键行为 仅在智能体运行时生效；Cmd/Ctrl+Enter 使用另一行为
+  - button "排队发送":
+    - text: 排队发送
+    - img
+  - text: 配置文件 打开 Pilot Harness 当前使用的 settings.yaml，适合高级配置与插件参数。
+  - button "打开配置文件"

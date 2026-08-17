@@ -1,0 +1,43 @@
+/* Session stats row: 12/20 tertiary text under the flow, aligned to the
+   shared message column axis (--dsh-chat-content-width). */
+
+.root {
+  /* Block, not flex: text-overflow only elides a block's inline content, so
+     an overlong line ends in … instead of a mid-glyph clip. */
+  display: block;
+  text-align: center;
+  max-width: none;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding: 0 8px;
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--dsw-alias-label-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sep {
+  color: var(--dsw-alias-separator-primary);
+  margin: 0 10px; /* carries the former flex gap */
+}
+
+.context {
+  display: grid;
+  gap: 2px;
+}
+
+.contextRow {
+  min-height: 24px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  color: var(--dsw-alias-label-secondary);
+  line-height: 20px;
+}
+
+.contextRow:hover {
+  background: var(--dsw-alias-interactive-bg-hover);
+  color: var(--dsw-alias-label-primary);
+}

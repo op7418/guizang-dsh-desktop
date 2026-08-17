@@ -1,0 +1,177 @@
+.section {
+  display: flex;
+  width: 100%;
+  max-width: 820px;
+  flex-direction: column;
+  gap: 20px;
+  color: var(--dsw-alias-label-primary);
+}
+
+.pageHeader h2,
+.pageHeader p,
+.brandCopy h3,
+.brandCopy p,
+.cardHeader h3,
+.cardHeader p {
+  margin: 0;
+}
+
+.pageHeader h2 {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: -0.02em;
+}
+
+.pageHeader p {
+  margin-top: 4px;
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.heroCard,
+.infoCard {
+  box-sizing: border-box;
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 14px;
+  background: var(--dsw-alias-bg-layer-1);
+}
+
+.heroCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+}
+
+.brandMark {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  flex: none;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-module-platform);
+  color: var(--dsw-alias-label-primary);
+}
+
+.brandCopy {
+  min-width: 0;
+  flex: 1;
+}
+
+.brandHeading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brandHeading h3 {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.brandHeading span,
+.capabilities span {
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: 8px;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 16px;
+}
+
+.brandHeading span {
+  padding: 1px 7px;
+}
+
+.brandCopy > p {
+  max-width: 680px;
+  margin-top: 5px;
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.capabilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 13px;
+}
+
+.capabilities span {
+  padding: 2px 8px;
+  background: var(--dsw-alias-bg-module-platform);
+}
+
+.infoCard {
+  padding: 18px 20px;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.cardHeader > svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.cardHeader h3 {
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+}
+
+.cardHeader p {
+  margin-top: 2px;
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.infoList {
+  margin: 14px 0 0;
+  padding: 0 12px;
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-module-platform);
+}
+
+.infoList > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 38px;
+  border-bottom: 1px solid var(--dsw-alias-border-l1);
+}
+
+.infoList > div:last-child {
+  border-bottom: 0;
+}
+
+.infoList dt {
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 11px;
+  line-height: 16px;
+}
+
+.infoList dd {
+  margin: 0;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 12px;
+  line-height: 18px;
+  text-align: right;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}

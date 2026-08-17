@@ -1,0 +1,7 @@
+- insert:
+    - id: time-context
+      name: '@deepseek-ai/dsh-time-context'
+    - id: schedule
+      name: '@deepseek-ai/dsh-schedule'
+    - id: pilot-schedule-summary
+      name: '@deepseek-ai/dsh-ui-schedule-summary'

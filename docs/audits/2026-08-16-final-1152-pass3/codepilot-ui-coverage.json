@@ -1,0 +1,564 @@
+{
+  "generatedAt": "2026-08-16T09:46:48.125Z",
+  "target": "/Users/op7418/Documents/code/dsh-test/pilot-harness",
+  "reference": "/Users/op7418/Documents/code/opus-4.6-test",
+  "referenceAnchors": {
+    "radius": true,
+    "composerShadow": true,
+    "platformTokens": true,
+    "macTrafficLights": true,
+    "macVibrancy": true,
+    "windowsOverlay": true,
+    "semanticIcons": true
+  },
+  "summary": {
+    "passed": 73,
+    "total": 73,
+    "percent": 100,
+    "categories": {
+      "tokens": {
+        "passed": 14,
+        "total": 14,
+        "percent": 100
+      },
+      "components": {
+        "passed": 21,
+        "total": 21,
+        "percent": 100
+      },
+      "icons": {
+        "passed": 8,
+        "total": 8,
+        "percent": 100
+      },
+      "plugins": {
+        "passed": 6,
+        "total": 6,
+        "percent": 100
+      },
+      "platform": {
+        "passed": 8,
+        "total": 8,
+        "percent": 100
+      },
+      "runtime": {
+        "passed": 16,
+        "total": 16,
+        "percent": 100
+      }
+    }
+  },
+  "checks": [
+    {
+      "category": "tokens",
+      "id": "radius-base",
+      "label": "基础圆角为 CodePilot 的 1rem",
+      "passed": true,
+      "evidence": "--pilot-radius-base"
+    },
+    {
+      "category": "tokens",
+      "id": "radius-scale",
+      "label": "圆角阶梯 12/14/16/20/24/28",
+      "passed": true,
+      "evidence": "desktop radius scale"
+    },
+    {
+      "category": "tokens",
+      "id": "background",
+      "label": "背景 token 使用 CodePilot OKLCH 值",
+      "passed": true,
+      "evidence": "--pilot-background"
+    },
+    {
+      "category": "tokens",
+      "id": "foreground",
+      "label": "前景 token 使用 CodePilot OKLCH 值",
+      "passed": true,
+      "evidence": "--pilot-foreground"
+    },
+    {
+      "category": "tokens",
+      "id": "card-popover",
+      "label": "卡片与浮层 token 对齐",
+      "passed": true,
+      "evidence": "card/popover"
+    },
+    {
+      "category": "tokens",
+      "id": "primary",
+      "label": "主色 token 对齐",
+      "passed": true,
+      "evidence": "--pilot-primary"
+    },
+    {
+      "category": "tokens",
+      "id": "secondary-muted",
+      "label": "次级与弱化表面 token 对齐",
+      "passed": true,
+      "evidence": "secondary/muted"
+    },
+    {
+      "category": "tokens",
+      "id": "border-input",
+      "label": "边框与输入 token 对齐",
+      "passed": true,
+      "evidence": "border/input"
+    },
+    {
+      "category": "tokens",
+      "id": "sidebar",
+      "label": "侧栏 token 对齐",
+      "passed": true,
+      "evidence": "--pilot-sidebar"
+    },
+    {
+      "category": "tokens",
+      "id": "focus-ring",
+      "label": "焦点环 token 对齐",
+      "passed": true,
+      "evidence": "--pilot-ring"
+    },
+    {
+      "category": "tokens",
+      "id": "diffuse-shadow",
+      "label": "输入区使用 CodePilot diffuse shadow",
+      "passed": true,
+      "evidence": "--pilot-shadow-diffuse"
+    },
+    {
+      "category": "tokens",
+      "id": "platform-surfaces",
+      "label": "窗口/侧栏/浮层使用平台表面 token",
+      "passed": true,
+      "evidence": "platform surface tokens"
+    },
+    {
+      "category": "tokens",
+      "id": "platform-font",
+      "label": "macOS UI 字体栈单独适配",
+      "passed": true,
+      "evidence": "platform font"
+    },
+    {
+      "category": "tokens",
+      "id": "dark-parity",
+      "label": "深色模式具有同构 CodePilot token",
+      "passed": true,
+      "evidence": "dark token block"
+    },
+    {
+      "category": "components",
+      "id": "composer-position",
+      "label": "工作区与模式上下文整合在输入卡片底部",
+      "passed": true,
+      "evidence": "ConversationRoot footer → InputBar context footer"
+    },
+    {
+      "category": "components",
+      "id": "composer-radius",
+      "label": "输入框使用 24px 大圆角例外",
+      "passed": true,
+      "evidence": "composer radius"
+    },
+    {
+      "category": "components",
+      "id": "nav-radius",
+      "label": "导航行使用 12px 圆角",
+      "passed": true,
+      "evidence": "nav radius"
+    },
+    {
+      "category": "components",
+      "id": "input-radius",
+      "label": "搜索/选择输入使用 28px 圆角",
+      "passed": true,
+      "evidence": "input radius"
+    },
+    {
+      "category": "components",
+      "id": "menu-radius",
+      "label": "菜单使用 14px、菜单项使用 12px",
+      "passed": true,
+      "evidence": "menu geometry"
+    },
+    {
+      "category": "components",
+      "id": "popover-motion",
+      "label": "展开层具备 CodePilot 的淡入/缩放动效",
+      "passed": true,
+      "evidence": "popover open state"
+    },
+    {
+      "category": "components",
+      "id": "hover-open",
+      "label": "Hover、active、expanded 状态完整",
+      "passed": true,
+      "evidence": "interactive state selectors"
+    },
+    {
+      "category": "components",
+      "id": "sidebar-shell",
+      "label": "侧栏实际默认宽度与表面对齐",
+      "passed": true,
+      "evidence": "sidebar surface + desktop layout default"
+    },
+    {
+      "category": "components",
+      "id": "project-rows",
+      "label": "项目与会话行复用导航圆角/hover",
+      "passed": true,
+      "evidence": "project/session row selectors"
+    },
+    {
+      "category": "components",
+      "id": "settings-shell",
+      "label": "设置页为完整桌面工作区而非网页弹窗",
+      "passed": true,
+      "evidence": "settings shell"
+    },
+    {
+      "category": "components",
+      "id": "settings-layout",
+      "label": "设置内容使用与 CodePilot 一致的居中内容宽度",
+      "passed": true,
+      "evidence": "settings content width"
+    },
+    {
+      "category": "components",
+      "id": "general-card",
+      "label": "通用设置使用 820px 居中的 16px 卡片",
+      "passed": true,
+      "evidence": "GeneralSection card"
+    },
+    {
+      "category": "components",
+      "id": "markdown",
+      "label": "Markdown 标题、列表、引用、代码与表格使用 CodePilot 层级",
+      "passed": true,
+      "evidence": "MarkdownText.module.css"
+    },
+    {
+      "category": "components",
+      "id": "tooltip-contrast",
+      "label": "Tooltip 使用深底白字并保留 reduced-motion",
+      "passed": true,
+      "evidence": "Tooltip.module.css"
+    },
+    {
+      "category": "components",
+      "id": "trajectory-chrome",
+      "label": "轨迹工具栏使用统一卡片、搜索与语义图标",
+      "passed": true,
+      "evidence": "Trajectory toolbar"
+    },
+    {
+      "category": "components",
+      "id": "worktree-chrome",
+      "label": "文件树使用侧栏入口、卡片浮层与安全操作工具栏",
+      "passed": true,
+      "evidence": "WorktreePanel.tsx"
+    },
+    {
+      "category": "components",
+      "id": "model-toolbar",
+      "label": "模型页搜索与筛选控件对齐",
+      "passed": true,
+      "evidence": "model toolbar"
+    },
+    {
+      "category": "components",
+      "id": "model-rows",
+      "label": "模型分组与行使用 CodePilot 卡片层级",
+      "passed": true,
+      "evidence": "model list geometry"
+    },
+    {
+      "category": "components",
+      "id": "provider-cards",
+      "label": "服务商卡片与操作按钮使用统一组件 token",
+      "passed": true,
+      "evidence": "provider cards"
+    },
+    {
+      "category": "components",
+      "id": "focus-visible",
+      "label": "键盘焦点为 3px 语义焦点环",
+      "passed": true,
+      "evidence": "focus visible"
+    },
+    {
+      "category": "components",
+      "id": "reduced-motion",
+      "label": "减少动态效果偏好受支持",
+      "passed": true,
+      "evidence": "reduced motion"
+    },
+    {
+      "category": "icons",
+      "id": "same-dependencies",
+      "label": "使用 CodePilot 的 HugeIcons 语义图标依赖",
+      "passed": true,
+      "evidence": "ui-primitives package dependencies"
+    },
+    {
+      "category": "icons",
+      "id": "semantic-layer",
+      "label": "具备统一 CodePilotIcon 语义映射层",
+      "passed": true,
+      "evidence": "CodePilotIcon.tsx"
+    },
+    {
+      "category": "icons",
+      "id": "sidebar-icons",
+      "label": "侧栏核心图标迁到语义层",
+      "passed": true,
+      "evidence": "SidebarRoot.tsx"
+    },
+    {
+      "category": "icons",
+      "id": "settings-icons",
+      "label": "设置导航图标迁到语义层",
+      "passed": true,
+      "evidence": "SettingsRoot.tsx"
+    },
+    {
+      "category": "icons",
+      "id": "workspace-icons",
+      "label": "项目区核心图标迁到语义层",
+      "passed": true,
+      "evidence": "WorkspaceBrowser/Picker"
+    },
+    {
+      "category": "icons",
+      "id": "model-icons",
+      "label": "模型页图标迁到语义层",
+      "passed": true,
+      "evidence": "ModelCatalogSection.tsx"
+    },
+    {
+      "category": "icons",
+      "id": "provider-brand-icons",
+      "label": "服务商使用 CodePilot 同源品牌图标库",
+      "passed": true,
+      "evidence": "provider brand icon"
+    },
+    {
+      "category": "icons",
+      "id": "trajectory-icons",
+      "label": "轨迹控制不再使用文本符号或手绘 SVG",
+      "passed": true,
+      "evidence": "TrajectoryToolbar.tsx"
+    },
+    {
+      "category": "plugins",
+      "id": "worktree-dual-face",
+      "label": "文件树是标准 Host + Client 双面插件",
+      "passed": true,
+      "evidence": "ui-worktree package"
+    },
+    {
+      "category": "plugins",
+      "id": "worktree-vanilla-install",
+      "label": "普通 Harness 可用相同 Cordis 插件行安装",
+      "passed": true,
+      "evidence": "ui-worktree README"
+    },
+    {
+      "category": "plugins",
+      "id": "desktop-bare-plugin",
+      "label": "桌面补丁使用可升级的包名而非绝对路径",
+      "passed": true,
+      "evidence": "desktop patch"
+    },
+    {
+      "category": "plugins",
+      "id": "runtime-closure",
+      "label": "CLI 发布闭包携带文件树插件供 profile 解析",
+      "passed": true,
+      "evidence": "apps/cli dependency"
+    },
+    {
+      "category": "plugins",
+      "id": "trajectory-export-slot",
+      "label": "单会话日志导出由插件注册到轨迹 toolbar slot",
+      "passed": true,
+      "evidence": "session-log-export client"
+    },
+    {
+      "category": "plugins",
+      "id": "model-provider-plugin",
+      "label": "桌面模型配置继续挂载 Harness pi-ai 服务商插件",
+      "passed": true,
+      "evidence": "desktop model patch"
+    },
+    {
+      "category": "platform",
+      "id": "mac-titlebar",
+      "label": "macOS 使用 hiddenInset",
+      "passed": true,
+      "evidence": "BrowserWindow titleBarStyle"
+    },
+    {
+      "category": "platform",
+      "id": "mac-traffic-lights",
+      "label": "macOS 红绿灯位置为 CodePilot 20/21",
+      "passed": true,
+      "evidence": "trafficLightPosition"
+    },
+    {
+      "category": "platform",
+      "id": "mac-vibrancy",
+      "label": "macOS 使用 under-window vibrancy",
+      "passed": true,
+      "evidence": "vibrancy"
+    },
+    {
+      "category": "platform",
+      "id": "mac-transparent",
+      "label": "macOS 使用透明原生窗口背板",
+      "passed": true,
+      "evidence": "transparent BrowserWindow"
+    },
+    {
+      "category": "platform",
+      "id": "mac-effect-state",
+      "label": "macOS 原生材质跟随窗口状态",
+      "passed": true,
+      "evidence": "visualEffectState"
+    },
+    {
+      "category": "platform",
+      "id": "windows-overlay",
+      "label": "Windows 使用 44px 透明标题栏叠层",
+      "passed": true,
+      "evidence": "titleBarOverlay"
+    },
+    {
+      "category": "platform",
+      "id": "integrated-topbar",
+      "label": "macOS 内容与窗口栏融合并保留 8px 可拖动命中带",
+      "passed": true,
+      "evidence": "desktop top area"
+    },
+    {
+      "category": "platform",
+      "id": "windows-safe-area",
+      "label": "Windows 标题栏安全区不遮挡内容",
+      "passed": true,
+      "evidence": "Windows safe area"
+    },
+    {
+      "category": "runtime",
+      "id": "chat-viewport",
+      "label": "聊天审计使用 1152×900 同尺寸视口",
+      "passed": true,
+      "evidence": "{\"width\":1152,\"height\":900,\"devicePixelRatio\":2}"
+    },
+    {
+      "category": "runtime",
+      "id": "mac-body-inset",
+      "label": "macOS 实际内容无伪标题栏上内边距",
+      "passed": true,
+      "evidence": "0px"
+    },
+    {
+      "category": "runtime",
+      "id": "window-drag-strip",
+      "label": "窗口顶部与可见侧栏标题行均可拖动",
+      "passed": true,
+      "evidence": "{\"body\":\"drag\",\"titlebar\":\"drag\"}"
+    },
+    {
+      "category": "runtime",
+      "id": "sidebar-width",
+      "label": "侧栏实际渲染宽度为 240px",
+      "passed": true,
+      "evidence": "240px"
+    },
+    {
+      "category": "runtime",
+      "id": "composer-geometry",
+      "label": "输入区实际为 768px 宽 / 24px 圆角",
+      "passed": true,
+      "evidence": "{\"selector\":\"[class*='_composerHero'] [class*='_card']\",\"box\":{\"x\":308,\"y\":468,\"width\":768,\"height\":169},\"background\":\"oklch(1 0 0)\",\"borderRadius\":\"24px\",\"boxShadow\":\"rgba(0, 0, 0, 0.1) 0px 12px 40px -8px, rgba(0, 0, 0, 0.04) 0px 4px 12px -4px\",\"padding\":\"10px 0px 0px\",\"appRegion\":\"none\"}"
+    },
+    {
+      "category": "runtime",
+      "id": "composer-shadow",
+      "label": "输入区实际应用 diffuse shadow",
+      "passed": true,
+      "evidence": "rgba(0, 0, 0, 0.1) 0px 12px 40px -8px, rgba(0, 0, 0, 0.04) 0px 4px 12px -4px"
+    },
+    {
+      "category": "runtime",
+      "id": "project-radius",
+      "label": "项目行实际应用 12px 圆角",
+      "passed": true,
+      "evidence": "12px"
+    },
+    {
+      "category": "runtime",
+      "id": "settings-shell",
+      "label": "设置页实际铺满窗口且无网页弹窗圆角",
+      "passed": true,
+      "evidence": "{\"selector\":\"[class*='_panel']:has(> [class*='_nav'] [class*='_navTitle'])\",\"box\":{\"x\":0,\"y\":0,\"width\":1152,\"height\":845},\"background\":\"oklch(1 0 0)\",\"borderRadius\":\"0px\",\"boxShadow\":\"none\",\"padding\":\"0px\",\"appRegion\":\"none\"}"
+    },
+    {
+      "category": "runtime",
+      "id": "settings-nav",
+      "label": "设置导航实际为 240px 并避让 40px 顶栏",
+      "passed": true,
+      "evidence": "{\"selector\":\"[class*='_panel'] > [class*='_nav']:has([class*='_navTitle'])\",\"box\":{\"x\":0,\"y\":0,\"width\":240,\"height\":845},\"background\":\"rgba(0, 0, 0, 0)\",\"borderRadius\":\"0px\",\"boxShadow\":\"none\",\"padding\":\"48px 8px 0px\",\"appRegion\":\"none\"}"
+    },
+    {
+      "category": "runtime",
+      "id": "provider-action",
+      "label": "服务商入口实际使用 12px 卡片按钮半径",
+      "passed": true,
+      "evidence": "12px"
+    },
+    {
+      "category": "runtime",
+      "id": "model-search",
+      "label": "模型搜索实际应用 28px 圆角",
+      "passed": true,
+      "evidence": "28px"
+    },
+    {
+      "category": "runtime",
+      "id": "model-card",
+      "label": "模型服务商卡片实际应用 16px 圆角",
+      "passed": true,
+      "evidence": "16px"
+    },
+    {
+      "category": "runtime",
+      "id": "model-row-density",
+      "label": "模型行实际压缩到 50px 以内",
+      "passed": true,
+      "evidence": "44px"
+    },
+    {
+      "category": "runtime",
+      "id": "general-card",
+      "label": "通用设置卡片实际为 820px / 16px 且居中",
+      "passed": true,
+      "evidence": "{\"selector\":\"[data-pilot-settings-card=\\\"general\\\"]\",\"box\":{\"x\":286,\"y\":72,\"width\":820,\"height\":523},\"background\":\"oklch(1 0 0)\",\"borderRadius\":\"16px\",\"boxShadow\":\"rgba(0, 0, 0, 0.04) 0px 1px 2px 0px\",\"padding\":\"0px 20px\",\"appRegion\":\"none\"}"
+    },
+    {
+      "category": "runtime",
+      "id": "worktree-plugin",
+      "label": "文件树浮层、工具栏与目录行均真实渲染",
+      "passed": true,
+      "evidence": "{\"panel\":{\"selector\":\"aside[aria-label='Files']\",\"box\":{\"x\":798,\"y\":12,\"width\":342,\"height\":821},\"background\":\"oklch(1 0 0)\",\"borderRadius\":\"20px\",\"boxShadow\":\"rgba(0, 0, 0, 0.08) 0px 6px 20px 0px, rgba(0, 0, 0, 0.12) 0px 24px 64px 0px\",\"padding\":\"0px\",\"appRegion\":\"none\"},\"toolbarButton\":{\"selector\":\"aside[aria-label='Files'] header button\",\"box\":{\"x\":1011,\"y\":38,\"width\":28,\"height\":28},\"background\":\"rgba(0, 0, 0, 0)\",\"borderRadius\":\"9px\",\"boxShadow\":\"none\",\"padding\":\"0px\",\"appRegion\":\"no-drag\"},\"treeRow\":{\"selector\":\"aside[aria-label='Files'] [class*='_row']\",\"box\":{\"x\":807,\"y\":100,\"width\":324,\"height\":30},\"background\":\"rgba(0, 0, 0, 0)\",\"borderRadius\":\"10px\",\"boxShadow\":\"none\",\"padding\":\"0px\",\"appRegion\":\"none\"}}"
+    },
+    {
+      "category": "runtime",
+      "id": "trajectory-view",
+      "label": "轨迹 toolbar、时间线与 ledger 卡片真实渲染",
+      "passed": true,
+      "evidence": "{\"header\":{\"selector\":\"[data-pilot-conversation-header]\",\"box\":{\"x\":260,\"y\":0,\"width\":864,\"height\":52},\"background\":\"rgba(0, 0, 0, 0)\",\"borderRadius\":\"0px\",\"boxShadow\":\"none\",\"padding\":\"0px\",\"appRegion\":\"none\"},\"toolbar\":{\"selector\":\"[role='toolbar'] > [class*='_inner']\",\"box\":{\"x\":260,\"y\":61,\"width\":872,\"height\":38},\"background\":\"oklch(1 0 0)\",\"borderRadius\":\"14px\",\"boxShadow\":\"rgba(0, 0, 0, 0.04) 0px 1px 2px 0px\",\"padding\":\"3px 4px\",\"appRegion\":\"none\"},\"ledger\":{\"selector\":\"[class*='_ledger']\",\"box\":{\"x\":259,\"y\":169,\"width\":874,\"height\":664},\"background\":\"oklch(1 0 0)\",\"borderRadius\":\"16px\",\"boxShadow\":\"rgba(0, 0, 0, 0.04) 0px 1px 2px 0px\",\"padding\":\"0px\",\"appRegion\":\"none\"},\"timeline\":{\"selector\":\"section[aria-label='Trajectory timeline']\",\"box\":{\"x\":259,\"y\":107,\"width\":874,\"height\":52},\"background\":\"rgba(0, 0, 0, 0)\",\"borderRadius\":\"14px\",\"boxShadow\":\"rgba(0, 0, 0, 0.04) 0px 1px 2px 0px\",\"padding\":\"0px\",\"appRegion\":\"none\"}}"
+    }
+  ]
+}

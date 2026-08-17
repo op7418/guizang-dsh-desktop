@@ -1,0 +1,29 @@
+- banner:
+  - navigation "Session hierarchy":
+    - 'button "Run two shell commands: wait" [disabled]'
+  - tablist:
+    - tab "Chat" [selected]
+    - tab "Trajectory"
+- text: "Run two shell commands: wait for cancellation, then write skipped.txt. {{date}} {{clock}}"
+- button "Copy":
+  - img
+- button "Context injection @deepseek-ai/dsh-system-prompt":
+  - img
+  - img
+  - text: Context injection @deepseek-ai/dsh-system-prompt
+- 'button "Failed Bash Error: tool call aborted" [expanded]':
+  - img
+  - text: "Failed Bash Error: tool call aborted"
+- text: "IN { \"command\": \"node -e \\\"require('node:fs').writeFileSync('started.txt', 'started'); setInterval(() => {}, 1000)\\\"\", \"description\": \"Wait until cancellation\" } OUT Error: tool call aborted"
+- button "Inspect"
+- 'button "Failed Bash Error: tool call aborted before dispatch"':
+  - img
+  - text: "Failed Bash Error: tool call aborted before dispatch"
+- textbox "Message the agent"
+- button "Commands"
+- 'button "Access mode, current: Workspace Write"': Workspace Write
+- button "Select model, current DeepSeek-V4-Flash":
+  - text: DeepSeek-V4-Flash
+  - img
+- button "Context details"
+- button "Send message" [disabled]

@@ -1,0 +1,237 @@
+.root {
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: var(--dsh-trajectory-toolbar-height);
+  padding: 8px 20px 6px;
+  background: var(--dsw-alias-bg-base);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  width: min(100%, 1120px);
+  min-height: 36px;
+  margin: 0 auto;
+  padding: 3px 4px;
+  gap: 8px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--dsw-alias-bg-module-platform);
+  box-shadow: none;
+}
+
+.actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+}
+
+.toggle {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 28px;
+  padding: 0 9px;
+  gap: 4px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--dsw-alias-label-tertiary);
+  background: transparent;
+  cursor: pointer;
+  font: var(--dsw-font-xxs-12);
+}
+
+.toggle:hover {
+  color: var(--dsw-alias-label-primary);
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.toggle[aria-pressed='true'] {
+  color: var(--dsw-alias-label-primary);
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.toggle:focus-visible {
+  outline: 2px solid var(--dsw-alias-state-business-primary);
+  outline-offset: 2px;
+}
+
+.toggleIcon {
+  flex: none;
+  width: 12px;
+  height: 12px;
+}
+
+.control {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 88px;
+  height: 28px;
+  padding: 0 5px;
+  gap: 4px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--dsw-alias-label-tertiary);
+  background: transparent;
+  cursor: pointer;
+  font: var(--dsw-font-xxs-12);
+}
+
+.control[hidden] {
+  display: none;
+}
+
+.control:hover:not(:disabled),
+.control[aria-checked='true'],
+.control[aria-pressed='true'] {
+  color: var(--dsw-alias-label-primary);
+}
+
+.control:focus-visible {
+  outline: 1px solid var(--dsw-alias-state-business-primary);
+  outline-offset: 1px;
+}
+
+.control:disabled {
+  color: var(--dsw-alias-label-dimmed);
+  cursor: not-allowed;
+}
+
+.controlTrack {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 20px;
+  height: 10px;
+  border-radius: 8px;
+  background: var(--dsw-alias-border-l2);
+  transition: background-color 120ms var(--ds-ease-in-out);
+}
+
+.controlThumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--dsw-alias-bg-layer-1);
+  transition: transform 120ms var(--ds-ease-in-out);
+}
+
+.controlTrack[data-on='true'] {
+  background: var(--dsw-alias-state-business-primary);
+}
+
+.controlTrack[data-on='true'] .controlThumb {
+  transform: translateX(10px);
+}
+
+.action {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 28px;
+  padding: 0 8px;
+  gap: 4px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--dsw-alias-label-tertiary);
+  background: transparent;
+  cursor: pointer;
+  font: var(--dsw-font-xxs-12);
+}
+
+.action:hover {
+  color: var(--dsw-alias-label-primary);
+  background: var(--dsw-alias-interactive-bg-hover);
+}
+
+.action:focus-visible {
+  outline: 2px solid var(--dsw-alias-state-business-primary);
+  outline-offset: 2px;
+}
+
+.actionIcon {
+  flex: none;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+.search {
+  display: flex;
+  flex: 0 1 188px;
+  align-items: center;
+  min-width: 84px;
+  height: 28px;
+  margin-left: auto;
+  padding: 0 6px;
+  gap: 4px;
+  border: 0;
+  border-radius: 8px;
+  color: var(--dsw-alias-label-caption);
+  background: var(--dsw-alias-bg-layer-1);
+}
+
+.search:hover {
+  background: var(--dsw-alias-interactive-bg-hover-solid);
+}
+
+.search:focus-within {
+  background: var(--dsw-alias-bg-layer-1);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--dsw-alias-state-business-primary) 16%, transparent);
+}
+
+.searchIcon {
+  flex: none;
+}
+
+.searchInput {
+  min-width: 0;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  color: var(--dsw-alias-label-primary);
+  background: transparent;
+  font: var(--dsw-font-xxs-12);
+}
+
+.searchInput::placeholder {
+  color: var(--dsw-alias-label-caption);
+}
+
+.searchInput::-webkit-search-cancel-button {
+  width: 12px;
+  height: 12px;
+  cursor: pointer;
+}
+
+.utilities {
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding-left: 4px;
+}
+
+@media (max-width: 820px) {
+  .root {
+    padding-inline: 12px;
+  }
+
+  .toggle,
+  .action {
+    padding-inline: 7px;
+  }
+
+  .search {
+    flex-basis: 132px;
+  }
+}
