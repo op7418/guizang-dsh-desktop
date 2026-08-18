@@ -94,17 +94,31 @@ jobs:
         run: pnpm --filter @deepseek-ai/dsh-desktop run test:e2e
 
       - name: Build native desktop artifacts
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+        if: ${{ github.event_name == 'workflow_dispatch' && runner.os != 'macOS' }}
         run: pnpm --filter @deepseek-ai/dsh-desktop run pack
+
+      - name: Build native macOS desktop artifacts
+        if: ${{ github.event_name == 'workflow_dispatch' && runner.os == 'macOS' }}
+        shell: bash
+        timeout-minutes: 45
+        run: |
+          ulimit -n 65536 2>/dev/null || ulimit -n 10240
+          echo "macOS open-file limit: $(ulimit -n)"
+          pnpm --filter @deepseek-ai/dsh-desktop run pack
 
       - name: Build signed macOS release artifacts
         if: ${{ startsWith(github.ref, 'refs/tags/v') && runner.os == 'macOS' }}
+        shell: bash
+        timeout-minutes: 45
         env:
           CSC_LINK: ${{ secrets.MAC_CERT_P12_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
           PILOT_HARNESS_APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           PILOT_HARNESS_REQUIRE_DEVELOPER_ID: '1'
-        run: pnpm --filter @deepseek-ai/dsh-desktop run pack:release
+        run: |
+          ulimit -n 65536 2>/dev/null || ulimit -n 10240
+          echo "macOS open-file limit: $(ulimit -n)"
+          pnpm --filter @deepseek-ai/dsh-desktop run pack:release
 
       - name: Build release artifacts
         if: ${{ startsWith(github.ref, 'refs/tags/v') && runner.os != 'macOS' }}

@@ -47,8 +47,9 @@ test('online previews are ad-hoc signed while tagged releases require Developer 
   assert.match(workflow, /verify-macos-signature\.mjs apps\/desktop\/release 1/)
   assert.match(
     workflow,
-    /if: \$\{\{ github\.event_name == 'workflow_dispatch' \}\}\n        run: pnpm --filter @deepseek-ai\/dsh-desktop run pack/,
+    /github\.event_name == 'workflow_dispatch' && runner\.os == 'macOS'/,
   )
+  assert.match(workflow, /ulimit -n 65536 2>\/dev\/null \|\| ulimit -n 10240/)
   assert.match(workflow, /desktop package version \$actual does not match tag \$GITHUB_REF_NAME/)
   assert.match(workflow, /if: startsWith\(github\.ref, 'refs\/tags\/v'\)/)
   assert.match(workflow, /> release-assets\/SHA256SUMS\.txt/)
