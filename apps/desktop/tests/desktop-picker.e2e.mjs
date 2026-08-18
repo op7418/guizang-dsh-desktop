@@ -203,6 +203,17 @@ try {
     await dialog.waitFor({ state: 'detached' })
     return true
   }
+  async function runPastProviderSetup(action) {
+    try {
+      return await action(5_000)
+    } catch (error) {
+      // Provider discovery is independent from first-paint and can finish
+      // while another first-run surface is already open. Retry only when the
+      // known provider prompt is actually present; unrelated overlays fail.
+      if (!await skipProviderSetup(10_000)) throw error
+      return action(30_000)
+    }
+  }
   await skipProviderSetup(10_000)
 
   const bridge = await page.evaluate(() => ({
@@ -225,31 +236,25 @@ try {
   const directoryBrowser = page.getByRole('dialog', { name: 'Select Workspace Directory', exact: true })
   async function addWorkspacePath(path, expectedName = basename(path)) {
     await electronApp.evaluate((_, selectedPath) => { globalThis.__pilotHarnessE2EPath = selectedPath }, path)
-    try {
-      await addWorkspace.click({ timeout: 5_000 })
-    } catch (error) {
-      // Models readiness settles independently from the first workspace paint.
-      // If the clean-profile prompt won that race, take its explicit skip path
-      // and retry. Any unrelated overlay still fails with the original error.
-      if (!await skipProviderSetup(10_000)) throw error
-      await addWorkspace.click()
-    }
+    await runPastProviderSetup(timeout => addWorkspace.click({ timeout }))
 
     // Linux intentionally uses the in-app directory browser instead of the
     // native bridge. Exercise that real fallback; macOS and Windows resolve
     // directly through the test IPC handler and never render this dialog.
     await directoryBrowser.waitFor({ timeout: 1_500 }).catch(() => undefined)
     if (await directoryBrowser.isVisible().catch(() => false)) {
-      await directoryBrowser.getByRole('button', { name: 'Edit path', exact: true }).click()
+      const editPath = directoryBrowser.getByRole('button', { name: 'Edit path', exact: true })
+      await runPastProviderSetup(timeout => editPath.click({ timeout }))
       const pathEditor = directoryBrowser.getByRole('textbox', { name: 'Edit path', exact: true })
-      await pathEditor.fill(path)
+      await runPastProviderSetup(timeout => pathEditor.fill(path, { timeout }))
       // Enter commits the path and synchronously unmounts this editor. Send
       // the key through the focused page so Playwright does not retry a
       // successful locator action merely because its target was detached.
-      await pathEditor.focus()
+      await runPastProviderSetup(timeout => pathEditor.focus({ timeout }))
       await page.keyboard.press('Enter')
       await pathEditor.waitFor({ state: 'detached' })
-      await directoryBrowser.getByRole('button', { name: 'Open', exact: true }).click()
+      const openDirectory = directoryBrowser.getByRole('button', { name: 'Open', exact: true })
+      await runPastProviderSetup(timeout => openDirectory.click({ timeout }))
     }
 
     const row = page.getByRole('treeitem').filter({ hasText: expectedName }).first()
