@@ -91,6 +91,23 @@ describe('ProviderOnboardingDialog', () => {
     expect(h.openSection).not.toHaveBeenCalled()
   })
 
+  it('waits for an existing dialog instead of replacing its active flow', async () => {
+    const blocker = document.createElement('div')
+    blocker.setAttribute('role', 'dialog')
+    blocker.setAttribute('aria-label', 'Select Workspace Directory')
+    document.body.append(blocker)
+    const h = harness()
+    render(<ProviderOnboardingDialog {...h.props} />)
+
+    await waitFor(() => { expect(h.props.controller.store.getSnapshot().status).toBe('ready') })
+    expect(screen.queryByRole('dialog', { name: en.onboardingTitle })).toBeNull()
+    expect(h.appRoot.inert).not.toBe(true)
+
+    blocker.remove()
+    expect(await screen.findByRole('dialog', { name: en.onboardingTitle })).toBeTruthy()
+    expect(h.appRoot.inert).toBe(true)
+  })
+
   it('does not block an already configured or unavailable installation', async () => {
     for (const h of [
       harness({ providerReady: true }),

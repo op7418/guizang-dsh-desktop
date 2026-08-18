@@ -1,6 +1,6 @@
 /** Generic first-run provider guidance over the shared Models snapshot. */
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { IApiClient } from '@deepseek-ai/dsh-api-remotes/client'
 import type { SnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
@@ -30,6 +30,37 @@ export interface ProviderOnboardingInjected {
 export type ProviderOnboardingDialogProps =
   PropsRuntime<'settings.onboarding'> & InjectFace<ProviderOnboardingInjected>
 
+/** Whether a dialog outside this onboarding step currently owns the screen. */
+function hasExternalDialog(): boolean {
+  return [...document.querySelectorAll('[role="dialog"]')]
+    .some(dialog => dialog.querySelector('[data-pilot-provider-onboarding]') === null)
+}
+
+/**
+ * Defer first-run guidance until an already-started user flow releases its
+ * dialog. Provider discovery is asynchronous and must never replace a folder
+ * picker (or another modal) merely because its response settled later.
+ */
+function useDialogAvailable(enabled: boolean): boolean {
+  const [available, setAvailable] = useState(false)
+
+  useEffect(() => {
+    if (!enabled) return
+    const update = (): void => { setAvailable(!hasExternalDialog()) }
+    const observer = new MutationObserver(update)
+    observer.observe(document.body, { childList: true, subtree: true })
+    // Wait one task before the first presentation so sibling dialogs created
+    // by the same interaction have committed to the document.
+    const timer = window.setTimeout(update, 0)
+    return () => {
+      window.clearTimeout(timer)
+      observer.disconnect()
+    }
+  }, [enabled])
+
+  return enabled && available
+}
+
 /**
  * Offer a vendor-neutral path into provider setup without blocking exploration.
  * @param props - settings-shell owner state and Models feature dependencies.
@@ -39,6 +70,7 @@ export function ProviderOnboardingDialog(props: ProviderOnboardingDialogProps): 
   const { complete, openSection, controller, useModels, t } = props
   const state = useModels(snapshot => snapshot)
   const readiness = onboardingReadiness(state)
+  const dialogAvailable = useDialogAvailable(readiness.kind === 'setup-required')
 
   useEffect(() => {
     if (state.status === 'idle') void controller.load()
@@ -48,7 +80,7 @@ export function ProviderOnboardingDialog(props: ProviderOnboardingDialogProps): 
     if (readiness.kind === 'provider-ready' || readiness.kind === 'unavailable') complete()
   }, [complete, readiness.kind])
 
-  if (readiness.kind !== 'setup-required') return null
+  if (readiness.kind !== 'setup-required' || !dialogAvailable) return null
 
   const addProvider = (): void => {
     openSection('providers')
@@ -57,10 +89,12 @@ export function ProviderOnboardingDialog(props: ProviderOnboardingDialogProps): 
 
   return (
     <OnboardingModal title={t('onboardingTitle')} focusTitle>
-      <p className={styles.description}>{t('onboardingDescription')}</p>
-      <div className={styles.actions}>
-        <Button variant="outline" onClick={complete}>{t('onboardingLater')}</Button>
-        <Button variant="primary" onClick={addProvider}>{t('onboardingOpenProviders')}</Button>
+      <div data-pilot-provider-onboarding>
+        <p className={styles.description}>{t('onboardingDescription')}</p>
+        <div className={styles.actions}>
+          <Button variant="outline" onClick={complete}>{t('onboardingLater')}</Button>
+          <Button variant="primary" onClick={addProvider}>{t('onboardingOpenProviders')}</Button>
+        </div>
       </div>
     </OnboardingModal>
   )
