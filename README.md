@@ -42,15 +42,15 @@ Pilot Harness does not replace the DeepSeek Harness agent loop, Session log, too
 
 Download the installer for your system from [GitHub Releases](https://github.com/op7418/pilot-harness/releases/latest):
 
-| Platform | Download |
-|---|---|
-| macOS (Apple Silicon) | [DMG installer](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.dmg) · [ZIP app](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.zip) |
-| Windows (x64) | [EXE installer](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Windows-x64.exe) |
-| Linux (x64) | [AppImage](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-x86_64.AppImage) · [DEB](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-amd64.deb) · [RPM](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-x86_64.rpm) |
+| Platform | Download | Install and handle the security prompt |
+|---|---|---|
+| **macOS (Apple Silicon)** | [DMG installer](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.dmg)<br>[ZIP app](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.zip) | Open the DMG and drag `pilot-harness.app` into **Applications**. If macOS cannot verify the developer, use **System Settings → Privacy & Security → Open Anyway**. If it reports that the app is damaged, open Terminal and run:<br><code>sudo xattr -rd com.apple.quarantine "/Applications/pilot-harness.app"</code><br><code>open "/Applications/pilot-harness.app"</code><br>Enter your login password when prompted; Terminal will not display it. [Apple's security instructions](https://support.apple.com/102445). |
+| **Windows (x64)** | [EXE installer](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Windows-x64.exe) | Run the EXE. If Microsoft Defender SmartScreen says **Windows protected your PC**, first confirm that the file came from this Release, then choose **More info → Run anyway**. Do not disable SmartScreen globally. A managed computer may hide this option; contact its administrator instead. [Microsoft's SmartScreen explanation](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/smartscreen-reputation). |
+| **Linux (x64)** | [AppImage](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-x86_64.AppImage)<br>[DEB](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-amd64.deb)<br>[RPM](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-x86_64.rpm) | DEB: <code>sudo apt install ./Pilot-Harness-Linux-amd64.deb</code><br>RPM: <code>sudo dnf install ./Pilot-Harness-Linux-x86_64.rpm</code><br>AppImage: <code>chmod +x Pilot-Harness-Linux-x86_64.AppImage</code>, then <code>./Pilot-Harness-Linux-x86_64.AppImage</code>. If the file manager blocks execution, enable **Allow executing file as program** in file properties. The preview packages are unsigned, so only accept a package-manager warning after confirming the official Release source. |
 
-After installation, open Pilot Harness, select a Workspace, then go to **Settings → Providers** to connect a provider and choose one of its available models. No separate DeepSeek Harness installation is required for the desktop app.
+All current preview installers are unsigned. Only override an operating-system warning for files downloaded from this repository's [official GitHub Release](https://github.com/op7418/pilot-harness/releases/latest); do not turn off platform security globally. Signing and notarization are planned for a future release.
 
-Preview installers are currently unsigned, so the operating system may ask you to confirm the first launch. Source setup and packaging instructions live in [Development](#development), not in the user installation path.
+After installation, open Pilot Harness, select a Workspace, then go to **Settings → Providers** to connect a provider and choose one of its available models. No separate DeepSeek Harness installation is required for the desktop app. Source setup and packaging instructions live in [Development](#development), not in the user installation path.
 
 ## What is included
 
