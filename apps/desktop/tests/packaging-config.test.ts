@@ -70,6 +70,15 @@ test('online previews are ad-hoc signed while formal releases require Developer 
   assert.doesNotMatch(rootReadmeZh, /pnpm run desktop:pack/)
   assert.match(rootReadme, /never built or uploaded from a developer machine/)
   assert.match(rootReadmeZh, /不会在开发者电脑上构建或上传/)
+  assert.match(builderConfig, /^  notarize: false$/m)
+  assert.match(rootReadme, /formal Release is published only after its Developer ID signature has been verified/)
+  assert.match(rootReadme, /System Settings → Privacy & Security/)
+  assert.match(rootReadme, /Do not run `xattr` or disable Gatekeeper/)
+  assert.match(rootReadme, /Preview macOS artifacts are ad-hoc signed/)
+  assert.match(rootReadmeZh, /正式 Release 只有在 Developer ID 签名校验通过后才会发布/)
+  assert.match(rootReadmeZh, /系统设置 → 隐私与安全性/)
+  assert.match(rootReadmeZh, /正式 Release 不需要执行 `xattr`/)
+  assert.match(rootReadmeZh, /macOS 预览产物仅使用临时签名/)
 
   const tracked = JSON.parse(upstreamState) as { repository?: string; tag?: string; commit?: string; pilotVersion?: string }
   assert.equal(tracked.repository, 'deepseek-ai/deepseek-harness')

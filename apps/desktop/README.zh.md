@@ -41,7 +41,7 @@ Electron 端到端检查会使用隔离的空 Harness home 启动客户端，通
 
 ## 打包
 
-正式安装包只由 `.github/workflows/desktop.yml` 构建和上传，本地打包不属于发布路径。手动触发且不填写 `release_tag` 时，工作流会使用明确的 macOS 临时签名配置和严格 Bundle 校验，生成保留七天的 Actions Artifact。版本一致的 `v*` Tag，或经过保护的上游同步工作流传入 `release_tag`，会在原生 GitHub runner 上构建 DMG/ZIP、NSIS、AppImage/DEB/RPM 与插件 bundle，生成 `SHA256SUMS.txt`，并且只在全部必需 Job 成功后发布 Release。由于未归档的 DSH 依赖闭包含数万个资源，macOS 打包会把递归遍历交给 Apple 原生 `codesign`，不再使用默认的 JavaScript 签名器；现有 `afterSign` 门禁仍会做严格的深度校验。正式 macOS 构建会导入仓库 Actions Secrets 中的 `MAC_CERT_P12_BASE64`、`MAC_CERT_PASSWORD` 与 `APPLE_TEAM_ID`；若产物不属于配置的 Developer ID Team，则会在上传前失败。证书材料只保存在 GitHub Secrets 中，不进入仓库或开发者电脑上的打包目录。公证仍由部署流程负责。
+正式安装包只由 `.github/workflows/desktop.yml` 构建和上传，本地打包不属于发布路径。每次通过验证的 `main` 推送，以及不填写 `release_tag` 的手动触发，都会使用明确的 macOS 临时签名配置和严格 Bundle 校验，生成保留七天的 Actions Artifact。版本一致的 `v*` Tag，或经过保护的上游同步工作流传入 `release_tag`，会在原生 GitHub runner 上构建 DMG/ZIP、NSIS、AppImage/DEB/RPM 与插件 bundle，生成 `SHA256SUMS.txt`，并且只在全部必需 Job 成功后发布 Release。由于未归档的 DSH 依赖闭包含数万个资源，macOS 打包会把递归遍历交给 Apple 原生 `codesign`，不再使用默认的 JavaScript 签名器；现有 `afterSign` 门禁仍会做严格的深度校验。正式 macOS 构建会导入仓库 Actions Secrets 中的 `MAC_CERT_P12_BASE64`、`MAC_CERT_PASSWORD` 与 `APPLE_TEAM_ID`；若产物不属于配置的 Developer ID Team，则会在上传前失败。证书材料只保存在 GitHub Secrets 中，不进入仓库或开发者电脑上的打包目录。Apple 公证仍由部署流程负责；启用前，用户文档只引导正式 Developer ID 版本的用户前往**系统设置 → 隐私与安全性 → 仍要打开**，不会要求关闭 Gatekeeper 或清除隔离属性。
 
 确认后的正方形图稿保存在 `assets/icon-master.png`。`pnpm --filter @deepseek-ai/dsh-desktop run icons` 会为系统启动器生成图形占比 83.6% 的平台版 PNG、ICNS、ICO 与 Linux 多尺寸资源，同时生成供应用内界面使用、图形铺满画布的 `brand-icon.png`。同一生成器还会把紧凑版本嵌入可卸载的 CodePilot 主题，使 Dock、恢复页、空会话、侧边栏、“关于”页、打包应用与安装包共用同一源图，并避免把系统启动器的留白带进应用界面。
 

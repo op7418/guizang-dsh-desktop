@@ -44,11 +44,11 @@ Pilot Harness 不替换 DeepSeek Harness 的 agent loop、Session 日志、工�
 
 | 平台 | 直接下载 | 安装方法与首次启动安全提示 |
 |---|---|---|
-| **macOS（Apple Silicon）** | [DMG 安装包](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.dmg)<br>[ZIP 应用](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.zip) | 打开 DMG，将 `pilot-harness.app` 拖入**应用程序**，然后先尝试打开一次。如果 macOS 无法验证，进入**系统设置 → 隐私与安全性 → 仍要打开**，再确认**打开**。不需要执行终端命令。如果 macOS 提示应用已损坏，请删除应用并从本表重新下载 DMG。[Apple 安全说明](https://support.apple.com/102445)。 |
+| **macOS（Apple Silicon）** | [DMG 安装包](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.dmg)<br>[ZIP 应用](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.zip) | 打开 DMG，将 `pilot-harness.app` 拖入**应用程序**，然后正常启动。正式 Release 只有在 Developer ID 签名校验通过后才会发布。由于目前尚未启用 Apple 公证，Gatekeeper 首次仍可能阻止启动；此时进入**系统设置 → 隐私与安全性**，点击**仍要打开**，再确认**打开**即可。正式 Release 不需要执行 `xattr`，也不要关闭 Gatekeeper。如果 macOS 提示已签名应用已损坏，请删除应用、核对 Release 校验和并重新下载，不要绕过该警告。[Apple 安全说明](https://support.apple.com/102445)。 |
 | **Windows（x64）** | [EXE 安装程序](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Windows-x64.exe) | 运行 EXE。如果 Microsoft Defender SmartScreen 显示**Windows 已保护你的电脑**，请先确认文件来自本 Release，再选择**更多信息 → 仍要运行**。不要全局关闭 SmartScreen。受管理的电脑可能不显示该选项，此时请联系管理员。[Microsoft SmartScreen 说明](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/smartscreen-reputation)。 |
 | **Linux（x64）** | [AppImage](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-x86_64.AppImage)<br>[DEB](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-amd64.deb)<br>[RPM](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-x86_64.rpm) | DEB：<code>sudo apt install ./Pilot-Harness-Linux-amd64.deb</code><br>RPM：<code>sudo dnf install ./Pilot-Harness-Linux-x86_64.rpm</code><br>AppImage：执行 <code>chmod +x Pilot-Harness-Linux-x86_64.AppImage</code>，再执行 <code>./Pilot-Harness-Linux-x86_64.AppImage</code>。如果文件管理器阻止运行，在文件属性中启用**允许作为程序执行**。预览包尚未签名，因此只有确认来自官方 Release 后才应接受包管理器警告。 |
 
-macOS 安装包已携带 Developer ID 签名，但尚未完成公证，因此首次启动仍可能需要点击**仍要打开**。Windows 与 Linux 预览安装包仍未签名。只有对从本仓库 [GitHub 官方 Release](https://github.com/op7418/pilot-harness/releases/latest)下载的文件才应覆盖操作系统警告；不要全局关闭平台安全功能。
+上表指向提供给普通用户的正式 Release，不是仅保留七天的 Actions 预览产物。正式 macOS 文件必须通过 Developer ID 校验才能发布；在尚未公证期间，预期只需在系统设置中点击一次**仍要打开**。Actions 中的 macOS 预览产物仅使用临时签名供 CI 验证，不属于普通安装路径。以后启用 Apple 公证后，正常情况下将不再需要**仍要打开**，届时必须随发布流水线同步更新本指引。Windows 与 Linux 预览安装包仍未签名。只有对从本仓库 [GitHub 官方 Release](https://github.com/op7418/pilot-harness/releases/latest)下载的文件才应覆盖操作系统警告；不要全局关闭平台安全功能。
 
 安装后打开 Pilot Harness，选择工作区，再前往**设置 → 服务商**连接服务商，并选择它提供的模型。桌面客户端无需另外安装 DeepSeek Harness。源码启动和打包说明放在[开发](#development)部分，不再占用普通用户的安装流程。
 
@@ -128,7 +128,7 @@ pnpm --filter @deepseek-ai/dsh-desktop run typecheck
 pnpm --filter @deepseek-ai/dsh-desktop run test:e2e
 ~~~
 
-正式安装包不会在开发者电脑上构建或上传。版本一致的 `v*` Tag 会启动 `Desktop` GitHub Actions 工作流，在原生 macOS、Windows 与 Linux runner 上构建和校验产物、生成 `SHA256SUMS.txt`，再发布 GitHub Release。手动触发但不填写 Release Tag 时，只会生成保留七天的 Actions Artifact。
+正式安装包不会在开发者电脑上构建或上传。每次通过验证并推送到 `main` 的提交，以及未填写 Release Tag 的手动触发，都会在原生 macOS、Windows 与 Linux runner 上生成保留七天的 Actions 预览产物。版本一致的 `v*` Tag 才会进入正式发布路径，校验各平台产物和 macOS Developer ID 签名、生成 `SHA256SUMS.txt`，再发布 GitHub Release。
 
 `Sync DeepSeek Harness upstream` 工作流每天北京时间 09:00 检查最新的非草稿官方 Release。能够干净合并的更新会在不强推的前提下完成合并和验证，提交到 `main`，再以 `v<上游版本>-pilot.1` 调用同一套原生发布流水线。遇到合并冲突时，工作流会创建或更新 GitHub Issue，并在改动 `main` 前停止；缺少 macOS 签名 Secrets 时也会创建 Issue，只同步已验证的源码，不发布未签名正式版。解决对应条件后重新运行工作流，就会继续待发布版本。
 
