@@ -190,17 +190,18 @@ try {
     throw new Error(`desktop did not reach the workspace UI: ${startupText}\n${String(error)}`)
   }
 
-  // A clean desktop profile intentionally starts with the provider guidance
-  // in front of the workspace UI. Exercise the supported non-blocking path
-  // before continuing with workspace selection; otherwise the modal mask is
-  // correctly expected to intercept the add-workspace control.
+  // A clean profile presents provider guidance as soon as it owns a blank
+  // session. That may be before the first workspace action (Linux home) or
+  // immediately after it (a completely empty macOS/Windows profile).
   const providerSetupSkip = page.getByRole('button', { name: /^(Skip for now|暂时跳过)$/ })
+  let providerSetupHandled = false
   async function skipProviderSetup(timeout = 0) {
     await providerSetupSkip.waitFor({ timeout }).catch(() => undefined)
     if (!await providerSetupSkip.isVisible().catch(() => false)) return false
     const dialog = page.locator('[data-pilot-dialog][role="dialog"]', { has: providerSetupSkip })
     await providerSetupSkip.click()
     await dialog.waitFor({ state: 'detached' })
+    providerSetupHandled = true
     return true
   }
   async function runPastProviderSetup(action) {
@@ -214,8 +215,6 @@ try {
       return action(30_000)
     }
   }
-  await skipProviderSetup(10_000)
-
   const bridge = await page.evaluate(() => ({
     pickDirectory: typeof window.pilotHarness?.pickDirectory,
     platform: window.pilotHarness?.platform,
@@ -270,6 +269,20 @@ try {
   }
 
   const rootProject = await addWorkspacePath(repoRoot, repoName)
+
+  // A truly empty macOS/Windows profile has no current session, so product
+  // onboarding intentionally waits until this first workspace exists. Linux
+  // runners may already expose a blank home workspace and present it earlier.
+  // In either case, finish this clean-profile checkpoint before adding the
+  // second workspace so the modal can never race that directory flow.
+  if (!providerSetupHandled && !await skipProviderSetup(30_000)) {
+    const onboardingState = await page.evaluate(() => ({
+      url: location.href,
+      body: document.body.innerText,
+      dismissed: localStorage.getItem('pilot-harness.provider-onboarding.dismissed'),
+    })).catch(() => undefined)
+    throw new Error(`clean profile did not present provider onboarding after its first workspace: ${JSON.stringify(onboardingState)}`)
+  }
 
   const desktopProject = await addWorkspacePath(appRoot, 'desktop')
   await desktopProject.click()
