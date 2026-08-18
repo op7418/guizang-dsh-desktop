@@ -247,10 +247,9 @@ try {
       await runPastProviderSetup(timeout => editPath.click({ timeout }))
       const pathEditor = directoryBrowser.getByRole('textbox', { name: 'Edit path', exact: true })
       await runPastProviderSetup(timeout => pathEditor.fill(path, { timeout }))
-      // Enter commits the path and synchronously unmounts this editor. Send
-      // the key through the focused page so Playwright does not retry a
-      // successful locator action merely because its target was detached.
-      await runPastProviderSetup(timeout => pathEditor.focus({ timeout }))
+      // fill() leaves the editor focused. Send Enter through the page before
+      // the debounced path preview can replace that editor; a locator press
+      // would otherwise retry after the successful commit detached its node.
       await page.keyboard.press('Enter')
       await pathEditor.waitFor({ state: 'detached' })
       const openDirectory = directoryBrowser.getByRole('button', { name: 'Open', exact: true })
