@@ -243,7 +243,11 @@ try {
       await directoryBrowser.getByRole('button', { name: 'Edit path', exact: true }).click()
       const pathEditor = directoryBrowser.getByRole('textbox', { name: 'Edit path', exact: true })
       await pathEditor.fill(path)
-      await pathEditor.press('Enter')
+      // Enter commits the path and synchronously unmounts this editor. Send
+      // the key through the focused page so Playwright does not retry a
+      // successful locator action merely because its target was detached.
+      await pathEditor.focus()
+      await page.keyboard.press('Enter')
       await pathEditor.waitFor({ state: 'detached' })
       await directoryBrowser.getByRole('button', { name: 'Open', exact: true }).click()
     }
