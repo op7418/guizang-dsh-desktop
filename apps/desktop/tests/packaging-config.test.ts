@@ -49,7 +49,7 @@ test('online previews are ad-hoc signed while tagged releases require Developer 
     workflow,
     /github\.event_name == 'workflow_dispatch' && runner\.os == 'macOS'/,
   )
-  assert.match(workflow, /ulimit -n 65536 2>\/dev\/null \|\| ulimit -n 10240/)
+  assert.match(workflow, /ulimit -n 1048575/)
   assert.match(workflow, /desktop package version \$actual does not match tag \$GITHUB_REF_NAME/)
   assert.match(workflow, /if: startsWith\(github\.ref, 'refs\/tags\/v'\)/)
   assert.match(workflow, /> release-assets\/SHA256SUMS\.txt/)

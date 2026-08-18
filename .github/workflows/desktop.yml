@@ -102,7 +102,7 @@ jobs:
         shell: bash
         timeout-minutes: 45
         run: |
-          ulimit -n 65536 2>/dev/null || ulimit -n 10240
+          ulimit -n 1048575
           echo "macOS open-file limit: $(ulimit -n)"
           pnpm --filter @deepseek-ai/dsh-desktop run pack
 
@@ -116,7 +116,7 @@ jobs:
           PILOT_HARNESS_APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           PILOT_HARNESS_REQUIRE_DEVELOPER_ID: '1'
         run: |
-          ulimit -n 65536 2>/dev/null || ulimit -n 10240
+          ulimit -n 1048575
           echo "macOS open-file limit: $(ulimit -n)"
           pnpm --filter @deepseek-ai/dsh-desktop run pack:release
 
