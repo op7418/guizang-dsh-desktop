@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict'
+import { createRequire } from 'node:module'
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
 import { test } from 'node:test'
 
 const appRoot = resolve(import.meta.dirname, '..')
+const require = createRequire(import.meta.url)
 
 test('Linux packages use an RPM-safe identity and a valid maintainer', async () => {
   const builderConfig = await readFile(resolve(appRoot, 'electron-builder.yml'), 'utf8')
@@ -31,6 +33,7 @@ test('online previews are ad-hoc signed while tagged releases require Developer 
 
   assert.doesNotMatch(builderConfig, /^  identity: null$/m)
   assert.match(builderConfig, /^afterSign: scripts\/after-sign\.cjs$/m)
+  assert.match(builderConfig, /^  sign: \.\/scripts\/native-macos-sign\.cjs$/m)
   assert.match(builderConfig, /^  hardenedRuntime: true$/m)
   assert.match(builderConfig, /^  entitlements: assets\/entitlements\.mac\.plist$/m)
   assert.match(builderConfig, /^  entitlementsInherit: assets\/entitlements\.mac\.inherit\.plist$/m)
@@ -49,7 +52,7 @@ test('online previews are ad-hoc signed while tagged releases require Developer 
     workflow,
     /github\.event_name == 'workflow_dispatch' && runner\.os == 'macOS'/,
   )
-  assert.match(workflow, /ulimit -n 1048575/)
+  assert.doesNotMatch(workflow, /ulimit -n/)
   assert.match(workflow, /desktop package version \$actual does not match tag \$GITHUB_REF_NAME/)
   assert.match(workflow, /if: startsWith\(github\.ref, 'refs\/tags\/v'\)/)
   assert.match(workflow, /> release-assets\/SHA256SUMS\.txt/)
@@ -58,4 +61,33 @@ test('online previews are ad-hoc signed while tagged releases require Developer 
   assert.doesNotMatch(rootReadmeZh, /pnpm run desktop:pack/)
   assert.match(rootReadme, /never built or uploaded from a developer machine/)
   assert.match(rootReadmeZh, /不会在开发者电脑上构建或上传/)
+})
+
+test('native macOS signing delegates recursive traversal to codesign', () => {
+  const signer = require(resolve(appRoot, 'scripts/native-macos-sign.cjs')) as {
+    buildCodesignArgs: (
+      options: { app: string; identity: string; keychain?: string },
+      fileOptions: Record<string, unknown>,
+    ) => string[]
+  }
+  const app = '/tmp/Pilot Harness.app'
+  const entitlements = '/tmp/entitlements.mac.plist'
+
+  const adhoc = signer.buildCodesignArgs(
+    { app, identity: '-' },
+    { entitlements, hardenedRuntime: true },
+  )
+  assert.deepEqual(adhoc.slice(0, 5), ['--force', '--deep', '--verbose=4', '--sign', '-'])
+  assert.ok(adhoc.includes('--timestamp=none'))
+  assert.deepEqual(adhoc.slice(-3), ['--entitlements', entitlements, app])
+  assert.match(adhoc[adhoc.indexOf('--options') + 1] ?? '', /(?:^|,)runtime(?:,|$)/)
+
+  const developerId = signer.buildCodesignArgs(
+    { app, identity: 'ABC123', keychain: '/tmp/build.keychain' },
+    { signatureFlags: ['library'], timestamp: 'https://timestamp.example.test' },
+  )
+  assert.ok(developerId.includes('--deep'))
+  assert.ok(developerId.includes('--keychain'))
+  assert.ok(developerId.includes('--timestamp=https://timestamp.example.test'))
+  assert.equal(developerId[developerId.indexOf('--options') + 1], 'library')
 })
