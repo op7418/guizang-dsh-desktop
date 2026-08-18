@@ -120,16 +120,15 @@ pnpm install
 pnpm run desktop:dev
 ~~~
 
-构建安装包或运行桌面检查：
+运行桌面检查：
 
 ~~~sh
-pnpm run desktop:pack
 pnpm run desktop:test
 pnpm --filter @deepseek-ai/dsh-desktop run typecheck
 pnpm --filter @deepseek-ai/dsh-desktop run test:e2e
 ~~~
 
-原生 CI 矩阵会在 macOS、Windows 与 Linux 上构建、测试、运行 Electron 流程并打包。正式发布候选版本仍需在目标机器上验证安装、标题栏、签名、公证和更新流程。
+正式安装包不会在开发者电脑上构建或上传。版本一致的 `v*` Tag 会启动 `Desktop` GitHub Actions 工作流，在原生 macOS、Windows 与 Linux runner 上构建和校验产物、生成 `SHA256SUMS.txt`，再发布 GitHub Release。手动触发工作流只会生成保留七天的 Actions Artifact，不会更新 Release。正式发布候选版本仍需在目标机器上验证安装、标题栏、签名、公证和更新流程。
 
 底层系统资料见 [DeepSeek Harness 架构](docs/architecture.md)、[开发指南](docs/development.md)与[桌面架构](apps/desktop/README.md)。
 

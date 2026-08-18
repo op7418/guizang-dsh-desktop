@@ -41,13 +41,7 @@ The Electron end-to-end check starts with an isolated empty Harness home, select
 
 ## Packaging
 
-Build an unsigned installer for the current operating system with:
-
-```sh
-pnpm run desktop:pack
-```
-
-The electron-builder matrix defines DMG/ZIP for macOS, NSIS for Windows, and AppImage/DEB/RPM for Linux. The `desktop.yml` workflow builds each target and runs the same blocking Electron flow on its native GitHub runner; Linux uses Xvfb, while macOS and Windows use their native runner sessions. Ordinary macOS builds select the explicit ad-hoc configuration and must pass strict bundle verification. A tagged macOS build selects the release configuration, imports `MAC_CERT_P12_BASE64`, and fails before upload unless the result carries the configured Developer ID Team. Notarization and update publishing remain deployment responsibilities.
+Official installers are built and uploaded only by `.github/workflows/desktop.yml`; local packaging is not a release path. A manual workflow dispatch builds temporary seven-day Actions artifacts with the explicit macOS ad-hoc configuration and strict bundle verification, but it cannot update GitHub Releases. A version-matched `v*` tag builds DMG/ZIP, NSIS, AppImage/DEB/RPM, and plugin bundles on native GitHub runners, generates `SHA256SUMS.txt`, and publishes the Release only after every required job succeeds. The tagged macOS build imports the `MAC_CERT_P12_BASE64`, `MAC_CERT_PASSWORD`, and `APPLE_TEAM_ID` repository Actions secrets, and fails before upload unless the result carries the configured Developer ID Team. Certificate material stays in GitHub Secrets rather than the repository or a developer packaging directory. Notarization remains a deployment responsibility.
 
 The approved square artwork remains in `assets/icon-master.png`. `pnpm --filter @deepseek-ai/dsh-desktop run icons` derives platform PNG, ICNS, ICO, and Linux variants with an 83.6% optical artwork footprint for native launchers, plus an edge-to-edge `brand-icon.png` for in-app surfaces. The same generator embeds a compact copy in the unloadable CodePilot theme, keeping the Dock, recovery page, empty conversation, sidebar, About page, packaged application, and installers on one source image without applying the native launcher inset inside the UI.
 

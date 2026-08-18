@@ -120,16 +120,15 @@ pnpm install
 pnpm run desktop:dev
 ~~~
 
-Build an installer or run the desktop checks with:
+Run the desktop checks with:
 
 ~~~sh
-pnpm run desktop:pack
 pnpm run desktop:test
 pnpm --filter @deepseek-ai/dsh-desktop run typecheck
 pnpm --filter @deepseek-ai/dsh-desktop run test:e2e
 ~~~
 
-The native CI matrix builds, tests, exercises the Electron flow, and packages on macOS, Windows, and Linux. Release candidates still need installation, title-bar, signing, notarization, and update checks on target machines.
+Official installers are never built or uploaded from a developer machine. A version-matched `v*` tag starts the `Desktop` GitHub Actions workflow, which builds on native macOS, Windows, and Linux runners, verifies the artifacts, generates `SHA256SUMS.txt`, and publishes the GitHub Release. A manual workflow dispatch produces seven-day Actions artifacts only and never updates Releases. Release candidates still need installation, title-bar, signing, notarization, and update checks on target machines.
 
 For the underlying system, read the [DeepSeek Harness architecture](docs/architecture.md), [development guide](docs/development.md), and [desktop architecture](apps/desktop/README.md).
 

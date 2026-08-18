@@ -1,5 +1,9 @@
 name: Desktop
 
+# Official desktop packages are produced only on GitHub-hosted native runners.
+# A manual dispatch creates short-lived Actions artifacts for maintainers; only
+# a version-matched v* tag is allowed to create or update a GitHub Release.
+
 on:
   pull_request:
     paths:
@@ -60,6 +64,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify release tag matches desktop version
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected="${GITHUB_REF_NAME#v}"
+          actual="$(node -p "require('./apps/desktop/package.json').version")"
+          if [ "$actual" != "$expected" ]; then
+            echo "::error::desktop package version $actual does not match tag $GITHUB_REF_NAME"
+            exit 1
+          fi
+
       - name: Build Harness and desktop shell
         run: pnpm run desktop:build
 
@@ -78,7 +94,7 @@ jobs:
         run: pnpm --filter @deepseek-ai/dsh-desktop run test:e2e
 
       - name: Build native desktop artifacts
-        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: pnpm --filter @deepseek-ai/dsh-desktop run pack
 
       - name: Build signed macOS release artifacts
@@ -95,7 +111,7 @@ jobs:
         run: pnpm --filter @deepseek-ai/dsh-desktop run pack:release
 
       - name: Verify macOS artifact signature
-        if: ${{ runner.os == 'macOS' }}
+        if: ${{ runner.os == 'macOS' && (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')) }}
         env:
           PILOT_HARNESS_ALLOW_ADHOC_SIGNING: ${{ startsWith(github.ref, 'refs/tags/v') && '0' || '1' }}
           PILOT_HARNESS_APPLE_TEAM_ID: ${{ startsWith(github.ref, 'refs/tags/v') && secrets.APPLE_TEAM_ID || '' }}
@@ -103,6 +119,7 @@ jobs:
         run: node apps/desktop/scripts/verify-macos-signature.mjs apps/desktop/release 1
 
       - uses: actions/upload-artifact@v4
+        if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v') }}
         with:
           name: pilot-harness-${{ runner.os }}
           path: |
@@ -113,6 +130,7 @@ jobs:
             apps/desktop/release/*.deb
             apps/desktop/release/*.rpm
           if-no-files-found: error
+          retention-days: 7
 
   plugin-bundles:
     name: Plugin bundles
@@ -156,10 +174,12 @@ jobs:
           grep -q 'id: session-log-download' "$RUNNER_TEMP/pilot-plugin-config.yml"
 
       - uses: actions/upload-artifact@v4
+        if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v') }}
         with:
           name: pilot-harness-plugins
           path: release/plugins/*.tgz
           if-no-files-found: error
+          retention-days: 7
 
   publish-release:
     name: Publish GitHub Release
@@ -186,9 +206,25 @@ jobs:
           mv "release-assets/Pilot Harness-${version}-amd64.deb" "release-assets/Pilot-Harness-Linux-amd64.deb"
           mv "release-assets/Pilot Harness-${version}-x86_64.rpm" "release-assets/Pilot-Harness-Linux-x86_64.rpm"
 
+      - name: Generate release checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          (
+            cd release-assets
+            find . -maxdepth 1 -type f ! -name SHA256SUMS.txt -print0 \
+              | sort -z \
+              | xargs -0 sha256sum \
+              | sed 's#  \./#  #'
+          ) > release-assets/SHA256SUMS.txt
+          cat release-assets/SHA256SUMS.txt
+
       - uses: softprops/action-gh-release@v2
         with:
           generate_release_notes: true
+          draft: false
+          prerelease: false
+          make_latest: true
           fail_on_unmatched_files: true
           files: |
             release-assets/Pilot-Harness-*.dmg
@@ -198,3 +234,4 @@ jobs:
             release-assets/Pilot-Harness-*.deb
             release-assets/Pilot-Harness-*.rpm
             release-assets/deepseek-ai-*.tgz
+            release-assets/SHA256SUMS.txt

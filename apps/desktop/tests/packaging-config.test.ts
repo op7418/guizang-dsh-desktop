@@ -19,12 +19,14 @@ test('Linux packages use an RPM-safe identity and a valid maintainer', async () 
   assert.match(packageJson.author?.email ?? '', /@users\.noreply\.github\.com$/)
 })
 
-test('macOS local artifacts are ad-hoc signed while tagged releases require Developer ID', async () => {
-  const [builderConfig, adhocConfig, packageJson, workflow] = await Promise.all([
+test('online previews are ad-hoc signed while tagged releases require Developer ID', async () => {
+  const [builderConfig, adhocConfig, packageJson, workflow, rootReadme, rootReadmeZh] = await Promise.all([
     readFile(resolve(appRoot, 'electron-builder.yml'), 'utf8'),
     readFile(resolve(appRoot, 'electron-builder.adhoc.yml'), 'utf8'),
     readFile(resolve(appRoot, 'package.json'), 'utf8'),
     readFile(resolve(appRoot, '../../.github/workflows/desktop.yml'), 'utf8'),
+    readFile(resolve(appRoot, '../../README.md'), 'utf8'),
+    readFile(resolve(appRoot, '../../README.zh.md'), 'utf8'),
   ])
 
   assert.doesNotMatch(builderConfig, /^  identity: null$/m)
@@ -43,4 +45,16 @@ test('macOS local artifacts are ad-hoc signed while tagged releases require Deve
   assert.match(workflow, /PILOT_HARNESS_APPLE_TEAM_ID: \$\{\{ secrets\.APPLE_TEAM_ID \}\}/)
   assert.match(workflow, /PILOT_HARNESS_REQUIRE_DEVELOPER_ID: '1'/)
   assert.match(workflow, /verify-macos-signature\.mjs apps\/desktop\/release 1/)
+  assert.match(
+    workflow,
+    /if: \$\{\{ github\.event_name == 'workflow_dispatch' \}\}\n        run: pnpm --filter @deepseek-ai\/dsh-desktop run pack/,
+  )
+  assert.match(workflow, /desktop package version \$actual does not match tag \$GITHUB_REF_NAME/)
+  assert.match(workflow, /if: startsWith\(github\.ref, 'refs\/tags\/v'\)/)
+  assert.match(workflow, /> release-assets\/SHA256SUMS\.txt/)
+  assert.match(workflow, /release-assets\/SHA256SUMS\.txt/)
+  assert.doesNotMatch(rootReadme, /pnpm run desktop:pack/)
+  assert.doesNotMatch(rootReadmeZh, /pnpm run desktop:pack/)
+  assert.match(rootReadme, /never built or uploaded from a developer machine/)
+  assert.match(rootReadmeZh, /不会在开发者电脑上构建或上传/)
 })

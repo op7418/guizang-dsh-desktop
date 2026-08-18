@@ -30,7 +30,7 @@ CodePilot 主题是建立在公开 Web 变量与生成后的 CSS Module 标签�
 
 桌面项目树遵循 CodePilot 的直接选择约定：点击未激活项目会启动或打开它的空白会话；明确的添加项目入口会用一次点击调用原生目录选择器。首次模型引导以已有空白会话为前提，因此引导遮罩不会挂载到冷启动项目选择器之上。Playwright Electron 检查会在隔离的空 Harness home 中运行这些路径，验证 macOS 侧边栏按钮的位置，走通服务商选择，并捕获服务商、模型、通用设置与关于页面。
 
-带 Tag 的 Release 会同时发布 macOS、Windows 与 Linux 原生安装包，以及 CodePilot 主题、Worktree 文件、Schedule 摘要和 Session 日志导出插件的预构建 tarball。每个插件 tarball 都声明 `dsh.bundle.patch` 并携带自己的 `cordis.patch.yml`，因此本地 Web profile 可以通过一条 `dsh plugin --profile web add <release-url>` 命令安装，不需要检出源码或手写 Patch。CI 会先把四个归档安装到空白 Web profile，并验证组合后的配置行 id，再发布这些产物。普通 macOS 产物使用 electron-builder 显式的临时签名身份与严格 Bundle 验证；带 Tag 的 macOS 产物则必须使用 Developer ID Application 证书和配置的 Team ID，因此缺失或不匹配的发布身份会阻止发布。因此根 README 会优先引导桌面用户前往 Releases，而把源码构建说明留在“开发”部分。
+正式安装包只由 `Desktop` GitHub Actions 工作流产出。手动触发可以把临时签名的原生安装包作为 Actions Artifact 保留七天，但不能更新 Release。版本一致的 `v*` Tag 会同时发布 macOS、Windows 与 Linux 原生安装包，以及 CodePilot 主题、Worktree 文件、Schedule 摘要和 Session 日志导出插件的预构建 tarball，并附带一份校验和清单。每个插件 tarball 都声明 `dsh.bundle.patch` 并携带自己的 `cordis.patch.yml`，因此本地 Web profile 可以通过一条 `dsh plugin --profile web add <release-url>` 命令安装，不需要检出源码或手写 Patch。CI 会先把四个归档安装到空白 Web profile，并验证组合后的配置行 id，再发布这些产物。手动 macOS 产物使用 electron-builder 显式的临时签名身份与严格 Bundle 验证；带 Tag 的 macOS 产物则必须使用 Developer ID Application 证书和配置的 Team ID，因此缺失或不匹配的发布身份会阻止发布。因此根 README 会优先引导桌面用户前往 Releases，把源码构建说明留在“开发”部分，并且不再把本地打包描述为发布路径。
 
 ## Alternatives considered
 
