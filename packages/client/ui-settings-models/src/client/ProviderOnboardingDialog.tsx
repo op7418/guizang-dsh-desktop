@@ -12,12 +12,13 @@ import type { en } from './locales.ts'
 import { OnboardingModal } from './OnboardingModal.tsx'
 import styles from './ProviderOnboardingDialog.module.css'
 
-const ONBOARDING_COMPLETED_SESSION_KEY = 'pilot-harness.provider-onboarding.completed'
+const ONBOARDING_DISMISSED_KEY = 'pilot-harness.provider-onboarding.dismissed'
+const ONBOARDING_DISMISSED_EVENT = 'pilot-harness:provider-onboarding-dismissed'
 
-/** Keep an explicit choice across React/plugin remounts, but not app restarts. */
-function onboardingCompletedForSession(): boolean {
+/** Keep an explicit choice across plugin remounts, reloads, and app restarts. */
+function onboardingWasDismissed(): boolean {
   try {
-    return window.sessionStorage.getItem(ONBOARDING_COMPLETED_SESSION_KEY) === 'true'
+    return window.localStorage.getItem(ONBOARDING_DISMISSED_KEY) === 'true'
   } catch {
     // A locked-down Web Harness may disable storage. The prompt still remains
     // skippable for the lifetime of its current settings-shell mount.
@@ -26,13 +27,40 @@ function onboardingCompletedForSession(): boolean {
 }
 
 /** Record either explicit path (skip or open settings) before the shell closes. */
-function completeOnboardingForSession(): void {
+function dismissOnboarding(): void {
   try {
-    window.sessionStorage.setItem(ONBOARDING_COMPLETED_SESSION_KEY, 'true')
+    window.localStorage.setItem(ONBOARDING_DISMISSED_KEY, 'true')
   } catch {
     // Storage is an enhancement for remounts, never a prerequisite for using
     // or dismissing the provider guidance.
   }
+  // The browser `storage` event only reaches other documents. Notify sibling
+  // plugin surfaces in this document as well so none can retain a stale
+  // pre-dismissal render and reopen after another dialog closes.
+  window.dispatchEvent(new Event(ONBOARDING_DISMISSED_EVENT))
+}
+
+/** Reactive view of the persistent choice shared by every mounted surface. */
+function useOnboardingDismissed(): boolean {
+  const [dismissed, setDismissed] = useState(onboardingWasDismissed)
+
+  useEffect(() => {
+    const dismiss = (): void => { setDismissed(true) }
+    const syncStorage = (event: StorageEvent): void => {
+      if (event.key === ONBOARDING_DISMISSED_KEY && event.newValue === 'true') dismiss()
+    }
+    window.addEventListener(ONBOARDING_DISMISSED_EVENT, dismiss)
+    window.addEventListener('storage', syncStorage)
+    // Close the subscribe/read gap if another surface dismissed while this
+    // component was committing.
+    if (onboardingWasDismissed()) dismiss()
+    return () => {
+      window.removeEventListener(ONBOARDING_DISMISSED_EVENT, dismiss)
+      window.removeEventListener('storage', syncStorage)
+    }
+  }, [])
+
+  return dismissed
 }
 
 /** Registration-side dependencies of {@link ProviderOnboardingDialog}. */
@@ -93,10 +121,10 @@ export function ProviderOnboardingDialog(props: ProviderOnboardingDialogProps): 
   const { complete, openSection, controller, useModels, t } = props
   const state = useModels(snapshot => snapshot)
   const readiness = onboardingReadiness(state)
-  const completedForSession = onboardingCompletedForSession()
+  const dismissed = useOnboardingDismissed()
   const ownerCompletionSent = useRef(false)
   const dialogAvailable = useDialogAvailable(
-    readiness.kind === 'setup-required' && !completedForSession,
+    readiness.kind === 'setup-required' && !dismissed,
   )
 
   useEffect(() => {
@@ -105,7 +133,7 @@ export function ProviderOnboardingDialog(props: ProviderOnboardingDialogProps): 
 
   useEffect(() => {
     if (
-      completedForSession
+      dismissed
       || readiness.kind === 'provider-ready'
       || readiness.kind === 'unavailable'
     ) {
@@ -113,19 +141,17 @@ export function ProviderOnboardingDialog(props: ProviderOnboardingDialogProps): 
       ownerCompletionSent.current = true
       complete()
     }
-  }, [complete, completedForSession, readiness.kind])
+  }, [complete, dismissed, readiness.kind])
 
-  if (completedForSession || readiness.kind !== 'setup-required' || !dialogAvailable) return null
+  if (dismissed || readiness.kind !== 'setup-required' || !dialogAvailable) return null
 
   const addProvider = (): void => {
-    completeOnboardingForSession()
+    dismissOnboarding()
     openSection('providers')
-    complete()
   }
 
   const skip = (): void => {
-    completeOnboardingForSession()
-    complete()
+    dismissOnboarding()
   }
 
   return (

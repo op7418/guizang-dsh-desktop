@@ -12,7 +12,7 @@ import { en } from '../src/client/locales.ts'
 afterEach(() => {
   cleanup()
   document.querySelectorAll('#root').forEach((root) => { root.remove() })
-  window.sessionStorage.clear()
+  window.localStorage.clear()
 })
 
 let nextRpc = 0
@@ -92,7 +92,7 @@ describe('ProviderOnboardingDialog', () => {
     expect(h.openSection).not.toHaveBeenCalled()
   })
 
-  it('keeps an explicit skip across plugin remounts in the same app run', async () => {
+  it('keeps an explicit skip across plugin remounts and later app launches', async () => {
     const first = harness()
     const firstView = render(<ProviderOnboardingDialog {...first.props} />)
     fireEvent.click(await screen.findByRole('button', { name: en.onboardingLater }))
@@ -105,6 +105,30 @@ describe('ProviderOnboardingDialog', () => {
     await waitFor(() => { expect(remounted.complete).toHaveBeenCalledOnce() })
     expect(screen.queryByRole('dialog', { name: en.onboardingTitle })).toBeNull()
     expect(remounted.openSection).not.toHaveBeenCalled()
+  })
+
+  it('broadcasts a skip to every provider prompt mounted in the same window', async () => {
+    const first = harness()
+    const sibling = harness()
+    render(
+      <>
+        <ProviderOnboardingDialog {...first.props} />
+        <ProviderOnboardingDialog {...sibling.props} />
+      </>,
+    )
+    await waitFor(() => {
+      expect(screen.getAllByRole('button', { name: en.onboardingLater })).toHaveLength(2)
+    })
+    const skipButtons = screen.getAllByRole('button', { name: en.onboardingLater })
+    fireEvent.click(skipButtons[0]!)
+
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: en.onboardingTitle })).toBeNull()
+    })
+    expect(first.complete).toHaveBeenCalledOnce()
+    expect(sibling.complete).toHaveBeenCalledOnce()
+    expect(first.openSection).not.toHaveBeenCalled()
+    expect(sibling.openSection).not.toHaveBeenCalled()
   })
 
   it('waits for an existing dialog instead of replacing its active flow', async () => {
