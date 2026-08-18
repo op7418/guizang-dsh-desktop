@@ -21,12 +21,14 @@ test('Linux packages use an RPM-safe identity and a valid maintainer', async () 
   assert.match(packageJson.author?.email ?? '', /@users\.noreply\.github\.com$/)
 })
 
-test('online previews are ad-hoc signed while tagged releases require Developer ID', async () => {
-  const [builderConfig, adhocConfig, packageJson, workflow, rootReadme, rootReadmeZh] = await Promise.all([
+test('online previews are ad-hoc signed while formal releases require Developer ID', async () => {
+  const [builderConfig, adhocConfig, packageJson, workflow, upstreamWorkflow, upstreamState, rootReadme, rootReadmeZh] = await Promise.all([
     readFile(resolve(appRoot, 'electron-builder.yml'), 'utf8'),
     readFile(resolve(appRoot, 'electron-builder.adhoc.yml'), 'utf8'),
     readFile(resolve(appRoot, 'package.json'), 'utf8'),
     readFile(resolve(appRoot, '../../.github/workflows/desktop.yml'), 'utf8'),
+    readFile(resolve(appRoot, '../../.github/workflows/upstream-sync.yml'), 'utf8'),
+    readFile(resolve(appRoot, '../../.github/upstream.json'), 'utf8'),
     readFile(resolve(appRoot, '../../README.md'), 'utf8'),
     readFile(resolve(appRoot, '../../README.zh.md'), 'utf8'),
   ])
@@ -50,17 +52,31 @@ test('online previews are ad-hoc signed while tagged releases require Developer 
   assert.match(workflow, /verify-macos-signature\.mjs apps\/desktop\/release 1/)
   assert.match(
     workflow,
-    /github\.event_name == 'workflow_dispatch' && runner\.os == 'macOS'/,
+    /github\.event_name == 'workflow_dispatch' && inputs\.release_tag == '' && runner\.os == 'macOS'/,
   )
   assert.doesNotMatch(workflow, /ulimit -n/)
-  assert.match(workflow, /desktop package version \$actual does not match tag \$GITHUB_REF_NAME/)
-  assert.match(workflow, /if: startsWith\(github\.ref, 'refs\/tags\/v'\)/)
+  assert.match(workflow, /desktop package version \$actual does not match tag \$RELEASE_TAG/)
+  assert.match(workflow, /inputs\.release_tag != ''/)
+  assert.match(workflow, /tag_name: \$\{\{ startsWith\(github\.ref/)
   assert.match(workflow, /> release-assets\/SHA256SUMS\.txt/)
   assert.match(workflow, /release-assets\/SHA256SUMS\.txt/)
   assert.doesNotMatch(rootReadme, /pnpm run desktop:pack/)
   assert.doesNotMatch(rootReadmeZh, /pnpm run desktop:pack/)
   assert.match(rootReadme, /never built or uploaded from a developer machine/)
   assert.match(rootReadmeZh, /不会在开发者电脑上构建或上传/)
+
+  const tracked = JSON.parse(upstreamState) as { repository?: string; tag?: string; commit?: string; pilotVersion?: string }
+  assert.equal(tracked.repository, 'deepseek-ai/deepseek-harness')
+  assert.match(tracked.tag ?? '', /^dsh-v/)
+  assert.match(tracked.commit ?? '', /^[0-9a-f]{40}$/)
+  assert.match(tracked.pilotVersion ?? '', /-pilot\.1$/)
+  assert.match(upstreamWorkflow, /cron: '0 1 \* \* \*'/)
+  assert.match(upstreamWorkflow, /git merge --no-ff --no-edit/)
+  assert.match(upstreamWorkflow, /git diff --name-only --diff-filter=U/)
+  assert.match(upstreamWorkflow, /git push origin HEAD:main/)
+  assert.doesNotMatch(upstreamWorkflow, /git push[^\n]*--force/)
+  assert.match(upstreamWorkflow, /gh workflow run desktop\.yml/)
+  assert.match(upstreamWorkflow, /MAC_CERT_P12_BASE64/)
 })
 
 test('native macOS signing delegates recursive traversal to codesign', () => {

@@ -1,0 +1,206 @@
+name: Sync DeepSeek Harness upstream
+
+on:
+  schedule:
+    # 09:00 Asia/Shanghai. GitHub schedules are expressed in UTC.
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+  issues: write
+
+concurrency:
+  group: upstream-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Merge, verify, and dispatch release
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      UPSTREAM_REPOSITORY: deepseek-ai/deepseek-harness
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: pnpm
+
+      - name: Discover latest official release
+        id: upstream
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="$(gh api "repos/$UPSTREAM_REPOSITORY/releases" --jq 'map(select(.draft == false))[0].tag_name')"
+          if [[ "$tag" != dsh-v* ]]; then
+            echo "::error::unexpected upstream release tag: $tag"
+            exit 1
+          fi
+          version="${tag#dsh-v}"
+          pilot_version="${version}-pilot.1"
+          release_tag="v${pilot_version}"
+          tracked_tag="$(node -p "require('./.github/upstream.json').tag")"
+          sync_needed=true
+          if [[ "$tag" == "$tracked_tag" ]]; then sync_needed=false; fi
+          release_needed=true
+          if gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            release_needed=false
+          fi
+          {
+            echo "tag=$tag"
+            echo "version=$version"
+            echo "pilot_version=$pilot_version"
+            echo "release_tag=$release_tag"
+            echo "sync_needed=$sync_needed"
+            echo "release_needed=$release_needed"
+          } >> "$GITHUB_OUTPUT"
+          echo "Official: $tag; sync needed: $sync_needed; release needed: $release_needed"
+
+      - name: Fetch official release
+        if: steps.upstream.outputs.sync_needed == 'true'
+        shell: bash
+        env:
+          UPSTREAM_TAG: ${{ steps.upstream.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git fetch --force --no-tags "https://github.com/$UPSTREAM_REPOSITORY.git" \
+            "refs/tags/$UPSTREAM_TAG:refs/tags/$UPSTREAM_TAG"
+
+      - name: Merge official release without force-pushing
+        id: merge
+        if: steps.upstream.outputs.sync_needed == 'true'
+        shell: bash
+        env:
+          UPSTREAM_TAG: ${{ steps.upstream.outputs.tag }}
+        run: |
+          set +e
+          git merge --no-ff --no-edit "$UPSTREAM_TAG"
+          merge_code=$?
+          set -e
+          if [[ $merge_code -eq 0 ]]; then
+            echo "status=clean" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git diff --name-only --diff-filter=U > "$RUNNER_TEMP/upstream-conflicts.txt"
+          git merge --abort
+          echo "status=conflict" >> "$GITHUB_OUTPUT"
+
+      - name: Report merge conflicts
+        if: steps.merge.outputs.status == 'conflict'
+        shell: bash
+        env:
+          UPSTREAM_TAG: ${{ steps.upstream.outputs.tag }}
+        run: |
+          set -euo pipefail
+          title="[upstream-sync] $UPSTREAM_TAG requires manual merge"
+          body_file="$RUNNER_TEMP/upstream-conflict-issue.md"
+          {
+            echo "Pilot Harness could not merge **$UPSTREAM_TAG** automatically."
+            echo
+            echo "Conflicting files:"
+            sed 's/^/- `/' "$RUNNER_TEMP/upstream-conflicts.txt" | sed 's/$/`/'
+            echo
+            echo "Workflow: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          } > "$body_file"
+          existing="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "$title in:title" --json number --jq '.[0].number // empty')"
+          if [[ -n "$existing" ]]; then
+            gh issue edit "$existing" --repo "$GITHUB_REPOSITORY" --body-file "$body_file"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file "$body_file"
+          fi
+          echo "::error::upstream merge requires manual conflict resolution"
+          exit 1
+
+      - name: Record upstream and desktop versions
+        if: steps.upstream.outputs.sync_needed == 'true' && steps.merge.outputs.status == 'clean'
+        shell: bash
+        env:
+          UPSTREAM_TAG: ${{ steps.upstream.outputs.tag }}
+          PILOT_VERSION: ${{ steps.upstream.outputs.pilot_version }}
+        run: |
+          set -euo pipefail
+          upstream_commit="$(git rev-parse "$UPSTREAM_TAG^{commit}")"
+          UPSTREAM_COMMIT="$upstream_commit" node --input-type=module -e \
+            "import fs from 'node:fs'; const file='./.github/upstream.json'; const state=JSON.parse(fs.readFileSync(file,'utf8')); Object.assign(state,{tag:process.env.UPSTREAM_TAG,commit:process.env.UPSTREAM_COMMIT,pilotVersion:process.env.PILOT_VERSION}); fs.writeFileSync(file,JSON.stringify(state,null,2)+'\\n')"
+          node --input-type=module -e \
+            "import fs from 'node:fs'; const file='./apps/desktop/package.json'; const pkg=JSON.parse(fs.readFileSync(file,'utf8')); pkg.version=process.env.PILOT_VERSION; fs.writeFileSync(file,JSON.stringify(pkg,null,2)+'\\n')"
+
+      - name: Install dependencies
+        if: steps.upstream.outputs.sync_needed == 'true' && steps.merge.outputs.status == 'clean'
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify merged desktop source
+        if: steps.upstream.outputs.sync_needed == 'true' && steps.merge.outputs.status == 'clean'
+        shell: bash
+        run: |
+          set -euo pipefail
+          pnpm run desktop:build
+          pnpm run desktop:test
+          pnpm --filter @deepseek-ai/dsh-desktop run typecheck
+
+      - name: Commit and push verified merge
+        if: steps.upstream.outputs.sync_needed == 'true' && steps.merge.outputs.status == 'clean'
+        shell: bash
+        env:
+          UPSTREAM_TAG: ${{ steps.upstream.outputs.tag }}
+        run: |
+          set -euo pipefail
+          git config user.name "pilot-harness-upstream-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/upstream.json apps/desktop/package.json
+          git commit --amend --no-edit
+          git push origin HEAD:main
+
+      - name: Check release signing prerequisites
+        id: signing
+        if: steps.upstream.outputs.release_needed == 'true' && steps.merge.outputs.status != 'conflict'
+        shell: bash
+        env:
+          MAC_CERT_P12_BASE64: ${{ secrets.MAC_CERT_P12_BASE64 }}
+          MAC_CERT_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          ready=true
+          for value in "$MAC_CERT_P12_BASE64" "$MAC_CERT_PASSWORD" "$APPLE_TEAM_ID"; do
+            if [[ -z "$value" ]]; then ready=false; fi
+          done
+          echo "ready=$ready" >> "$GITHUB_OUTPUT"
+
+      - name: Dispatch native release build
+        if: steps.upstream.outputs.release_needed == 'true' && steps.signing.outputs.ready == 'true'
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ steps.upstream.outputs.release_tag }}
+        run: gh workflow run desktop.yml --repo "$GITHUB_REPOSITORY" --ref main -f "release_tag=$RELEASE_TAG"
+
+      - name: Report missing signing prerequisites
+        if: steps.upstream.outputs.release_needed == 'true' && steps.signing.outputs.ready != 'true'
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ steps.upstream.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+          title="[release] Configure macOS signing for automated desktop releases"
+          body_file="$RUNNER_TEMP/signing-issue.md"
+          {
+            echo "The upstream source sync completed, but **$RELEASE_TAG** was not dispatched."
+            echo
+            echo "Add repository Actions secrets \`MAC_CERT_P12_BASE64\`, \`MAC_CERT_PASSWORD\`, and \`APPLE_TEAM_ID\`, then rerun **Sync DeepSeek Harness upstream**."
+            echo
+            echo "Workflow: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          } > "$body_file"
+          existing="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "$title in:title" --json number --jq '.[0].number // empty')"
+          if [[ -n "$existing" ]]; then
+            gh issue edit "$existing" --repo "$GITHUB_REPOSITORY" --body-file "$body_file"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file "$body_file"
+          fi
+          echo "::warning::source is synchronized; release waits for macOS signing secrets"

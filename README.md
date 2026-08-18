@@ -96,7 +96,7 @@ Adds active-reminder metadata to Session hover details while the upstream Schedu
 ### Session-log export
 
 ~~~sh
-dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-session-log-export-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-session-log-export-0.1.0-rc.7.tgz
 ~~~
 
 Adds per-Session ZIP export to the **Trajectory** toolbar and the <code>/export</code> command. See [export plugin details](packages/session-query/session-log-export/README.md).
@@ -128,7 +128,9 @@ pnpm --filter @deepseek-ai/dsh-desktop run typecheck
 pnpm --filter @deepseek-ai/dsh-desktop run test:e2e
 ~~~
 
-Official installers are never built or uploaded from a developer machine. A version-matched `v*` tag starts the `Desktop` GitHub Actions workflow, which builds on native macOS, Windows, and Linux runners, verifies the artifacts, generates `SHA256SUMS.txt`, and publishes the GitHub Release. A manual workflow dispatch produces seven-day Actions artifacts only and never updates Releases. Release candidates still need installation, title-bar, signing, notarization, and update checks on target machines.
+Official installers are never built or uploaded from a developer machine. A version-matched `v*` tag starts the `Desktop` GitHub Actions workflow, which builds on native macOS, Windows, and Linux runners, verifies the artifacts, generates `SHA256SUMS.txt`, and publishes the GitHub Release. A manual workflow dispatch without a release tag produces seven-day Actions artifacts only.
+
+The `Sync DeepSeek Harness upstream` workflow checks the newest non-draft official release every day at 09:00 Asia/Shanghai. A clean update is merged without force-pushing, verified, committed to `main`, and dispatched to the same native release pipeline as `v<upstream-version>-pilot.1`. A merge conflict opens or refreshes a GitHub Issue and stops before changing `main`; missing macOS signing secrets also open an issue and leave the verified source synchronized without publishing an unsigned release. Rerunning the workflow after resolving either condition resumes the pending release.
 
 For the underlying system, read the [DeepSeek Harness architecture](docs/architecture.md), [development guide](docs/development.md), and [desktop architecture](apps/desktop/README.md).
 

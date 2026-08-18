@@ -23,17 +23,18 @@ import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import { AgentLoopCard } from './AgentLoopCard.tsx'
 import { BashCard } from './BashCard.tsx'
 import { ConfigurablePluginsTab } from './ConfigurablePluginsTab.tsx'
-import type { ConfigurablePluginsTabInjected } from './ConfigurablePluginsTab.tsx'
 import { PluginsSettingsSection } from './PluginsSettingsSection.tsx'
 import type { PluginsSettingsSectionInjected, PluginsSettingsTabEntry } from './PluginsSettingsSection.tsx'
 import { WebSearchCard } from './WebSearchCard.tsx'
 import { AGENT_LOOP_NS, AgentLoopCardController } from './agent-loop-card-controller.ts'
 import { SHELL_NS, BashCardController } from './bash-card-controller.ts'
+import { ConfigurablePluginsTabController } from './tab-store.ts'
 import { WEB_SEARCH_NS, WebSearchCardController } from './web-search-card-controller.ts'
 import { en, zh } from './locales.ts'
 
 export type { PluginsSettingsSectionInjected, PluginsSettingsSectionProps } from './PluginsSettingsSection.tsx'
-export type { ConfigurablePluginsTabInjected, ConfigurablePluginsTabProps } from './ConfigurablePluginsTab.tsx'
+export type { ConfigurablePluginsTabProps } from './ConfigurablePluginsTab.tsx'
+export type { ConfigurablePluginsTabFace, ConfigurablePluginsTabState } from './tab-store.ts'
 export type { PluginCardProps } from './PluginCard.tsx'
 export type { SettingsPluginItemOwnerProps } from './slot-contract.ts'
 export type { FieldProps } from './fields.tsx'
@@ -70,6 +71,27 @@ export function apply(ctx: ClientContext): void {
     () => ctx.remote.$on('credentials/updated', (ref) => { webSearch.refreshCredential(ref) }),
     'ui-settings-plugins: credential invalidations',
   )
+
+  // Which namespaces the Host serves is a registration fact the wire does not
+  // announce, so the directory re-reads on the two signals that can carry a
+  // changed composition: a settings document commit and a reconnect.
+  const configurable = new ConfigurablePluginsTabController(
+    api, () => ctx.slots.entries('settings.plugin.item'))
+  ctx.effect(() => () => { configurable.dispose() }, 'ui-settings-plugins: tab directory')
+  ctx.effect(
+    () => ctx.remote.$on('settings/document-updated', () => { void configurable.load() }),
+    'ui-settings-plugins: served-namespace invalidations',
+  )
+  ctx.effect(
+    () => ctx.on('connection/reset', () => { void configurable.load() }),
+    'ui-settings-plugins: served-namespace reconnect',
+  )
+  // A card registered after the first read joins the list without a wire call.
+  ctx.effect(
+    () => ctx.slots.subscribe('settings.plugin.item', () => { configurable.refresh() }),
+    'ui-settings-plugins: card ledger',
+  )
+  void configurable.load()
 
   let tabsVersion = -1
   let tabsRevision = -1
@@ -126,31 +148,26 @@ export function apply(ctx: ClientContext): void {
     order: 0,
     label: () => t('configurableTab'),
     locale: NS,
-    inject: (): ConfigurablePluginsTabInjected => ({
-      cardCount: ctx.slots.entries('settings.plugin.item').length,
-    }),
-    children: { 'settings.plugin.item': { kind: 'list', scope: 'root' } },
+    inject: () => configurable.inject(),
+    children: { 'settings.plugin.item': { kind: 'keyed', scope: 'root' } },
   }, ConfigurablePluginsTab))
 
   ctx.slots.inject('settings.plugin.item', function* () {
     yield ctx.slots.register({
       name: 'settings.plugin.item',
-      id: 'bash',
-      order: 0,
+      key: SHELL_NS,
       locale: NS,
       inject: () => bash.inject(),
     }, BashCard)
     yield ctx.slots.register({
       name: 'settings.plugin.item',
-      id: 'agent-loop',
-      order: 10,
+      key: AGENT_LOOP_NS,
       locale: NS,
       inject: () => agentLoop.inject(),
     }, AgentLoopCard)
     yield ctx.slots.register({
       name: 'settings.plugin.item',
-      id: 'web-search',
-      order: 20,
+      key: WEB_SEARCH_NS,
       locale: NS,
       inject: () => webSearch.inject(),
     }, WebSearchCard)

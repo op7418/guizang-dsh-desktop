@@ -30,8 +30,8 @@ artifact it produces itself.
 When a scenario needs a Client-owned constant or pure function, mirror it here
 instead, next to the commented-out import that names the source module. A drift
 then surfaces as a missed selector or a stale mirrored value — a loud failure,
-never a silent pass. `scaffold.ts` follows this rule for the welcome-notice
-namespace, acknowledgement field, version, and asserted Chinese copy.
+never a silent pass. Browser-owned fixture values should follow this rule when
+a Host-side scenario needs them.
 
 Two kinds of Client import stand. `assembled-boot.ts` drives the shell itself, so
 it imports `AppWebEntry` from `@deepseek-ai/dsh-client-web` and the boot-manifest

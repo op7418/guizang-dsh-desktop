@@ -96,7 +96,7 @@ dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/la
 ### Session 日志导出
 
 ~~~sh
-dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-session-log-export-0.1.0-rc.5.tgz
+dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/latest/download/deepseek-ai-dsh-session-log-export-0.1.0-rc.7.tgz
 ~~~
 
 在**轨迹**工具栏和 <code>/export</code> 命令中增加单 Session ZIP 导出。详见[导出插件说明](packages/session-query/session-log-export/README.md)。
@@ -128,7 +128,9 @@ pnpm --filter @deepseek-ai/dsh-desktop run typecheck
 pnpm --filter @deepseek-ai/dsh-desktop run test:e2e
 ~~~
 
-正式安装包不会在开发者电脑上构建或上传。版本一致的 `v*` Tag 会启动 `Desktop` GitHub Actions 工作流，在原生 macOS、Windows 与 Linux runner 上构建和校验产物、生成 `SHA256SUMS.txt`，再发布 GitHub Release。手动触发工作流只会生成保留七天的 Actions Artifact，不会更新 Release。正式发布候选版本仍需在目标机器上验证安装、标题栏、签名、公证和更新流程。
+正式安装包不会在开发者电脑上构建或上传。版本一致的 `v*` Tag 会启动 `Desktop` GitHub Actions 工作流，在原生 macOS、Windows 与 Linux runner 上构建和校验产物、生成 `SHA256SUMS.txt`，再发布 GitHub Release。手动触发但不填写 Release Tag 时，只会生成保留七天的 Actions Artifact。
+
+`Sync DeepSeek Harness upstream` 工作流每天北京时间 09:00 检查最新的非草稿官方 Release。能够干净合并的更新会在不强推的前提下完成合并和验证，提交到 `main`，再以 `v<上游版本>-pilot.1` 调用同一套原生发布流水线。遇到合并冲突时，工作流会创建或更新 GitHub Issue，并在改动 `main` 前停止；缺少 macOS 签名 Secrets 时也会创建 Issue，只同步已验证的源码，不发布未签名正式版。解决对应条件后重新运行工作流，就会继续待发布版本。
 
 底层系统资料见 [DeepSeek Harness 架构](docs/architecture.md)、[开发指南](docs/development.md)与[桌面架构](apps/desktop/README.md)。
 

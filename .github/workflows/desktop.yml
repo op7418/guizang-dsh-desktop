@@ -1,8 +1,9 @@
 name: Desktop
 
 # Official desktop packages are produced only on GitHub-hosted native runners.
-# A manual dispatch creates short-lived Actions artifacts for maintainers; only
-# a version-matched v* tag is allowed to create or update a GitHub Release.
+# A manual dispatch without a release tag creates short-lived Actions artifacts.
+# A version-matched v* tag, or the guarded upstream-sync workflow passing an
+# explicit release_tag, creates a GitHub Release from native hosted runners.
 
 on:
   pull_request:
@@ -23,6 +24,11 @@ on:
     branches: [main]
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Optional v* tag to publish after all native jobs pass'
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -65,14 +71,16 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Verify release tag matches desktop version
-        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        if: ${{ startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '') }}
         shell: bash
+        env:
+          RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || inputs.release_tag }}
         run: |
           set -euo pipefail
-          expected="${GITHUB_REF_NAME#v}"
+          expected="${RELEASE_TAG#v}"
           actual="$(node -p "require('./apps/desktop/package.json').version")"
           if [ "$actual" != "$expected" ]; then
-            echo "::error::desktop package version $actual does not match tag $GITHUB_REF_NAME"
+            echo "::error::desktop package version $actual does not match tag $RELEASE_TAG"
             exit 1
           fi
 
@@ -93,18 +101,18 @@ jobs:
         if: runner.os != 'Linux'
         run: pnpm --filter @deepseek-ai/dsh-desktop run test:e2e
 
-      - name: Build native desktop artifacts
-        if: ${{ github.event_name == 'workflow_dispatch' && runner.os != 'macOS' }}
+      - name: Build native desktop preview artifacts
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag == '' && runner.os != 'macOS' }}
         run: pnpm --filter @deepseek-ai/dsh-desktop run pack
 
-      - name: Build native macOS desktop artifacts
-        if: ${{ github.event_name == 'workflow_dispatch' && runner.os == 'macOS' }}
+      - name: Build native macOS desktop preview artifacts
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.release_tag == '' && runner.os == 'macOS' }}
         shell: bash
         timeout-minutes: 45
         run: pnpm --filter @deepseek-ai/dsh-desktop run pack
 
       - name: Build signed macOS release artifacts
-        if: ${{ startsWith(github.ref, 'refs/tags/v') && runner.os == 'macOS' }}
+        if: ${{ (startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')) && runner.os == 'macOS' }}
         shell: bash
         timeout-minutes: 45
         env:
@@ -115,15 +123,15 @@ jobs:
         run: pnpm --filter @deepseek-ai/dsh-desktop run pack:release
 
       - name: Build release artifacts
-        if: ${{ startsWith(github.ref, 'refs/tags/v') && runner.os != 'macOS' }}
+        if: ${{ (startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '')) && runner.os != 'macOS' }}
         run: pnpm --filter @deepseek-ai/dsh-desktop run pack:release
 
       - name: Verify macOS artifact signature
         if: ${{ runner.os == 'macOS' && (github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')) }}
         env:
-          PILOT_HARNESS_ALLOW_ADHOC_SIGNING: ${{ startsWith(github.ref, 'refs/tags/v') && '0' || '1' }}
-          PILOT_HARNESS_APPLE_TEAM_ID: ${{ startsWith(github.ref, 'refs/tags/v') && secrets.APPLE_TEAM_ID || '' }}
-          PILOT_HARNESS_REQUIRE_DEVELOPER_ID: ${{ startsWith(github.ref, 'refs/tags/v') && '1' || '0' }}
+          PILOT_HARNESS_ALLOW_ADHOC_SIGNING: ${{ (startsWith(github.ref, 'refs/tags/v') || inputs.release_tag != '') && '0' || '1' }}
+          PILOT_HARNESS_APPLE_TEAM_ID: ${{ (startsWith(github.ref, 'refs/tags/v') || inputs.release_tag != '') && secrets.APPLE_TEAM_ID || '' }}
+          PILOT_HARNESS_REQUIRE_DEVELOPER_ID: ${{ (startsWith(github.ref, 'refs/tags/v') || inputs.release_tag != '') && '1' || '0' }}
         run: node apps/desktop/scripts/verify-macos-signature.mjs apps/desktop/release 1
 
       - uses: actions/upload-artifact@v4
@@ -191,7 +199,7 @@ jobs:
 
   publish-release:
     name: Publish GitHub Release
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: ${{ startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '') }}
     needs: [native-package, plugin-bundles]
     runs-on: ubuntu-latest
     permissions:
@@ -205,8 +213,10 @@ jobs:
 
       - name: Give desktop installers stable download names
         shell: bash
+        env:
+          RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || inputs.release_tag }}
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          version="${RELEASE_TAG#v}"
           mv "release-assets/Pilot Harness-${version}-arm64.dmg" "release-assets/Pilot-Harness-macOS-arm64.dmg"
           mv "release-assets/Pilot Harness-${version}-arm64.zip" "release-assets/Pilot-Harness-macOS-arm64.zip"
           mv "release-assets/Pilot Harness.Setup.${version}.exe" "release-assets/Pilot-Harness-Windows-x64.exe"
@@ -229,6 +239,8 @@ jobs:
 
       - uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || inputs.release_tag }}
+          target_commitish: ${{ github.sha }}
           generate_release_notes: true
           draft: false
           prerelease: false

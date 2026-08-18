@@ -26,7 +26,7 @@ describe('web e2e: goal bar clear convergence', () => {
   let tripwire: ReturnType<typeof watchConsole>
 
   beforeAll(async () => {
-    scaffold = await launchWebScaffold({ extraOverlayPath: OVERLAY, welcomeNoticePending: true })
+    scaffold = await launchWebScaffold({ extraOverlayPath: OVERLAY })
     browser = await chromium.launch()
     page = await newEnglishPage(browser)
     tripwire = watchConsole(page)

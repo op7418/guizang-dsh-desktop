@@ -1,7 +1,5 @@
 /** Copy dictionaries for the Models settings section. */
 
-import { WELCOME_NOTICE_COPY } from '../onboarding-copy.ts'
-
 /** English strings (the key-set source of truth for this pair). */
 export const en = {
   nav: 'Models',
@@ -113,13 +111,10 @@ export const en = {
   customNeedsModels: 'A custom provider needs at least one model.',
   create: 'Create provider',
   creating: 'Creating\u2026',
-  welcomeTitle: WELCOME_NOTICE_COPY.en.title,
-  welcomeBody: WELCOME_NOTICE_COPY.en.body,
-  welcomeContinue: WELCOME_NOTICE_COPY.en.continueLabel,
-  welcomeError: 'The acknowledgement could not be saved. Please try again.',
-  onboardingTitle: 'Add an API key to get started',
-  onboardingDescription: 'Configure the official DeepSeek provider to start building.',
-  onboardingLater: 'Configure later',
+  onboardingTitle: 'Add a model provider',
+  onboardingDescription: 'No usable provider or model is configured yet. Add one now, or skip this step and explore Pilot Harness first.',
+  onboardingLater: 'Skip for now',
+  onboardingOpenProviders: 'Add provider',
   onboardingSave: 'Save and continue',
   onboardingSaving: 'Saving…',
   keyRequired: 'Enter an API key to continue.',
@@ -239,13 +234,10 @@ export const zh: { [Key in keyof typeof en]: string } = {
   customNeedsModels: '自定义服务商至少需要一个模型。',
   create: '创建服务商',
   creating: '创建中\u2026',
-  welcomeTitle: WELCOME_NOTICE_COPY.zh.title,
-  welcomeBody: WELCOME_NOTICE_COPY.zh.body,
-  welcomeContinue: WELCOME_NOTICE_COPY.zh.continueLabel,
-  welcomeError: '暂时无法保存确认状态，请重试。',
-  onboardingTitle: '添加一个 API Key 开始使用',
-  onboardingDescription: '配置 DeepSeek 官方模型，即可开始使用。',
-  onboardingLater: '稍后配置',
+  onboardingTitle: '添加模型服务商',
+  onboardingDescription: '尚未配置可用的服务商或模型。现在前往服务商设置完成添加，也可以暂时跳过，先浏览 Pilot Harness。',
+  onboardingLater: '暂时跳过',
+  onboardingOpenProviders: '添加服务商',
   onboardingSave: '保存并继续',
   onboardingSaving: '保存中…',
   keyRequired: '请输入 API 密钥后继续。',
