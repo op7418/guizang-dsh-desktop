@@ -190,6 +190,21 @@ try {
     throw new Error(`desktop did not reach the workspace UI: ${startupText}\n${String(error)}`)
   }
 
+  // A clean desktop profile intentionally starts with the provider guidance
+  // in front of the workspace UI. Exercise the supported non-blocking path
+  // before continuing with workspace selection; otherwise the modal mask is
+  // correctly expected to intercept the add-workspace control.
+  const providerSetupSkip = page.getByRole('button', { name: /^(Skip for now|暂时跳过)$/ })
+  async function skipProviderSetup(timeout = 0) {
+    await providerSetupSkip.waitFor({ timeout }).catch(() => undefined)
+    if (!await providerSetupSkip.isVisible().catch(() => false)) return false
+    const dialog = page.locator('[data-pilot-dialog][role="dialog"]', { has: providerSetupSkip })
+    await providerSetupSkip.click()
+    await dialog.waitFor({ state: 'detached' })
+    return true
+  }
+  await skipProviderSetup(10_000)
+
   const bridge = await page.evaluate(() => ({
     pickDirectory: typeof window.pilotHarness?.pickDirectory,
     platform: window.pilotHarness?.platform,
@@ -210,7 +225,15 @@ try {
   const directoryBrowser = page.getByRole('dialog', { name: 'Select Workspace Directory', exact: true })
   async function addWorkspacePath(path, expectedName = basename(path)) {
     await electronApp.evaluate((_, selectedPath) => { globalThis.__pilotHarnessE2EPath = selectedPath }, path)
-    await addWorkspace.click()
+    try {
+      await addWorkspace.click({ timeout: 5_000 })
+    } catch (error) {
+      // Models readiness settles independently from the first workspace paint.
+      // If the clean-profile prompt won that race, take its explicit skip path
+      // and retry. Any unrelated overlay still fails with the original error.
+      if (!await skipProviderSetup(10_000)) throw error
+      await addWorkspace.click()
+    }
 
     // Linux intentionally uses the in-app directory browser instead of the
     // native bridge. Exercise that real fallback; macOS and Windows resolve
@@ -239,20 +262,6 @@ try {
   }
 
   const rootProject = await addWorkspacePath(repoRoot, repoName)
-
-  // First-run onboarding starts only after the project has been accepted. It
-  // is intentionally blocking from this point; complete the notice and take
-  // the supported "later" path so the remaining project interactions run.
-  await page.waitForTimeout(500)
-  const continueButton = page.getByRole('button', { name: 'Continue', exact: true })
-  if (await continueButton.isVisible().catch(() => false)) {
-    await continueButton.click()
-    const configureLater = page.getByRole('button', { name: 'Configure later', exact: true })
-    if (await configureLater.isVisible({ timeout: 1_000 }).catch(() => false)) {
-      await configureLater.click()
-    }
-    await page.getByRole('dialog').waitFor({ state: 'detached' })
-  }
 
   const desktopProject = await addWorkspacePath(appRoot, 'desktop')
   await desktopProject.click()
