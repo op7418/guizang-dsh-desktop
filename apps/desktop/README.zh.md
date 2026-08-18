@@ -47,7 +47,7 @@ Electron 端到端检查会使用隔离的空 Harness home 启动客户端，通
 pnpm run desktop:pack
 ```
 
-electron-builder 矩阵为 macOS 定义 DMG/ZIP，为 Windows 定义 NSIS，为 Linux 定义 AppImage/DEB/RPM。`desktop.yml` 会在三种原生 GitHub runner 上分别构建并执行同一套阻断性 Electron 流程；Linux 使用 Xvfb，macOS 与 Windows 使用各自 runner 的原生会话。发布签名、公证和更新分发仍由部署流程负责。
+electron-builder 矩阵为 macOS 定义 DMG/ZIP，为 Windows 定义 NSIS，为 Linux 定义 AppImage/DEB/RPM。`desktop.yml` 会在三种原生 GitHub runner 上分别构建并执行同一套阻断性 Electron 流程；Linux 使用 Xvfb，macOS 与 Windows 使用各自 runner 的原生会话。普通 macOS 构建会选择显式的临时签名配置，并必须通过严格 Bundle 验证。带 Tag 的 macOS 构建会选择 Release 配置、导入 `MAC_CERT_P12_BASE64`，并在产物不属于配置的 Developer ID Team 时于上传前失败。公证和更新分发仍由部署流程负责。
 
 确认后的正方形图稿保存在 `assets/icon-master.png`。`pnpm --filter @deepseek-ai/dsh-desktop run icons` 会为系统启动器生成图形占比 83.6% 的平台版 PNG、ICNS、ICO 与 Linux 多尺寸资源，同时生成供应用内界面使用、图形铺满画布的 `brand-icon.png`。同一生成器还会把紧凑版本嵌入可卸载的 CodePilot 主题，使 Dock、恢复页、空会话、侧边栏、“关于”页、打包应用与安装包共用同一源图，并避免把系统启动器的留白带进应用界面。
 
@@ -61,5 +61,5 @@ Harness 默认数据目录位于该应用专属的 Electron 用户数据目录�
 
 - 桌面主题依赖当前 DSH 公开主题变量名与显式的 `data-pilot-*` 组件 Hook 提供布局，不再选择生成的 CSS Module 类名；但上游 Slot 或 DOM 契约变化后仍需重新做视觉回归。
 - 第一版使用 DSH 的文件型凭据服务商。如果需要阻止同一系统用户下的 agent 进程读取已存密钥，后续应实现操作系统 Keychain 凭据插件。
-- 在发布流水线提供平台身份和公证凭据之前，安装包保持未签名状态。
+- 带 Tag 的 macOS 安装包必须带有经过验证的 Developer ID 签名，但尚未公证。Windows 与 Linux 安装包在各自发布流程获得平台签名身份之前仍保持未签名状态。
 - macOS 已做过本地实机验证；macOS、Windows 与 Linux 都会在原生 CI runner 上执行构建和 Electron 流程校验，但发布候选版本仍需在目标桌面环境补安装、原生窗口、签名与更新冒烟。

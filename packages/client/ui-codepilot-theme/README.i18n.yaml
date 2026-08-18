@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write packages/client/ui-codepilot-theme/README.md
-README.md: ca45205771c5269541807acb6db326adba2ef347
-README.zh.md: 75ef7f68a9182194f6011a3ed16e302545db522a
+README.md: 71358b894a3951f26ab2afc0996504d51e211860
+README.zh.md: 47e3f1903cf057bafefe256eed96d1dbe417792d

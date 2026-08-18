@@ -47,7 +47,7 @@ Build an unsigned installer for the current operating system with:
 pnpm run desktop:pack
 ```
 
-The electron-builder matrix defines DMG/ZIP for macOS, NSIS for Windows, and AppImage/DEB/RPM for Linux. The `desktop.yml` workflow builds each target and runs the same blocking Electron flow on its native GitHub runner; Linux uses Xvfb, while macOS and Windows use their native runner sessions. Release signing, notarization, and update publishing remain deployment responsibilities.
+The electron-builder matrix defines DMG/ZIP for macOS, NSIS for Windows, and AppImage/DEB/RPM for Linux. The `desktop.yml` workflow builds each target and runs the same blocking Electron flow on its native GitHub runner; Linux uses Xvfb, while macOS and Windows use their native runner sessions. Ordinary macOS builds select the explicit ad-hoc configuration and must pass strict bundle verification. A tagged macOS build selects the release configuration, imports `MAC_CERT_P12_BASE64`, and fails before upload unless the result carries the configured Developer ID Team. Notarization and update publishing remain deployment responsibilities.
 
 The approved square artwork remains in `assets/icon-master.png`. `pnpm --filter @deepseek-ai/dsh-desktop run icons` derives platform PNG, ICNS, ICO, and Linux variants with an 83.6% optical artwork footprint for native launchers, plus an edge-to-edge `brand-icon.png` for in-app surfaces. The same generator embeds a compact copy in the unloadable CodePilot theme, keeping the Dock, recovery page, empty conversation, sidebar, About page, packaged application, and installers on one source image without applying the native launcher inset inside the UI.
 
@@ -61,5 +61,5 @@ The default Harness data directory is the app-specific Electron user-data folder
 
 - The desktop theme follows the current DSH public token names and explicit `data-pilot-*` component hooks for geometry. It no longer selects generated CSS-module class names, but upstream slot or DOM-contract changes still require a visual regression pass.
 - The first implementation uses the DSH file-backed credential provider. An OS-keychain credential plugin is the appropriate follow-up when same-user agent processes must not be able to read stored keys.
-- Installers are unsigned until a release pipeline supplies platform identities and notarization credentials.
+- Tagged macOS installers require a verified Developer ID signature but are not notarized. Windows and Linux installers remain unsigned until their release pipelines receive platform signing identities.
 - macOS has also been exercised locally; macOS, Windows, and Linux are build- and Electron-flow-checked on native CI runners, while release candidates still require installation, native-window, signing, and update smoke checks on the target desktop environment.

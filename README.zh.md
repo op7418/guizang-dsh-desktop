@@ -44,11 +44,11 @@ Pilot Harness 不替换 DeepSeek Harness 的 agent loop、Session 日志、工�
 
 | 平台 | 直接下载 | 安装方法与首次启动安全提示 |
 |---|---|---|
-| **macOS（Apple Silicon）** | [DMG 安装包](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.dmg)<br>[ZIP 应用](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.zip) | 打开 DMG，将 `pilot-harness.app` 拖入**应用程序**。如果 macOS 无法验证开发者，进入**系统设置 → 隐私与安全性 → 仍要打开**。如果提示应用已损坏，打开终端执行：<br><code>sudo xattr -rd com.apple.quarantine "/Applications/pilot-harness.app"</code><br><code>open "/Applications/pilot-harness.app"</code><br>系统提示时输入登录密码；终端不会显示密码字符。[Apple 安全说明](https://support.apple.com/102445)。 |
+| **macOS（Apple Silicon）** | [DMG 安装包](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.dmg)<br>[ZIP 应用](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-macOS-arm64.zip) | 打开 DMG，将 `pilot-harness.app` 拖入**应用程序**，然后先尝试打开一次。如果 macOS 无法验证，进入**系统设置 → 隐私与安全性 → 仍要打开**，再确认**打开**。不需要执行终端命令。如果 macOS 提示应用已损坏，请删除应用并从本表重新下载 DMG。[Apple 安全说明](https://support.apple.com/102445)。 |
 | **Windows（x64）** | [EXE 安装程序](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Windows-x64.exe) | 运行 EXE。如果 Microsoft Defender SmartScreen 显示**Windows 已保护你的电脑**，请先确认文件来自本 Release，再选择**更多信息 → 仍要运行**。不要全局关闭 SmartScreen。受管理的电脑可能不显示该选项，此时请联系管理员。[Microsoft SmartScreen 说明](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/smartscreen-reputation)。 |
 | **Linux（x64）** | [AppImage](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-x86_64.AppImage)<br>[DEB](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-amd64.deb)<br>[RPM](https://github.com/op7418/pilot-harness/releases/latest/download/Pilot-Harness-Linux-x86_64.rpm) | DEB：<code>sudo apt install ./Pilot-Harness-Linux-amd64.deb</code><br>RPM：<code>sudo dnf install ./Pilot-Harness-Linux-x86_64.rpm</code><br>AppImage：执行 <code>chmod +x Pilot-Harness-Linux-x86_64.AppImage</code>，再执行 <code>./Pilot-Harness-Linux-x86_64.AppImage</code>。如果文件管理器阻止运行，在文件属性中启用**允许作为程序执行**。预览包尚未签名，因此只有确认来自官方 Release 后才应接受包管理器警告。 |
 
-当前所有预览安装包均未签名。只有对从本仓库 [GitHub 官方 Release](https://github.com/op7418/pilot-harness/releases/latest)下载的文件才应覆盖操作系统警告；不要全局关闭平台安全功能。后续版本将补充签名与公证。
+macOS 安装包已携带 Developer ID 签名，但尚未完成公证，因此首次启动仍可能需要点击**仍要打开**。Windows 与 Linux 预览安装包仍未签名。只有对从本仓库 [GitHub 官方 Release](https://github.com/op7418/pilot-harness/releases/latest)下载的文件才应覆盖操作系统警告；不要全局关闭平台安全功能。
 
 安装后打开 Pilot Harness，选择工作区，再前往**设置 → 服务商**连接服务商，并选择它提供的模型。桌面客户端无需另外安装 DeepSeek Harness。源码启动和打包说明放在[开发](#development)部分，不再占用普通用户的安装流程。
 

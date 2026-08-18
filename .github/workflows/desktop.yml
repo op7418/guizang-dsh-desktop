@@ -78,7 +78,29 @@ jobs:
         run: pnpm --filter @deepseek-ai/dsh-desktop run test:e2e
 
       - name: Build native desktop artifacts
+        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
         run: pnpm --filter @deepseek-ai/dsh-desktop run pack
+
+      - name: Build signed macOS release artifacts
+        if: ${{ startsWith(github.ref, 'refs/tags/v') && runner.os == 'macOS' }}
+        env:
+          CSC_LINK: ${{ secrets.MAC_CERT_P12_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          PILOT_HARNESS_APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          PILOT_HARNESS_REQUIRE_DEVELOPER_ID: '1'
+        run: pnpm --filter @deepseek-ai/dsh-desktop run pack:release
+
+      - name: Build release artifacts
+        if: ${{ startsWith(github.ref, 'refs/tags/v') && runner.os != 'macOS' }}
+        run: pnpm --filter @deepseek-ai/dsh-desktop run pack:release
+
+      - name: Verify macOS artifact signature
+        if: ${{ runner.os == 'macOS' }}
+        env:
+          PILOT_HARNESS_ALLOW_ADHOC_SIGNING: ${{ startsWith(github.ref, 'refs/tags/v') && '0' || '1' }}
+          PILOT_HARNESS_APPLE_TEAM_ID: ${{ startsWith(github.ref, 'refs/tags/v') && secrets.APPLE_TEAM_ID || '' }}
+          PILOT_HARNESS_REQUIRE_DEVELOPER_ID: ${{ startsWith(github.ref, 'refs/tags/v') && '1' || '0' }}
+        run: node apps/desktop/scripts/verify-macos-signature.mjs apps/desktop/release 1
 
       - uses: actions/upload-artifact@v4
         with:

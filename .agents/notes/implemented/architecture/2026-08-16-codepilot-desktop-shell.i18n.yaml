@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/architecture/2026-08-16-codepilot-desktop-shell.md
-2026-08-16-codepilot-desktop-shell.md: 5cad406c0b12c281453b6d4eb40cf9903d0ffb03
-2026-08-16-codepilot-desktop-shell.zh.md: afc92b8d63f06d04a0391d942ee069dccd6a8945
+2026-08-16-codepilot-desktop-shell.md: 7cc90e803d89577308f74b6535987b3c16c58448
+2026-08-16-codepilot-desktop-shell.zh.md: d0982e4e66b52f70ebe266b40315bec289002b85

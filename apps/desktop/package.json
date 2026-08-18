@@ -28,7 +28,8 @@
     "build": "node scripts/build.mjs",
     "icons": "node scripts/generate-icons.mjs",
     "dev": "pnpm run build && electron .",
-    "pack": "pnpm run build && electron-builder --config electron-builder.yml --publish never",
+    "pack": "pnpm run build && electron-builder --config electron-builder.adhoc.yml --publish never",
+    "pack:release": "pnpm run build && electron-builder --config electron-builder.yml --publish never",
     "test": "node --import tsx --test tests/*.test.ts",
     "test:e2e": "node tests/run-desktop-e2e.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json"

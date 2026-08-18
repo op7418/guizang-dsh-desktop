@@ -30,7 +30,7 @@ CodePilot 主题是建立在公开 Web 变量与生成后的 CSS Module 标签�
 
 桌面项目树遵循 CodePilot 的直接选择约定：点击未激活项目会启动或打开它的空白会话；明确的添加项目入口会用一次点击调用原生目录选择器。首次模型引导以已有空白会话为前提，因此引导遮罩不会挂载到冷启动项目选择器之上。Playwright Electron 检查会在隔离的空 Harness home 中运行这些路径，验证 macOS 侧边栏按钮的位置，走通服务商选择，并捕获服务商、模型、通用设置与关于页面。
 
-带 Tag 的 Release 会同时发布 macOS、Windows 与 Linux 原生安装包，以及 CodePilot 主题、Worktree 文件、Schedule 摘要和 Session 日志导出插件的预构建 tarball。每个插件 tarball 都声明 `dsh.bundle.patch` 并携带自己的 `cordis.patch.yml`，因此本地 Web profile 可以通过一条 `dsh plugin --profile web add <release-url>` 命令安装，不需要检出源码或手写 Patch。CI 会先把四个归档安装到空白 Web profile，并验证组合后的配置行 id，再发布这些产物。因此根 README 会优先引导桌面用户前往 Releases，而把源码构建说明留在“开发”部分。
+带 Tag 的 Release 会同时发布 macOS、Windows 与 Linux 原生安装包，以及 CodePilot 主题、Worktree 文件、Schedule 摘要和 Session 日志导出插件的预构建 tarball。每个插件 tarball 都声明 `dsh.bundle.patch` 并携带自己的 `cordis.patch.yml`，因此本地 Web profile 可以通过一条 `dsh plugin --profile web add <release-url>` 命令安装，不需要检出源码或手写 Patch。CI 会先把四个归档安装到空白 Web profile，并验证组合后的配置行 id，再发布这些产物。普通 macOS 产物使用 electron-builder 显式的临时签名身份与严格 Bundle 验证；带 Tag 的 macOS 产物则必须使用 Developer ID Application 证书和配置的 Team ID，因此缺失或不匹配的发布身份会阻止发布。因此根 README 会优先引导桌面用户前往 Releases，而把源码构建说明留在“开发”部分。
 
 ## Alternatives considered
 
@@ -44,4 +44,4 @@ CodePilot 主题是建立在公开 Web 变量与生成后的 CSS Module 标签�
 
 桌面客户端无需 fork 核心即可继承 DSH 的模型、服务商、插件和会话行为，其安装包可以面向 macOS、Windows 与 Linux。DSH 客户端插件或 wire 发生变更时，会通过同一套 Web 组合抵达桌面端。原生目录选择不再启动第二个 AppleScript 进程，并让选择框的模态关系附着在 Electron 窗口上。插件归档也为本地 Web 用户提供了低门槛安装路径，同时不会假装较旧的上游客户端已经公开 Pilot Harness 新增的呈现 Slot。
 
-应用依赖 Web profile 可以在本机回环地址中嵌入，并依赖它输出完成启动后的 URL 日志。上游主题变量或侧边栏发生变化后，主题插件需要重新做视觉验证。原生依赖要求安装包在对应目标操作系统上构建，生产分发仍需要配置签名与公证。
+应用依赖 Web profile 可以在本机回环地址中嵌入，并依赖它输出完成启动后的 URL 日志。上游主题变量或侧边栏发生变化后，主题插件需要重新做视觉验证。原生依赖要求安装包在对应目标操作系统上构建。Developer ID 签名使 macOS 用户可以通过“隐私与安全性”批准未公证的预览版，而无需移除隔离元数据；要消除这次首次启动批准，仍需要完成公证。

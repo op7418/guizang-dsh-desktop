@@ -1,6 +1,7 @@
 appId: com.codepilot.pilotharness
 productName: Pilot Harness
 executableName: pilot-harness
+afterSign: scripts/after-sign.cjs
 # DSH materializes profile plugin links back to package directories. Those
 # links must target real filesystem paths; an asar archive is not traversable
 # through an operating-system symlink.
@@ -13,7 +14,11 @@ files:
   - package.json
 mac:
   category: public.app-category.developer-tools
-  identity: null
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: assets/entitlements.mac.plist
+  entitlementsInherit: assets/entitlements.mac.inherit.plist
+  notarize: false
   icon: assets/icon.icns
   artifactName: "${productName}-${version}-${arch}.${ext}"
   target:
