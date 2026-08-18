@@ -52,8 +52,10 @@ test('online previews are ad-hoc signed while formal releases require Developer 
   assert.match(workflow, /verify-macos-signature\.mjs apps\/desktop\/release 1/)
   assert.match(
     workflow,
-    /github\.event_name == 'workflow_dispatch' && inputs\.release_tag == '' && runner\.os == 'macOS'/,
+    /github\.event_name == 'push' && github\.ref == 'refs\/heads\/main'/,
   )
+  assert.match(workflow, /github\.event_name == 'workflow_dispatch' && inputs\.release_tag == ''/)
+  assert.match(workflow, /runner\.os == 'macOS'/)
   assert.doesNotMatch(workflow, /ulimit -n/)
   assert.match(workflow, /desktop package version \$actual does not match tag \$RELEASE_TAG/)
   assert.match(workflow, /inputs\.release_tag != ''/)
