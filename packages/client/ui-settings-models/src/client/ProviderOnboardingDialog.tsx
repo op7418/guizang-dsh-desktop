@@ -1,6 +1,6 @@
 /** Generic first-run provider guidance over the shared Models snapshot. */
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { IApiClient } from '@deepseek-ai/dsh-api-remotes/client'
 import type { SnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
@@ -11,6 +11,29 @@ import { onboardingReadiness } from './store.ts'
 import type { en } from './locales.ts'
 import { OnboardingModal } from './OnboardingModal.tsx'
 import styles from './ProviderOnboardingDialog.module.css'
+
+const ONBOARDING_COMPLETED_SESSION_KEY = 'pilot-harness.provider-onboarding.completed'
+
+/** Keep an explicit choice across React/plugin remounts, but not app restarts. */
+function onboardingCompletedForSession(): boolean {
+  try {
+    return window.sessionStorage.getItem(ONBOARDING_COMPLETED_SESSION_KEY) === 'true'
+  } catch {
+    // A locked-down Web Harness may disable storage. The prompt still remains
+    // skippable for the lifetime of its current settings-shell mount.
+    return false
+  }
+}
+
+/** Record either explicit path (skip or open settings) before the shell closes. */
+function completeOnboardingForSession(): void {
+  try {
+    window.sessionStorage.setItem(ONBOARDING_COMPLETED_SESSION_KEY, 'true')
+  } catch {
+    // Storage is an enhancement for remounts, never a prerequisite for using
+    // or dismissing the provider guidance.
+  }
+}
 
 /** Registration-side dependencies of {@link ProviderOnboardingDialog}. */
 export interface ProviderOnboardingInjected {
@@ -70,20 +93,38 @@ export function ProviderOnboardingDialog(props: ProviderOnboardingDialogProps): 
   const { complete, openSection, controller, useModels, t } = props
   const state = useModels(snapshot => snapshot)
   const readiness = onboardingReadiness(state)
-  const dialogAvailable = useDialogAvailable(readiness.kind === 'setup-required')
+  const completedForSession = onboardingCompletedForSession()
+  const ownerCompletionSent = useRef(false)
+  const dialogAvailable = useDialogAvailable(
+    readiness.kind === 'setup-required' && !completedForSession,
+  )
 
   useEffect(() => {
     if (state.status === 'idle') void controller.load()
   }, [controller, state.status])
 
   useEffect(() => {
-    if (readiness.kind === 'provider-ready' || readiness.kind === 'unavailable') complete()
-  }, [complete, readiness.kind])
+    if (
+      completedForSession
+      || readiness.kind === 'provider-ready'
+      || readiness.kind === 'unavailable'
+    ) {
+      if (ownerCompletionSent.current) return
+      ownerCompletionSent.current = true
+      complete()
+    }
+  }, [complete, completedForSession, readiness.kind])
 
-  if (readiness.kind !== 'setup-required' || !dialogAvailable) return null
+  if (completedForSession || readiness.kind !== 'setup-required' || !dialogAvailable) return null
 
   const addProvider = (): void => {
+    completeOnboardingForSession()
     openSection('providers')
+    complete()
+  }
+
+  const skip = (): void => {
+    completeOnboardingForSession()
     complete()
   }
 
@@ -92,7 +133,7 @@ export function ProviderOnboardingDialog(props: ProviderOnboardingDialogProps): 
       <div data-pilot-provider-onboarding>
         <p className={styles.description}>{t('onboardingDescription')}</p>
         <div className={styles.actions}>
-          <Button variant="outline" onClick={complete}>{t('onboardingLater')}</Button>
+          <Button variant="outline" onClick={skip}>{t('onboardingLater')}</Button>
           <Button variant="primary" onClick={addProvider}>{t('onboardingOpenProviders')}</Button>
         </div>
       </div>

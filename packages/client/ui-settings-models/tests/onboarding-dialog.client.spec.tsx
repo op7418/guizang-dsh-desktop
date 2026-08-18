@@ -11,7 +11,8 @@ import { en } from '../src/client/locales.ts'
 
 afterEach(() => {
   cleanup()
-  document.getElementById('root')?.remove()
+  document.querySelectorAll('#root').forEach((root) => { root.remove() })
+  window.sessionStorage.clear()
 })
 
 let nextRpc = 0
@@ -89,6 +90,21 @@ describe('ProviderOnboardingDialog', () => {
     fireEvent.click(await screen.findByRole('button', { name: en.onboardingLater }))
     expect(h.complete).toHaveBeenCalledOnce()
     expect(h.openSection).not.toHaveBeenCalled()
+  })
+
+  it('keeps an explicit skip across plugin remounts in the same app run', async () => {
+    const first = harness()
+    const firstView = render(<ProviderOnboardingDialog {...first.props} />)
+    fireEvent.click(await screen.findByRole('button', { name: en.onboardingLater }))
+    firstView.unmount()
+    first.appRoot.remove()
+
+    const remounted = harness()
+    render(<ProviderOnboardingDialog {...remounted.props} />)
+    await waitFor(() => { expect(remounted.props.controller.store.getSnapshot().status).toBe('ready') })
+    await waitFor(() => { expect(remounted.complete).toHaveBeenCalledOnce() })
+    expect(screen.queryByRole('dialog', { name: en.onboardingTitle })).toBeNull()
+    expect(remounted.openSection).not.toHaveBeenCalled()
   })
 
   it('waits for an existing dialog instead of replacing its active flow', async () => {
