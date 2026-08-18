@@ -139,11 +139,6 @@ export function SettingsRoot(props: SettingsRootComponentProps) {
     ? onboardingSteps.find(step => !completedOnboarding.has(step.id))
     : undefined
 
-  useEffect(() => {
-    if (onboardingActive) return
-    setCompletedOnboarding(new Set())
-  }, [onboardingActive])
-
   const completeOnboardingStep = useCallback((id: string) => {
     setCompletedOnboarding((previous) => {
       if (previous.has(id)) return previous
