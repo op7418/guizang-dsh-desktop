@@ -62,7 +62,7 @@ jobs:
       PILOT_HARNESS_E2E_HEIGHT: '677'
       PILOT_HARNESS_E2E_SETTINGS_HEIGHT: '677'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
@@ -169,7 +169,7 @@ jobs:
     name: Plugin bundles
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
 
@@ -225,7 +225,7 @@ jobs:
       # contend on the standard hosted runner.
       DSH_GATE_CONCURRENCY: '1'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           persist-credentials: false
@@ -261,7 +261,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: actions/download-artifact@v5
         with:
