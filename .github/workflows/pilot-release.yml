@@ -19,7 +19,10 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
       DSH_TELEMETRY_DISABLED: '1'
-      DSH_GATE_CONCURRENCY: '4'
+      # The complete gate includes coverage, snapshots, docs, and browser E2E.
+      # Keep the release baseline serial on a standard hosted runner so those
+      # resource-heavy suites cannot starve or mutate fixtures under each other.
+      DSH_GATE_CONCURRENCY: '1'
     steps:
       - uses: actions/checkout@v6
         with:

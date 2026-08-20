@@ -172,7 +172,9 @@ jobs:
         shell: bash
         env:
           DSH_ARCHIVE_BASE_REF: ${{ github.sha }}
-          DSH_GATE_CONCURRENCY: '4'
+          # A merged upstream candidate must pass the same stable serial
+          # baseline used for an explicit Pilot release.
+          DSH_GATE_CONCURRENCY: '1'
         run: |
           set -euo pipefail
           pnpm run check:ci:linux-primary

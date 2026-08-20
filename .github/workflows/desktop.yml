@@ -217,7 +217,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DSH_TELEMETRY_DISABLED: '1'
-      DSH_GATE_CONCURRENCY: '4'
+      # Match the source-release baseline: release verification is exhaustive,
+      # but serialized so coverage, snapshots, docs, and browser E2E do not
+      # contend on the standard hosted runner.
+      DSH_GATE_CONCURRENCY: '1'
     steps:
       - uses: actions/checkout@v6
         with:
