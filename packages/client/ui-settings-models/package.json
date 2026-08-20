@@ -46,6 +46,8 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@deepseek-ai/dsh-settings": "workspace:^",
+    "@deepseek-ai/schemastery": "workspace:^",
     "@lobehub/icons": "^4.12.0"
   },
   "peerDependencies": {

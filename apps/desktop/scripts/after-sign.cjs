@@ -3,7 +3,7 @@
 const fs = require('node:fs')
 const path = require('node:path')
 const { spawnSync } = require('node:child_process')
-const { resolveMacosSigningMode } = require('./macos-signing-policy.cjs')
+const { assertHelperEntitlements, resolveMacosSigningMode } = require('./macos-signing-policy.cjs')
 
 const INSPECT_TIMEOUT_MS = 15_000
 const VERIFY_TIMEOUT_MS = 60_000
@@ -29,6 +29,23 @@ function findApp(appOutDir) {
   return apps[0]
 }
 
+/** Find nested Electron Helper app bundles whose inherited permissions matter. */
+function findHelpers(appPath) {
+  const helpers = []
+  const pending = [appPath]
+  while (pending.length > 0) {
+    const directory = pending.pop()
+    if (directory === undefined) continue
+    for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue
+      const absolute = path.join(directory, entry.name)
+      if (absolute !== appPath && entry.name.endsWith('.app')) helpers.push(absolute)
+      else pending.push(absolute)
+    }
+  }
+  return helpers.sort()
+}
+
 module.exports = async function afterSign(context) {
   if (context.packager.platform.name !== 'mac') return
 
@@ -43,5 +60,10 @@ module.exports = async function afterSign(context) {
   })
 
   runCodesign(['--verify', '--deep', '--strict', '--verbose=4', appPath], VERIFY_TIMEOUT_MS)
-  console.log(`[afterSign] ${decision.mode} signature verified for ${path.basename(appPath)}`)
+  const helpers = findHelpers(appPath)
+  for (const helper of helpers) {
+    const entitlements = runCodesign(['-d', '--entitlements', ':-', helper], INSPECT_TIMEOUT_MS)
+    assertHelperEntitlements(entitlements, helper)
+  }
+  console.log(`[afterSign] ${decision.mode} signature and ${helpers.length} Helper entitlement set(s) verified for ${path.basename(appPath)}`)
 }

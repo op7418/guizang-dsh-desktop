@@ -8,6 +8,7 @@
   "files": ["src/client/index.ts", "src/client/css-modules.d.ts"],
   "references": [
     { "path": "../../../vendor/cordis" },
-    { "path": "../runtime" }
+    { "path": "../runtime" },
+    { "path": "../ui-theme" }
   ]
 }

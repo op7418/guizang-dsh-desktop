@@ -22,12 +22,25 @@ test('Linux packages use an RPM-safe identity and a valid maintainer', async () 
 })
 
 test('online previews are ad-hoc signed while formal releases require Developer ID', async () => {
-  const [builderConfig, adhocConfig, packageJson, workflow, upstreamWorkflow, upstreamState, rootReadme, rootReadmeZh] = await Promise.all([
+  const [
+    builderConfig,
+    adhocConfig,
+    packageJson,
+    workflow,
+    upstreamWorkflow,
+    pilotReleaseWorkflow,
+    ciWorkflow,
+    upstreamState,
+    rootReadme,
+    rootReadmeZh,
+  ] = await Promise.all([
     readFile(resolve(appRoot, 'electron-builder.yml'), 'utf8'),
     readFile(resolve(appRoot, 'electron-builder.adhoc.yml'), 'utf8'),
     readFile(resolve(appRoot, 'package.json'), 'utf8'),
     readFile(resolve(appRoot, '../../.github/workflows/desktop.yml'), 'utf8'),
     readFile(resolve(appRoot, '../../.github/workflows/upstream-sync.yml'), 'utf8'),
+    readFile(resolve(appRoot, '../../.github/workflows/pilot-release.yml'), 'utf8'),
+    readFile(resolve(appRoot, '../../.github/workflows/ci.yml'), 'utf8'),
     readFile(resolve(appRoot, '../../.github/upstream.json'), 'utf8'),
     readFile(resolve(appRoot, '../../README.md'), 'utf8'),
     readFile(resolve(appRoot, '../../README.zh.md'), 'utf8'),
@@ -50,6 +63,13 @@ test('online previews are ad-hoc signed while formal releases require Developer 
   assert.match(workflow, /PILOT_HARNESS_APPLE_TEAM_ID: \$\{\{ secrets\.APPLE_TEAM_ID \}\}/)
   assert.match(workflow, /PILOT_HARNESS_REQUIRE_DEVELOPER_ID: '1'/)
   assert.match(workflow, /verify-macos-signature\.mjs apps\/desktop\/release 1/)
+  assert.match(workflow, /run test:packaged/)
+  assert.match(workflow, /release-quality:/)
+  assert.match(workflow, /needs: \[native-package, plugin-bundles, release-quality\]/)
+  assert.match(workflow, /pnpm run check:ci:linux-primary/)
+  assert.match(workflow, /node apps\/desktop\/scripts\/audit-codepilot-ui\.mjs/)
+  assert.match(workflow, /prerelease: \$\{\{/)
+  assert.match(workflow, /make_latest: \$\{\{/)
   assert.match(
     workflow,
     /github\.event_name == 'push' && github\.ref == 'refs\/heads\/main'/,
@@ -84,21 +104,37 @@ test('online previews are ad-hoc signed while formal releases require Developer 
   assert.equal(tracked.repository, 'deepseek-ai/deepseek-harness')
   assert.match(tracked.tag ?? '', /^dsh-v/)
   assert.match(tracked.commit ?? '', /^[0-9a-f]{40}$/)
-  assert.match(tracked.pilotVersion ?? '', /-pilot\.1$/)
+  assert.match(tracked.pilotVersion ?? '', /-pilot\.[1-9]\d*$/)
   assert.match(upstreamWorkflow, /cron: '0 1 \* \* \*'/)
+  assert.match(upstreamWorkflow, /github\.ref == 'refs\/heads\/main'/)
+  assert.match(upstreamWorkflow, /releases\/latest/)
   assert.match(upstreamWorkflow, /git merge --no-ff --no-edit/)
   assert.match(upstreamWorkflow, /git diff --name-only --diff-filter=U/)
   assert.match(upstreamWorkflow, /git push origin HEAD:main/)
   assert.doesNotMatch(upstreamWorkflow, /git push[^\n]*--force/)
+  assert.doesNotMatch(upstreamWorkflow, /git commit --amend/)
+  assert.match(upstreamWorkflow, /pnpm run check:ci:linux-primary/)
+  assert.match(upstreamWorkflow, /node apps\/desktop\/scripts\/audit-codepilot-ui\.mjs/)
   assert.match(upstreamWorkflow, /gh workflow run desktop\.yml/)
   assert.match(upstreamWorkflow, /MAC_CERT_P12_BASE64/)
+  assert.match(upstreamWorkflow, /group: pilot-source-release/)
+  assert.match(pilotReleaseWorkflow, /github\.ref == 'refs\/heads\/main'/)
+  assert.match(pilotReleaseWorkflow, /pilot-release-revision\.mjs/)
+  assert.match(pilotReleaseWorkflow, /pnpm run check:ci:linux-primary/)
+  assert.match(pilotReleaseWorkflow, /gh workflow run desktop\.yml/)
+  assert.match(pilotReleaseWorkflow, /group: pilot-source-release/)
+  assert.match(ciWorkflow, /branches: \[main\]/)
+  assert.match(ciWorkflow, /github\.event_name == 'push' && github\.ref == 'refs\/heads\/main'/)
+  assert.match(ciWorkflow, /node apps\/desktop\/scripts\/audit-codepilot-ui\.mjs/)
 })
 
-test('native macOS signing delegates recursive traversal to codesign', () => {
+test('native macOS signing separates recursive bootstrap from Helper entitlements', () => {
   const signer = require(resolve(appRoot, 'scripts/native-macos-sign.cjs')) as {
     buildCodesignArgs: (
       options: { app: string; identity: string; keychain?: string },
       fileOptions: Record<string, unknown>,
+      target?: string,
+      deep?: boolean,
     ) => string[]
   }
   const app = '/tmp/Pilot Harness.app'
@@ -107,6 +143,8 @@ test('native macOS signing delegates recursive traversal to codesign', () => {
   const adhoc = signer.buildCodesignArgs(
     { app, identity: '-' },
     { entitlements, hardenedRuntime: true },
+    app,
+    true,
   )
   assert.deepEqual(adhoc.slice(0, 5), ['--force', '--deep', '--verbose=4', '--sign', '-'])
   assert.ok(adhoc.includes('--timestamp=none'))
@@ -116,9 +154,11 @@ test('native macOS signing delegates recursive traversal to codesign', () => {
   const developerId = signer.buildCodesignArgs(
     { app, identity: 'ABC123', keychain: '/tmp/build.keychain' },
     { signatureFlags: ['library'], timestamp: 'https://timestamp.example.test' },
+    '/tmp/Pilot Harness.app/Contents/Frameworks/Pilot Harness Helper.app',
   )
-  assert.ok(developerId.includes('--deep'))
+  assert.ok(!developerId.includes('--deep'))
   assert.ok(developerId.includes('--keychain'))
   assert.ok(developerId.includes('--timestamp=https://timestamp.example.test'))
   assert.equal(developerId[developerId.indexOf('--options') + 1], 'library')
+  assert.equal(developerId.at(-1), '/tmp/Pilot Harness.app/Contents/Frameworks/Pilot Harness Helper.app')
 })

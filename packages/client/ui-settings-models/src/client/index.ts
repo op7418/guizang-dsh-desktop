@@ -23,6 +23,11 @@ import { ProviderOnboardingDialog } from './ProviderOnboardingDialog.tsx'
 import type { ProviderOnboardingInjected } from './ProviderOnboardingDialog.tsx'
 import { ModelsSettingsStore } from './store.ts'
 import { en, zh, type ModelsKey } from './locales.ts'
+import {
+  PROVIDER_ONBOARDING_DISMISSED_FIELD,
+  PROVIDER_ONBOARDING_SETTINGS_NAMESPACE,
+  type ProviderOnboardingSettings,
+} from '../onboarding-settings.ts'
 
 export type { ModelsSectionInjected, ModelsSectionProps } from './ModelsSection.tsx'
 export { ModelCatalogSection, saveDefaultModel } from './ModelCatalogSection.tsx'
@@ -54,7 +59,7 @@ export function refreshIfLoaded(controller: ModelsSettingsStore): void {
  * ui-settings' apply, whose activation order relative to this one is NOT
  * constrained; registration depends on each slot through `slots.inject()`.
  */
-export const inject = ['slots', 'locale', 'connection', 'remote']
+export const inject = ['slots', 'locale', 'connection', 'remote', 'settingsScope']
 
 /**
  * Register the Providers and Models sections once `settings.section` is on
@@ -67,6 +72,9 @@ export function apply(ctx: ClientContext): void {
 
   const connection = ctx.get('connection') as ConnectionHandle
   const controller = new ModelsSettingsStore(connection.api)
+  const onboarding = ctx.settingsScope.bind<ProviderOnboardingSettings>({
+    namespace: PROVIDER_ONBOARDING_SETTINGS_NAMESPACE,
+  })
   const useSnapshot = bindSnapshotSelector(controller.store)
   // Registration-time text (the nav label thunk) and the inject faces share
   // one bound translate; copy freshness rides the locale revision.
@@ -79,9 +87,12 @@ export function apply(ctx: ClientContext): void {
   })
   const onboardingInjected = (): ProviderOnboardingInjected => ({
     controller,
-    hooks: { models: controller.store },
+    hooks: { models: controller.store, onboarding },
     api: connection.api,
     t,
+    dismissOnboarding: () => {
+      void onboarding.set(PROVIDER_ONBOARDING_DISMISSED_FIELD, true)
+    },
   })
 
   // Pushed invalidations converge every open surface without polling: any

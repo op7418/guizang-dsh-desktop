@@ -1,5 +1,5 @@
 import { spawn, type ChildProcessWithoutNullStreams } from 'node:child_process'
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { join, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import {
@@ -13,6 +13,7 @@ import {
   session,
   shell,
 } from 'electron'
+import { decodeNativeThemeSource, isNativeThemeSource, nativeThemeBackgroundColor } from './native-theme.ts'
 import { extractHarnessServerUrl, LineBuffer } from './server-url.ts'
 
 const STARTUP_TIMEOUT_MS = 60_000
@@ -69,6 +70,32 @@ function applicationIconPath(): string {
   return join(__dirname, 'icon.png')
 }
 
+function nativeThemeSourcePath(): string {
+  return join(app.getPath('userData'), 'native-theme-source')
+}
+
+/** Restore the last renderer-owned preference before the first native frame. */
+function restoreNativeThemeSource(): void {
+  let stored: string | undefined
+  try {
+    stored = readFileSync(nativeThemeSourcePath(), 'utf8')
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      rememberLog('desktop', `native theme restore failed: ${String(error)}`)
+    }
+  }
+  nativeTheme.themeSource = decodeNativeThemeSource(stored)
+}
+
+/** Persist the accepted preference atomically for the next native frame. */
+function persistNativeThemeSource(source: 'system' | 'light' | 'dark'): void {
+  const target = nativeThemeSourcePath()
+  const temporary = `${target}.tmp`
+  mkdirSync(app.getPath('userData'), { recursive: true })
+  writeFileSync(temporary, `${source}\n`, { mode: 0o600 })
+  renameSync(temporary, target)
+}
+
 async function showShell(state: 'loading' | 'failed', message = ''): Promise<void> {
   if (mainWindow === null || mainWindow.isDestroyed()) return
   try {
@@ -88,9 +115,12 @@ function titleBarOverlay(): Electron.TitleBarOverlayOptions {
   }
 }
 
-function applyTitleBarTheme(): void {
-  if (process.platform !== 'win32' || mainWindow === null || mainWindow.isDestroyed()) return
-  mainWindow.setTitleBarOverlay(titleBarOverlay())
+function applyNativeTheme(): void {
+  if (mainWindow === null || mainWindow.isDestroyed()) return
+  if (process.platform !== 'darwin') {
+    mainWindow.setBackgroundColor(nativeThemeBackgroundColor(nativeTheme.shouldUseDarkColors))
+  }
+  if (process.platform === 'win32') mainWindow.setTitleBarOverlay(titleBarOverlay())
 }
 
 function isAllowedNavigation(target: string): boolean {
@@ -139,7 +169,7 @@ function createWindow(): BrowserWindow {
     icon: applicationIconPath(),
     backgroundColor: process.platform === 'darwin'
       ? '#00ffffff'
-      : (nativeTheme.shouldUseDarkColors ? '#171717' : '#ffffff'),
+      : nativeThemeBackgroundColor(nativeTheme.shouldUseDarkColors),
     ...(process.platform === 'darwin'
       ? {
         titleBarStyle: 'hiddenInset',
@@ -387,6 +417,7 @@ if (!app.requestSingleInstanceLock()) {
   })
 
   app.whenReady().then(async () => {
+    restoreNativeThemeSource()
     if (process.platform === 'darwin') app.dock?.setIcon(applicationIconPath())
     session.defaultSession.setPermissionRequestHandler((_webContents, _permission, callback) => { callback(false) })
     ipcMain.handle('pilot-harness:restart', async () => { await restartHarness(); return harnessUrl !== null })
@@ -396,7 +427,15 @@ if (!app.requestSingleInstanceLock()) {
       return (await shell.openPath(resolveDshHome())) === ''
     })
     ipcMain.handle('pilot-harness:copy-diagnostics', () => { clipboard.writeText(diagnostics()); return true })
-    nativeTheme.on('updated', applyTitleBarTheme)
+    ipcMain.handle('pilot-harness:set-theme-source', (event, source: unknown) => {
+      if (!isAllowedNavigation(event.senderFrame?.url ?? '')) return false
+      if (!isNativeThemeSource(source)) return false
+      nativeTheme.themeSource = source
+      persistNativeThemeSource(source)
+      applyNativeTheme()
+      return true
+    })
+    nativeTheme.on('updated', applyNativeTheme)
     installMenu()
     mainWindow = createWindow()
     await showShell('loading')

@@ -10,7 +10,7 @@ Every GUI first launch opened with a full-viewport internal-test statement (å†…æ
 
 ## Decision
 
-This decision removed the first-run notice from the assembled product rather than rewording it. `ui-settings-general` seated no `settings.onboarding` step; the notice component, acknowledgement store, copy owner, and locale keys were deleted, while the Host kept the `ui-onboarding` namespace so stored documents remained valid. The later [shared-modal product onboarding](../feature/2026-08-13-shared-modal-product-onboarding.md) restores a new concise testing-stage notice in `ui-settings-models`, reusing that field and backend contract without restoring the removed takeover layout or telemetry instructions. Telemetry opt-in remains an explicit deployment environment choice documented in the [CLI reference README](../../../../apps/cli/reference/README.md); the restored notice says nothing about enabling it.
+This decision removed the first-run notice from the assembled product rather than rewording it. `ui-settings-general` seats no `settings.onboarding` step; the notice component, acknowledgement store, copy owner, and locale keys are absent. A shared-modal testing-stage notice was later introduced and then superseded by [profile-scoped provider onboarding](../feature/2026-08-18-profile-scoped-provider-onboarding.md), which keeps the official notice absent and registers its own provider-guidance setting. Telemetry opt-in remains an explicit deployment environment choice documented in the [CLI reference README](../../../../apps/cli/reference/README.md); onboarding says nothing about enabling it.
 
 ## Alternatives considered
 
@@ -22,4 +22,4 @@ This decision removed the first-run notice from the assembled product rather tha
 
 ## Consequences
 
-This removal eliminated the full-viewport notice and its telemetry copy. The later restoration is intentionally a different presentation and copy revision: a shared modal precedes the inline credential dialog, the remote scenario again covers process-local acknowledgement, and the existing `welcomeNoticeVersion` field records the new copy version. The historical telemetry prompt remains absent.
+The full-viewport notice, the later shared-modal official notice, and their telemetry copy remain absent. Provider onboarding is a separate, skippable product prompt with profile-scoped acknowledgement. The historical telemetry prompt remains absent.

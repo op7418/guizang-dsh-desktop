@@ -16,6 +16,7 @@ const { resolveMacosSigningMode } = require('../scripts/macos-signing-policy.cjs
 }
 
 const developerIdSignature = [
+  'CodeDirectory v=20500 size=123 flags=0x10000(runtime) hashes=1+7 location=embedded',
   'Authority=Developer ID Application: Pilot Harness (TEAM123456)',
   'TeamIdentifier=TEAM123456',
 ].join('\n')
@@ -38,7 +39,7 @@ test('macOS release signatures require the configured Developer ID Team', () => 
 
 test('macOS release policy rejects unsigned and ad-hoc artifacts', () => {
   assert.throws(() => resolveMacosSigningMode({
-    signatureOutput: 'Signature=adhoc\nTeamIdentifier=not set',
+    signatureOutput: 'CodeDirectory flags=0x10000(runtime)\nSignature=adhoc\nTeamIdentifier=not set',
     requireDeveloperId: true,
     allowAdhoc: true,
     expectedTeamId: 'TEAM123456',
@@ -47,18 +48,27 @@ test('macOS release policy rejects unsigned and ad-hoc artifacts', () => {
 
 test('macOS non-release policy accepts ad-hoc signing only when selected', () => {
   assert.throws(() => resolveMacosSigningMode({
-    signatureOutput: 'Signature=adhoc\nTeamIdentifier=not set',
+    signatureOutput: 'CodeDirectory flags=0x10000(runtime)\nSignature=adhoc\nTeamIdentifier=not set',
     requireDeveloperId: false,
     allowAdhoc: false,
     expectedTeamId: '',
   }), /not explicitly selected/)
 
   assert.deepEqual(resolveMacosSigningMode({
-    signatureOutput: 'Signature=adhoc\nTeamIdentifier=not set',
+    signatureOutput: 'CodeDirectory flags=0x10000(runtime)\nSignature=adhoc\nTeamIdentifier=not set',
     requireDeveloperId: false,
     allowAdhoc: true,
     expectedTeamId: '',
   }), { mode: 'adhoc', teamId: null })
+})
+
+test('macOS signing policy rejects signatures without hardened runtime', () => {
+  assert.throws(() => resolveMacosSigningMode({
+    signatureOutput: 'Authority=Developer ID Application: Pilot Harness (TEAM123456)\nTeamIdentifier=TEAM123456',
+    requireDeveloperId: true,
+    allowAdhoc: false,
+    expectedTeamId: 'TEAM123456',
+  }), /missing the hardened runtime/)
 })
 
 test('macOS signing hooks use the shared policy and bounded strict verification', async () => {
@@ -71,5 +81,7 @@ test('macOS signing hooks use the shared policy and bounded strict verification'
     assert.match(source, /'--verify', '--deep', '--strict', '--verbose=4'/)
     assert.match(source, /killSignal: 'SIGKILL'/)
     assert.match(source, /error\?\.code === 'ETIMEDOUT'/)
+    assert.match(source, /'--entitlements', ':-', helper/)
+    assert.match(source, /assertHelperEntitlements\(entitlements, helper\)/)
   }
 })

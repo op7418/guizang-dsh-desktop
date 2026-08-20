@@ -1,4 +1,18 @@
-/** Host loader entry for the browser implementation exported from `./client`. */
+/** Host registration for profile-scoped provider-onboarding state. */
 
-/** Host plugin body — no host-side behavior for the models settings plugin. */
-export function apply(): void {}
+import type { Context } from '@deepseek-ai/cordis'
+import { settingsNamespace } from '@deepseek-ai/dsh-settings'
+import {
+  PROVIDER_ONBOARDING_SETTINGS_NAMESPACE,
+  ProviderOnboardingSettingsSchema,
+} from './onboarding-settings.ts'
+
+/** Register provider-onboarding state in the current Harness settings profile. */
+export function apply(ctx: Context): void {
+  ctx.inject(['settings'], (settingsCtx) => {
+    settingsCtx.settings.register(
+      settingsNamespace(PROVIDER_ONBOARDING_SETTINGS_NAMESPACE),
+      ProviderOnboardingSettingsSchema,
+    )
+  })
+}

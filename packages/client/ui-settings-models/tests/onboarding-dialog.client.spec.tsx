@@ -3,16 +3,18 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { RpcResponse } from '@deepseek-ai/dsh-api-remotes/client'
+import { createSnapshotStore } from '@deepseek-ai/dsh-client-runtime/client'
+import type { SettingsScope, SettingsScopeSnapshot } from '@deepseek-ai/dsh-client-runtime/client'
 import { bindSnapshotSelector } from '@deepseek-ai/dsh-client-web-react'
 import { ProviderOnboardingDialog } from '../src/client/ProviderOnboardingDialog.tsx'
 import type { ProviderOnboardingDialogProps } from '../src/client/ProviderOnboardingDialog.tsx'
 import { ModelsSettingsStore } from '../src/client/store.ts'
 import { en } from '../src/client/locales.ts'
+import type { ProviderOnboardingSettings } from '../src/onboarding-settings.ts'
 
 afterEach(() => {
   cleanup()
   document.querySelectorAll('#root').forEach((root) => { root.remove() })
-  window.localStorage.clear()
 })
 
 let nextRpc = 0
@@ -20,7 +22,32 @@ function ok<T>(value: T): RpcResponse<T> {
   return { rpcId: `provider-onboarding-${nextRpc++}` as never, result: { ok: true, value } }
 }
 
-function harness(options: { providerReady?: boolean; writable?: boolean; fail?: boolean } = {}) {
+function onboardingScope(): SettingsScope<ProviderOnboardingSettings> {
+  const store = createSnapshotStore<SettingsScopeSnapshot<ProviderOnboardingSettings>>({
+    status: 'ready', value: { dismissed: false }, base: undefined, user: undefined,
+    revision: 0, writable: true, mode: 'host',
+  })
+  return {
+    getSnapshot: store.getSnapshot,
+    subscribe: store.subscribe,
+    async set(_field, value) {
+      store.update((snapshot) => {
+        snapshot.value = { dismissed: value === true }
+        snapshot.revision = (snapshot.revision ?? 0) + 1
+      })
+    },
+    async unset() {
+      store.update((snapshot) => { snapshot.value = { dismissed: false } })
+    },
+  }
+}
+
+function harness(options: {
+  providerReady?: boolean
+  writable?: boolean
+  fail?: boolean
+  onboarding?: SettingsScope<ProviderOnboardingSettings>
+} = {}) {
   const appRoot = document.createElement('div')
   appRoot.id = 'root'
   document.body.append(appRoot)
@@ -49,6 +76,7 @@ function harness(options: { providerReady?: boolean; writable?: boolean; fail?: 
     },
   }
   const controller = new ModelsSettingsStore(face as never)
+  const onboarding = options.onboarding ?? onboardingScope()
   const complete = vi.fn()
   const openSection = vi.fn()
   const unusedHook = (() => { throw new Error('unused standard hook') }) as never
@@ -60,10 +88,12 @@ function harness(options: { providerReady?: boolean; writable?: boolean; fail?: 
     useWorkspaces: unusedHook,
     controller,
     useModels: bindSnapshotSelector(controller.store),
+    useOnboarding: bindSnapshotSelector(onboarding),
     api: face as never,
     t: key => en[key],
+    dismissOnboarding: () => { void onboarding.set('dismissed', true) },
   }
-  return { appRoot, complete, openSection, props }
+  return { appRoot, complete, onboarding, openSection, props }
 }
 
 describe('ProviderOnboardingDialog', () => {
@@ -92,14 +122,14 @@ describe('ProviderOnboardingDialog', () => {
     expect(h.openSection).not.toHaveBeenCalled()
   })
 
-  it('keeps an explicit skip across plugin remounts and later app launches', async () => {
+  it('keeps an explicit skip across plugin remounts in the same settings profile', async () => {
     const first = harness()
     const firstView = render(<ProviderOnboardingDialog {...first.props} />)
     fireEvent.click(await screen.findByRole('button', { name: en.onboardingLater }))
     firstView.unmount()
     first.appRoot.remove()
 
-    const remounted = harness()
+    const remounted = harness({ onboarding: first.onboarding })
     render(<ProviderOnboardingDialog {...remounted.props} />)
     await waitFor(() => { expect(remounted.props.controller.store.getSnapshot().status).toBe('ready') })
     await waitFor(() => { expect(remounted.complete).toHaveBeenCalledOnce() })
@@ -108,8 +138,9 @@ describe('ProviderOnboardingDialog', () => {
   })
 
   it('broadcasts a skip to every provider prompt mounted in the same window', async () => {
-    const first = harness()
-    const sibling = harness()
+    const onboarding = onboardingScope()
+    const first = harness({ onboarding })
+    const sibling = harness({ onboarding })
     render(
       <>
         <ProviderOnboardingDialog {...first.props} />

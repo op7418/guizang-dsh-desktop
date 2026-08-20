@@ -7,6 +7,21 @@ function parseMacosSignature(output) {
   return {
     developerId: /^Authority=Developer ID Application:/m.test(text),
     teamId: teamMatch?.[1]?.trim() || null,
+    hardenedRuntime: /^CodeDirectory .*\bflags=.*\bruntime\b/im.test(text),
+  }
+}
+
+/** Reject a nested Electron Helper whose inherited JIT permissions are absent. */
+function assertHelperEntitlements(output, helperPath) {
+  const text = typeof output === 'string' ? output : ''
+  for (const entitlement of [
+    'com.apple.security.cs.allow-jit',
+    'com.apple.security.cs.allow-unsigned-executable-memory',
+    'com.apple.security.inherit',
+  ]) {
+    if (!text.includes(`<key>${entitlement}</key>`)) {
+      throw new Error(`macOS Helper entitlement ${entitlement} is missing: ${helperPath}`)
+    }
   }
 }
 
@@ -22,6 +37,9 @@ function resolveMacosSigningMode({
   expectedTeamId,
 }) {
   const signature = parseMacosSignature(signatureOutput)
+  if (!signature.hardenedRuntime) {
+    throw new Error('macOS package is missing the hardened runtime signature flag')
+  }
   const hasDeveloperId = signature.developerId
     && !!signature.teamId
     && signature.teamId !== 'not set'
@@ -46,6 +64,7 @@ function resolveMacosSigningMode({
 }
 
 module.exports = {
+  assertHelperEntitlements,
   parseMacosSignature,
   resolveMacosSigningMode,
 }

@@ -12,22 +12,35 @@ permissions:
   issues: write
 
 concurrency:
-  group: upstream-sync
+  # Shared with the Pilot-only revision workflow: both update upstream.json,
+  # package version, and main before dispatching the desktop release.
+  group: pilot-source-release
   cancel-in-progress: false
 
 jobs:
   sync:
     name: Merge, verify, and dispatch release
+    if: github.event_name == 'schedule' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{ github.token }}
-      UPSTREAM_REPOSITORY: deepseek-ai/deepseek-harness
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
+      - name: Load upstream configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          repository="$(node -p "require('./.github/upstream.json').repository")"
+          if [[ ! "$repository" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]; then
+            echo "::error::invalid upstream repository: $repository"
+            exit 1
+          fi
+          echo "UPSTREAM_REPOSITORY=$repository" >> "$GITHUB_ENV"
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
 
       - uses: actions/setup-node@v6
         with:
@@ -39,40 +52,42 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          tag="$(gh api "repos/$UPSTREAM_REPOSITORY/releases" --jq 'map(select(.draft == false))[0].tag_name')"
-          if [[ "$tag" != dsh-v* ]]; then
-            echo "::error::unexpected upstream release tag: $tag"
-            exit 1
-          fi
-          version="${tag#dsh-v}"
-          pilot_version="${version}-pilot.1"
-          release_tag="v${pilot_version}"
-          tracked_tag="$(node -p "require('./.github/upstream.json').tag")"
-          sync_needed=true
-          if [[ "$tag" == "$tracked_tag" ]]; then sync_needed=false; fi
+          release_json="$RUNNER_TEMP/upstream-release.json"
+          gh api "repos/$UPSTREAM_REPOSITORY/releases/latest" > "$release_json"
+          node .github/scripts/upstream-release.mjs \
+            "$release_json" .github/upstream.json >> "$GITHUB_OUTPUT"
+          release_tag="$(node .github/scripts/upstream-release.mjs "$release_json" .github/upstream.json | sed -n 's/^release_tag=//p')"
           release_needed=true
           if gh release view "$release_tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             release_needed=false
           fi
-          {
-            echo "tag=$tag"
-            echo "version=$version"
-            echo "pilot_version=$pilot_version"
-            echo "release_tag=$release_tag"
-            echo "sync_needed=$sync_needed"
-            echo "release_needed=$release_needed"
-          } >> "$GITHUB_OUTPUT"
-          echo "Official: $tag; sync needed: $sync_needed; release needed: $release_needed"
+          echo "release_needed=$release_needed" >> "$GITHUB_OUTPUT"
+          echo "Official: $(sed -n 's/^tag=//p' "$GITHUB_OUTPUT" | tail -1); release needed: $release_needed"
 
       - name: Fetch official release
-        if: steps.upstream.outputs.sync_needed == 'true'
         shell: bash
         env:
           UPSTREAM_TAG: ${{ steps.upstream.outputs.tag }}
         run: |
           set -euo pipefail
-          git fetch --force --no-tags "https://github.com/$UPSTREAM_REPOSITORY.git" \
-            "refs/tags/$UPSTREAM_TAG:refs/tags/$UPSTREAM_TAG"
+          git fetch --no-tags "https://github.com/$UPSTREAM_REPOSITORY.git" \
+            "refs/tags/$UPSTREAM_TAG:refs/tags/pilot-upstream-candidate"
+
+      - name: Verify the fetched release identity
+        id: candidate
+        shell: bash
+        env:
+          UPSTREAM_TAG: ${{ steps.upstream.outputs.tag }}
+          SYNC_NEEDED: ${{ steps.upstream.outputs.sync_needed }}
+        run: |
+          set -euo pipefail
+          candidate_commit="$(git rev-parse 'refs/tags/pilot-upstream-candidate^{commit}')"
+          tracked_commit="$(node -p "require('./.github/upstream.json').commit")"
+          if [[ "$SYNC_NEEDED" != 'true' && "$candidate_commit" != "$tracked_commit" ]]; then
+            echo "::error::upstream tag $UPSTREAM_TAG moved from $tracked_commit to $candidate_commit"
+            exit 1
+          fi
+          echo "commit=$candidate_commit" >> "$GITHUB_OUTPUT"
 
       - name: Merge official release without force-pushing
         id: merge
@@ -82,11 +97,18 @@ jobs:
           UPSTREAM_TAG: ${{ steps.upstream.outputs.tag }}
         run: |
           set +e
-          git merge --no-ff --no-edit "$UPSTREAM_TAG"
+          before="$(git rev-parse HEAD)"
+          git merge --no-ff --no-edit refs/tags/pilot-upstream-candidate
           merge_code=$?
           set -e
           if [[ $merge_code -eq 0 ]]; then
             echo "status=clean" >> "$GITHUB_OUTPUT"
+            after="$(git rev-parse HEAD)"
+            if [[ "$before" == "$after" ]]; then
+              echo "merge_created=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "merge_created=true" >> "$GITHUB_OUTPUT"
+            fi
             exit 0
           fi
           git diff --name-only --diff-filter=U > "$RUNNER_TEMP/upstream-conflicts.txt"
@@ -110,7 +132,7 @@ jobs:
             echo
             echo "Workflow: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           } > "$body_file"
-          existing="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "$title in:title" --json number --jq '.[0].number // empty')"
+          existing="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "$title in:title" --json number,title --jq "map(select(.title == \"$title\"))[0].number // empty")"
           if [[ -n "$existing" ]]; then
             gh issue edit "$existing" --repo "$GITHUB_REPOSITORY" --body-file "$body_file"
           else
@@ -125,10 +147,10 @@ jobs:
         env:
           UPSTREAM_TAG: ${{ steps.upstream.outputs.tag }}
           PILOT_VERSION: ${{ steps.upstream.outputs.pilot_version }}
+          UPSTREAM_COMMIT: ${{ steps.candidate.outputs.commit }}
         run: |
           set -euo pipefail
-          upstream_commit="$(git rev-parse "$UPSTREAM_TAG^{commit}")"
-          UPSTREAM_COMMIT="$upstream_commit" node --input-type=module -e \
+          node --input-type=module -e \
             "import fs from 'node:fs'; const file='./.github/upstream.json'; const state=JSON.parse(fs.readFileSync(file,'utf8')); Object.assign(state,{tag:process.env.UPSTREAM_TAG,commit:process.env.UPSTREAM_COMMIT,pilotVersion:process.env.PILOT_VERSION}); fs.writeFileSync(file,JSON.stringify(state,null,2)+'\\n')"
           node --input-type=module -e \
             "import fs from 'node:fs'; const file='./apps/desktop/package.json'; const pkg=JSON.parse(fs.readFileSync(file,'utf8')); pkg.version=process.env.PILOT_VERSION; fs.writeFileSync(file,JSON.stringify(pkg,null,2)+'\\n')"
@@ -137,14 +159,27 @@ jobs:
         if: steps.upstream.outputs.sync_needed == 'true' && steps.merge.outputs.status == 'clean'
         run: pnpm install --frozen-lockfile
 
-      - name: Verify merged desktop source
+      - name: Install browser test runtime
+        if: steps.upstream.outputs.sync_needed == 'true' && steps.merge.outputs.status == 'clean'
+        run: pnpm --filter @deepseek-ai/dsh-web-frontend exec playwright install --with-deps chromium
+
+      - name: Prepare Linux sandbox
+        if: steps.upstream.outputs.sync_needed == 'true' && steps.merge.outputs.status == 'clean'
+        run: bash scripts/prepare-ci-bubblewrap.sh
+
+      - name: Verify the complete merged source
         if: steps.upstream.outputs.sync_needed == 'true' && steps.merge.outputs.status == 'clean'
         shell: bash
+        env:
+          DSH_ARCHIVE_BASE_REF: ${{ github.sha }}
+          DSH_GATE_CONCURRENCY: '4'
         run: |
           set -euo pipefail
+          pnpm run check:ci:linux-primary
           pnpm run desktop:build
           pnpm run desktop:test
           pnpm --filter @deepseek-ai/dsh-desktop run typecheck
+          node apps/desktop/scripts/audit-codepilot-ui.mjs
 
       - name: Commit and push verified merge
         if: steps.upstream.outputs.sync_needed == 'true' && steps.merge.outputs.status == 'clean'
@@ -156,8 +191,23 @@ jobs:
           git config user.name "pilot-harness-upstream-bot"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .github/upstream.json apps/desktop/package.json
-          git commit --amend --no-edit
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(upstream): record $UPSTREAM_TAG"
+          fi
           git push origin HEAD:main
+
+      - name: Close the resolved merge-conflict issue
+        if: steps.upstream.outputs.sync_needed == 'true' && steps.merge.outputs.status == 'clean'
+        shell: bash
+        env:
+          UPSTREAM_TAG: ${{ steps.upstream.outputs.tag }}
+        run: |
+          set -euo pipefail
+          title="[upstream-sync] $UPSTREAM_TAG requires manual merge"
+          existing="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "$title in:title" --json number,title --jq "map(select(.title == \"$title\"))[0].number // empty")"
+          if [[ -n "$existing" ]]; then
+            gh issue close "$existing" --repo "$GITHUB_REPOSITORY" --comment "Resolved by workflow run $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID."
+          fi
 
       - name: Check release signing prerequisites
         id: signing
@@ -179,7 +229,22 @@ jobs:
         shell: bash
         env:
           RELEASE_TAG: ${{ steps.upstream.outputs.release_tag }}
-        run: gh workflow run desktop.yml --repo "$GITHUB_REPOSITORY" --ref main -f "release_tag=$RELEASE_TAG"
+          RELEASE_PRERELEASE: ${{ steps.upstream.outputs.prerelease }}
+        run: >-
+          gh workflow run desktop.yml --repo "$GITHUB_REPOSITORY" --ref main
+          -f "release_tag=$RELEASE_TAG"
+          -f "release_prerelease=$RELEASE_PRERELEASE"
+
+      - name: Close the signing-prerequisite issue
+        if: steps.upstream.outputs.release_needed == 'true' && steps.signing.outputs.ready == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          title="[release] Configure macOS signing for automated desktop releases"
+          existing="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "$title in:title" --json number,title --jq "map(select(.title == \"$title\"))[0].number // empty")"
+          if [[ -n "$existing" ]]; then
+            gh issue close "$existing" --repo "$GITHUB_REPOSITORY" --comment "Signing prerequisites are configured; release dispatch resumed in $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID."
+          fi
 
       - name: Report missing signing prerequisites
         if: steps.upstream.outputs.release_needed == 'true' && steps.signing.outputs.ready != 'true'
@@ -197,7 +262,7 @@ jobs:
             echo
             echo "Workflow: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
           } > "$body_file"
-          existing="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "$title in:title" --json number --jq '.[0].number // empty')"
+          existing="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "$title in:title" --json number,title --jq "map(select(.title == \"$title\"))[0].number // empty")"
           if [[ -n "$existing" ]]; then
             gh issue edit "$existing" --repo "$GITHUB_REPOSITORY" --body-file "$body_file"
           else

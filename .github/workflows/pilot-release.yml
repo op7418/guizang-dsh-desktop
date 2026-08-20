@@ -1,0 +1,112 @@
+name: Release Pilot Harness changes
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: pilot-source-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Verify, version, and dispatch native release
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      DSH_TELEMETRY_DISABLED: '1'
+      DSH_GATE_CONCURRENCY: '4'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: pnpm
+
+      - name: Require release signing prerequisites
+        shell: bash
+        env:
+          MAC_CERT_P12_BASE64: ${{ secrets.MAC_CERT_P12_BASE64 }}
+          MAC_CERT_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          set -euo pipefail
+          for value in "$MAC_CERT_P12_BASE64" "$MAC_CERT_PASSWORD" "$APPLE_TEAM_ID"; do
+            if [[ -z "$value" ]]; then
+              echo "::error::MAC_CERT_P12_BASE64, MAC_CERT_PASSWORD, and APPLE_TEAM_ID are required"
+              exit 1
+            fi
+          done
+
+      - name: Select the next Pilot revision
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+          releases_json="$RUNNER_TEMP/pilot-releases.json"
+          gh api --paginate --slurp \
+            "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
+            --jq '[.[][] | {tagName: .tag_name}]' > "$releases_json"
+          node .github/scripts/pilot-release-revision.mjs \
+            .github/upstream.json "$releases_json" >> "$GITHUB_OUTPUT"
+
+      - name: Record the Pilot revision
+        shell: bash
+        env:
+          PILOT_VERSION: ${{ steps.release.outputs.pilot_version }}
+        run: |
+          set -euo pipefail
+          node --input-type=module -e \
+            "import fs from 'node:fs'; const file='./.github/upstream.json'; const state=JSON.parse(fs.readFileSync(file,'utf8')); state.pilotVersion=process.env.PILOT_VERSION; fs.writeFileSync(file,JSON.stringify(state,null,2)+'\\n')"
+          node --input-type=module -e \
+            "import fs from 'node:fs'; const file='./apps/desktop/package.json'; const pkg=JSON.parse(fs.readFileSync(file,'utf8')); pkg.version=process.env.PILOT_VERSION; fs.writeFileSync(file,JSON.stringify(pkg,null,2)+'\\n')"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install browser test runtime
+        run: pnpm --filter @deepseek-ai/dsh-web-frontend exec playwright install --with-deps chromium
+
+      - name: Prepare Linux sandbox
+        run: bash scripts/prepare-ci-bubblewrap.sh
+
+      - name: Verify the complete release source
+        env:
+          DSH_ARCHIVE_BASE_REF: ${{ github.sha }}
+        run: |
+          pnpm run check:ci:linux-primary
+          pnpm run desktop:build
+          pnpm run desktop:test
+          pnpm --filter @deepseek-ai/dsh-desktop run typecheck
+          node apps/desktop/scripts/audit-codepilot-ui.mjs
+
+      - name: Commit and push the verified Pilot revision
+        shell: bash
+        env:
+          PILOT_VERSION: ${{ steps.release.outputs.pilot_version }}
+        run: |
+          set -euo pipefail
+          git config user.name "pilot-harness-release-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/upstream.json apps/desktop/package.json
+          git commit -m "chore(release): prepare Pilot Harness $PILOT_VERSION"
+          git push origin HEAD:main
+
+      - name: Dispatch native release build
+        shell: bash
+        env:
+          RELEASE_TAG: ${{ steps.release.outputs.release_tag }}
+          RELEASE_PRERELEASE: ${{ steps.release.outputs.prerelease }}
+        run: >-
+          gh workflow run desktop.yml --repo "$GITHUB_REPOSITORY" --ref main
+          -f "release_tag=$RELEASE_TAG"
+          -f "release_prerelease=$RELEASE_PRERELEASE"

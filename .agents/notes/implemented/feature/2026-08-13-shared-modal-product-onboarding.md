@@ -4,6 +4,8 @@ Status: implemented
 
 English | [中文](2026-08-13-shared-modal-product-onboarding.zh.md)
 
+> The shared modal remains in use, but the welcome and DeepSeek-specific steps recorded here are superseded by [Profile-scoped provider onboarding without an official notice](2026-08-18-profile-scoped-provider-onboarding.md).
+
 ## Problem
 
 First-run onboarding mixed two interaction models: a viewport takeover for product context and a credential prompt that redirected users into Settings before they could enter a key. That made a short, ordered flow feel like two unrelated surfaces and left onboarding UI ownership split across packages. The product still needs a versioned testing-stage notice before provider setup, but restoring it must not add a second independent overlay or change the Host settings and credential boundaries.

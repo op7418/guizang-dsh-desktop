@@ -6,7 +6,7 @@ import { createRequire } from 'node:module'
 import { relative, resolve } from 'node:path'
 
 const require = createRequire(import.meta.url)
-const { resolveMacosSigningMode } = require('./macos-signing-policy.cjs')
+const { assertHelperEntitlements, resolveMacosSigningMode } = require('./macos-signing-policy.cjs')
 const INSPECT_TIMEOUT_MS = 15_000
 const VERIFY_TIMEOUT_MS = 60_000
 
@@ -25,6 +25,23 @@ function findApps(root, maxDepth = 4) {
     }
   }
   return apps.sort()
+}
+
+/** Find nested Electron Helper app bundles inside one outer application. */
+function findHelpers(appPath) {
+  const helpers = []
+  const pending = [appPath]
+  while (pending.length > 0) {
+    const directory = pending.pop()
+    if (directory === undefined) continue
+    for (const entry of readdirSync(directory, { withFileTypes: true })) {
+      if (!entry.isDirectory()) continue
+      const absolute = resolve(directory, entry.name)
+      if (absolute !== appPath && entry.name.endsWith('.app')) helpers.push(absolute)
+      else pending.push(absolute)
+    }
+  }
+  return helpers.sort()
 }
 
 /** Run one bounded codesign operation. */
@@ -59,5 +76,10 @@ for (const appPath of apps) {
     expectedTeamId: process.env.PILOT_HARNESS_APPLE_TEAM_ID?.trim() || '',
   })
   runCodesign(['--verify', '--deep', '--strict', '--verbose=4', appPath], VERIFY_TIMEOUT_MS)
-  console.log(`${decision.mode} signature OK: ${relative(releaseRoot, appPath)}${decision.teamId ? ` team=${decision.teamId}` : ''}`)
+  const helpers = findHelpers(appPath)
+  for (const helper of helpers) {
+    const entitlements = runCodesign(['-d', '--entitlements', ':-', helper], INSPECT_TIMEOUT_MS)
+    assertHelperEntitlements(entitlements, helper)
+  }
+  console.log(`${decision.mode} signature and ${helpers.length} Helper entitlement set(s) OK: ${relative(releaseRoot, appPath)}${decision.teamId ? ` team=${decision.teamId}` : ''}`)
 }

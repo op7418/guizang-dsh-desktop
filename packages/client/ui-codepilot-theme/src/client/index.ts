@@ -1,9 +1,27 @@
 /** Client-owned CodePilot theme activation and reversible teardown marker. */
 import type { ClientContext } from '@deepseek-ai/dsh-client-runtime/client'
+import type { ThemeSnapshot } from '@deepseek-ai/dsh-client-ui-theme/client'
 import './brand-icon.module.css'
 import './theme.module.css'
 
-export const inject: string[] = []
+export const inject = ['theme']
+
+interface PilotDesktopThemeBridge {
+  setThemeSource?: (source: 'system' | 'light' | 'dark') => Promise<boolean>
+}
+
+function nativeThemeSource(snapshot: ThemeSnapshot): 'system' | 'light' | 'dark' {
+  if (snapshot.preference === 'system' || snapshot.preference === 'light' || snapshot.preference === 'dark') {
+    return snapshot.preference
+  }
+  return snapshot.active.colorScheme
+}
+
+function syncNativeTheme(snapshot: ThemeSnapshot): void {
+  const bridge = (globalThis as { pilotHarness?: PilotDesktopThemeBridge }).pilotHarness
+  if (bridge?.setThemeSource === undefined) return
+  void bridge.setThemeSource(nativeThemeSource(snapshot)).catch(() => undefined)
+}
 
 export function apply(ctx: ClientContext): void {
   const root = document.documentElement
@@ -13,4 +31,8 @@ export function apply(ctx: ClientContext): void {
     if (previous === null) root.removeAttribute('data-codepilot-theme')
     else root.setAttribute('data-codepilot-theme', previous)
   }, 'ui-codepilot-theme: activation marker')
+  ctx.effect(() => {
+    syncNativeTheme(ctx.theme.getTheme())
+    return ctx.on('theme/change', syncNativeTheme)
+  }, 'ui-codepilot-theme: desktop native palette sync')
 }

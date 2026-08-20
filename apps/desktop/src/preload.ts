@@ -10,6 +10,9 @@ contextBridge.exposeInMainWorld('pilotHarness', {
   pickDirectory: () => ipcRenderer.invoke('pilot-harness:pick-directory') as Promise<string | null>,
   showDataFolder: () => ipcRenderer.invoke('pilot-harness:show-data-folder') as Promise<boolean>,
   copyDiagnostics: () => ipcRenderer.invoke('pilot-harness:copy-diagnostics') as Promise<boolean>,
+  setThemeSource: (source: 'system' | 'light' | 'dark') => (
+    ipcRenderer.invoke('pilot-harness:set-theme-source', source) as Promise<boolean>
+  ),
 })
 
 window.addEventListener('DOMContentLoaded', () => {

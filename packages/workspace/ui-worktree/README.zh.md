@@ -12,6 +12,8 @@ dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/la
 
 重启 Web profile，再用 `dsh --profile web --dump-config` 确认 `pilot-worktree`。执行 `dsh plugin --profile web remove @deepseek-ai/dsh-ui-worktree` 即可移除。
 
+安装后的 profile 解析的是普通 Cordis 插件行 `name: '@deepseek-ai/dsh-ui-worktree'`，不需要桌面端专用 Loader。
+
 Pilot Harness 桌面补丁挂载的是同一条 bundle 配置。桌面外壳只负责原生窗口行为和客户端打包，不拥有文件树业务逻辑。浏览器必须通过 loopback origin 连接，并公开 `conversation.session.header.utilities`、`shell.right-sidebar` 与 `sidebar.workspaces.session.detail`；Pilot Harness v0.1.0 已包含这些契约。较旧的上游版本可以安装 bundle，但无法呈现 Files 控件或右侧栏。
 
 Worktree 还会向 `sidebar.workspaces.session.detail` 贡献当前 Git 分支。该详情请求使用 `summary=branch`，直接读取普通仓库或 linked worktree 的 `.git/HEAD`，并跳过目录枚举与递归统计。游离 HEAD 仓库显示短提交前缀；非 Git Workspace 则省略这一行。

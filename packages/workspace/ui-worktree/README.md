@@ -12,6 +12,8 @@ dsh plugin --profile web add https://github.com/op7418/pilot-harness/releases/la
 
 Restart the Web profile, then confirm `pilot-worktree` with `dsh --profile web --dump-config`. Remove it with `dsh plugin --profile web remove @deepseek-ai/dsh-ui-worktree`.
 
+The installed profile resolves the ordinary Cordis plugin row `name: '@deepseek-ai/dsh-ui-worktree'`; it does not require a desktop-only loader.
+
 The Pilot Harness desktop patch mounts that same bundle row. The desktop shell only supplies native window behavior and packaging; it does not own the file-tree business logic. The browser must connect through a loopback origin and expose `conversation.session.header.utilities`, `shell.right-sidebar`, and `sidebar.workspaces.session.detail`; Pilot Harness v0.1.0 includes those contracts. An older upstream release can install the bundle but cannot render the Files control or sidebar.
 
 Worktree also contributes the current Git branch to `sidebar.workspaces.session.detail`. That detail request uses `summary=branch`, reads `.git/HEAD` directly for ordinary repositories and linked worktrees, and skips directory enumeration and recursive counting. Detached repositories show the short commit prefix; non-Git Workspaces omit the row.

@@ -30,6 +30,11 @@ on:
         description: 'Optional v* tag to publish after all native jobs pass'
         required: false
         type: string
+      release_prerelease:
+        description: 'Publish the requested release as a prerelease instead of latest'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -61,7 +66,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
 
       - uses: actions/setup-node@v6
         with:
@@ -135,6 +140,14 @@ jobs:
           PILOT_HARNESS_REQUIRE_DEVELOPER_ID: ${{ (startsWith(github.ref, 'refs/tags/v') || inputs.release_tag != '') && '1' || '0' }}
         run: node apps/desktop/scripts/verify-macos-signature.mjs apps/desktop/release 1
 
+      - name: Run packaged desktop smoke on Linux
+        if: ${{ runner.os == 'Linux' && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')) }}
+        run: xvfb-run --auto-servernum pnpm --filter @deepseek-ai/dsh-desktop run test:packaged
+
+      - name: Run packaged desktop smoke
+        if: ${{ runner.os != 'Linux' && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')) }}
+        run: pnpm --filter @deepseek-ai/dsh-desktop run test:packaged
+
       - uses: actions/upload-artifact@v4
         if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v') }}
         with:
@@ -157,7 +170,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
 
       - uses: actions/setup-node@v6
         with:
@@ -198,10 +211,46 @@ jobs:
           if-no-files-found: error
           retention-days: 7
 
+  release-quality:
+    name: Release quality gates
+    if: ${{ startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '') }}
+    runs-on: ubuntu-latest
+    env:
+      DSH_TELEMETRY_DISABLED: '1'
+      DSH_GATE_CONCURRENCY: '4'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install browser test runtime
+        run: pnpm --filter @deepseek-ai/dsh-web-frontend exec playwright install --with-deps chromium
+
+      - name: Prepare Linux sandbox
+        run: bash scripts/prepare-ci-bubblewrap.sh
+
+      - name: Run complete source and artifact gates
+        env:
+          DSH_ARCHIVE_BASE_REF: ${{ github.event.repository.default_branch == github.ref_name && github.event.before || github.sha }}
+        run: |
+          pnpm run check:ci:linux-primary
+          node apps/desktop/scripts/audit-codepilot-ui.mjs
+
   publish-release:
     name: Publish GitHub Release
     if: ${{ startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.release_tag != '') }}
-    needs: [native-package, plugin-bundles]
+    needs: [native-package, plugin-bundles, release-quality]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -216,14 +265,7 @@ jobs:
         shell: bash
         env:
           RELEASE_TAG: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || inputs.release_tag }}
-        run: |
-          version="${RELEASE_TAG#v}"
-          mv "release-assets/Pilot Harness-${version}-arm64.dmg" "release-assets/Pilot-Harness-macOS-arm64.dmg"
-          mv "release-assets/Pilot Harness-${version}-arm64.zip" "release-assets/Pilot-Harness-macOS-arm64.zip"
-          mv "release-assets/Pilot Harness.Setup.${version}.exe" "release-assets/Pilot-Harness-Windows-x64.exe"
-          mv "release-assets/Pilot Harness-${version}-x86_64.AppImage" "release-assets/Pilot-Harness-Linux-x86_64.AppImage"
-          mv "release-assets/Pilot Harness-${version}-amd64.deb" "release-assets/Pilot-Harness-Linux-amd64.deb"
-          mv "release-assets/Pilot Harness-${version}-x86_64.rpm" "release-assets/Pilot-Harness-Linux-x86_64.rpm"
+        run: node .github/scripts/prepare-release-assets.mjs release-assets "$RELEASE_TAG"
 
       - name: Generate release checksums
         shell: bash
@@ -238,14 +280,14 @@ jobs:
           ) > release-assets/SHA256SUMS.txt
           cat release-assets/SHA256SUMS.txt
 
-      - uses: softprops/action-gh-release@v2
+      - uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65 # v2
         with:
           tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || inputs.release_tag }}
           target_commitish: ${{ github.sha }}
           generate_release_notes: true
           draft: false
-          prerelease: false
-          make_latest: true
+          prerelease: ${{ (github.event_name == 'workflow_dispatch' && inputs.release_prerelease) || (startsWith(github.ref, 'refs/tags/v') && contains(github.ref_name, '-rc.')) }}
+          make_latest: ${{ !((github.event_name == 'workflow_dispatch' && inputs.release_prerelease) || (startsWith(github.ref, 'refs/tags/v') && contains(github.ref_name, '-rc.'))) }}
           fail_on_unmatched_files: true
           files: |
             release-assets/Pilot-Harness-*.dmg

@@ -74,6 +74,8 @@ async function inspectState(page, selectors) {
       body: {
         paddingTop: body.paddingTop,
         background: body.backgroundColor,
+        colorScheme: root.colorScheme,
+        darkTheme: document.body.hasAttribute('data-ds-dark-theme'),
         fontFamily: body.fontFamily,
         dragStrip: getComputedStyle(document.body, '::before').getPropertyValue('-webkit-app-region'),
       },
@@ -82,7 +84,10 @@ async function inspectState(page, selectors) {
         '--pilot-input-radius', '--pilot-menu-radius', '--pilot-sidebar-width',
         '--pilot-background', '--pilot-foreground', '--pilot-border', '--pilot-shadow-diffuse',
         '--pilot-text-primary', '--pilot-text-secondary', '--pilot-text-muted', '--pilot-text-caption',
-      ].map(name => [name, root.getPropertyValue(name).trim()])),
+        '--pilot-platform-surface-sidebar', '--pilot-platform-surface-popover',
+        '--dsw-alias-markdown-code-block', '--dsw-alias-markdown-inline-code',
+        '--dsw-alias-scrollbar-bg-l1', '--dsw-specific-login-input', '--dsw-shadow-lv2',
+      ].map(name => [name, body.getPropertyValue(name).trim()])),
       elements,
     }
   }, selectors)
@@ -547,6 +552,54 @@ try {
   if (bridge.platform === 'darwin' && settingsBackBox.x < 84 && settingsBackBox.y < 44) {
     throw new Error('Settings back button overlaps the macOS traffic lights')
   }
+
+  async function selectTheme(name, source, dark) {
+    await page.getByRole('button', { name, exact: true }).click()
+    await page.waitForFunction(expected => document.body.hasAttribute('data-ds-dark-theme') === expected, dark)
+    const deadline = Date.now() + 3_000
+    while (Date.now() < deadline) {
+      const current = await electronApp.evaluate(({ nativeTheme }) => nativeTheme.themeSource)
+      if (current === source) return
+      await page.waitForTimeout(50)
+    }
+    throw new Error(`desktop native theme did not adopt ${source}`)
+  }
+
+  const darkSelectors = {
+    settingsNav: "[data-pilot-settings='panel'] > [data-pilot-settings='nav']",
+    activeNav: '[data-pilot-settings-nav-item][data-active]',
+    generalCard: '[data-pilot-settings-card="general"]',
+    selectedTheme: 'button[aria-pressed="true"]',
+  }
+  await selectTheme('Light', 'light', false)
+  const lightTheme = await inspectState(page, darkSelectors)
+  await selectTheme('Dark', 'dark', true)
+  await capture(page, '07b-general-settings-dark.png')
+  runtimeAudit.states.darkTheme = await inspectState(page, darkSelectors)
+  runtimeAudit.states.darkTheme.nativeThemeSource = await electronApp.evaluate(({ nativeTheme }) => nativeTheme.themeSource)
+  const darkTheme = runtimeAudit.states.darkTheme
+  const palettePairs = [
+    '--pilot-background',
+    '--pilot-foreground',
+    '--pilot-text-primary',
+    '--pilot-platform-surface-sidebar',
+    '--pilot-platform-surface-popover',
+    '--pilot-shadow-diffuse',
+    '--dsw-alias-markdown-code-block',
+    '--dsw-alias-markdown-inline-code',
+    '--dsw-alias-scrollbar-bg-l1',
+    '--dsw-specific-login-input',
+    '--dsw-shadow-lv2',
+  ]
+  if (!darkTheme.body.darkTheme || darkTheme.body.colorScheme !== 'dark' || darkTheme.nativeThemeSource !== 'dark'
+    || palettePairs.some(token => darkTheme.tokens[token] === lightTheme.tokens[token])
+    || darkTheme.elements.generalCard?.background === lightTheme.elements.generalCard?.background
+    || darkTheme.elements.settingsNav?.background === lightTheme.elements.settingsNav?.background
+    || darkTheme.elements.activeNav?.background === lightTheme.elements.activeNav?.background
+    || darkTheme.elements.activeNav?.color === lightTheme.elements.activeNav?.color) {
+    throw new Error(`dark mode retained light presentation values: ${JSON.stringify({ lightTheme, darkTheme })}`)
+  }
+  await selectTheme('Light', 'light', false)
 
   await page.getByRole('button', { name: 'Plugins', exact: true }).click()
   await page.getByRole('tab', { name: 'Plugin list', exact: true }).click()

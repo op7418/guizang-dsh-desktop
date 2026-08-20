@@ -4,7 +4,9 @@ English | [中文](README.zh.md)
 
 An ordinary DeepSeek Harness Client plugin that applies the CodePilot visual language without replacing Harness state or interaction logic.
 
-The plugin owns its stylesheet and an activation marker. Unloading or disabling the plugin removes both, allowing the stock Harness theme to take over again. Desktop-only title-bar adjustments remain gated by the desktop preload attributes; the design tokens and component styling also work in a browser Harness client.
+The plugin owns its stylesheet and an activation marker. Unloading or disabling the plugin removes both, allowing the stock Harness theme to take over again. Its light and dark palettes define the same Pilot colors/platform surfaces and Harness semantic alias, component, and shadow token sets, so a later plugin stylesheet cannot leave light text, sidebar material, Markdown, control, scrollbar, or elevation values active under the dark palette. Desktop-only title-bar adjustments remain gated by the desktop preload attributes; the design tokens and component styling also work in a browser Harness client.
+
+In the desktop shell, the plugin also forwards the selected `system`/`light`/`dark` preference through the optional preload bridge. Electron's native material, non-transparent window backing, and Windows caption controls therefore follow the application preference. The main process accepts only Electron's three native theme source values; a regular browser has no bridge and keeps the same CSS behavior without desktop coupling.
 
 The plugin also owns the Pilot Harness product mark used by the empty conversation, expanded and collapsed sidebar, and About page. Its generated data URL travels inside the client bundle, so the brand does not depend on an Electron asset URL and disappears with the rest of the theme when the plugin unloads. Native launcher icons are generated separately with platform optical padding; in-app marks use the edge-to-edge derivative so they retain their intended component size. In the collapsed rail, the brand toggle occupies the same centered 36px control slot as Chat, Add Workspace, and Search.
 

@@ -11,10 +11,9 @@ describe('invariant companion', () => {
     await expect(ctx.plugin(ModelsInvariant).await()).resolves.toBeDefined()
   })
 
-  it('node-half apply is a no-op host placeholder', async () => {
+  it('node-half apply tolerates an absent optional settings provider', async () => {
     const { apply } = await import('@deepseek-ai/dsh-client-ui-settings-models')
-    apply()
-    expect(true).toBe(true) // reaching here without throw is the contract
+    expect(() => { apply(new Context()) }).not.toThrow()
   })
 
   it('renders null until the shell injects the section dependencies', () => {

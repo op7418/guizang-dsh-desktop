@@ -15,9 +15,10 @@ export const name = 'client-ui-settings-models-invariant'
 export const inject = ['invariants']
 
 /**
- * No runtime invariant: a nav-entry-only section plugin rendering a fixed
- * empty content column — it emits no cordis events and owns no cross-plugin
- * mutable relation.
+ * No runtime invariant: the settings provider validates and publishes the
+ * profile-scoped onboarding section, while the browser store joins provider,
+ * credential, and catalog snapshots without emitting a package-owned event.
+ * Host registration and browser behavior are covered by this package's specs.
  */
 const install: InvariantInstaller = () => {}
 

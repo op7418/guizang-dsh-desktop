@@ -2,5 +2,5 @@
 # side as of the last confirmed-consistent state. Both languages carry equal authority;
 # after editing either side, bring the other along and re-record with:
 #   pnpm run verify-translation-pairing --write .agents/notes/implemented/feature/2026-08-13-shared-modal-product-onboarding.md
-2026-08-13-shared-modal-product-onboarding.md: 771b6675ea170c5001fca7c880f6c246e19fe7f1
-2026-08-13-shared-modal-product-onboarding.zh.md: ebbcb73344b531e90a6d27641f25fa9961d572ac
+2026-08-13-shared-modal-product-onboarding.md: e7b12933a8a780411174854c63400fd9e903b593
+2026-08-13-shared-modal-product-onboarding.zh.md: 2c7cbf313977054e0f2a980748ffe98d3ef9bd7d

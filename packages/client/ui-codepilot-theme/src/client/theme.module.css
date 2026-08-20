@@ -183,34 +183,60 @@ html[data-codepilot-theme] body[data-ds-dark-theme] {
   --pilot-secondary-foreground: oklch(0.985 0.001 106.423);
   --pilot-muted: oklch(0.268 0.007 34.298);
   --pilot-muted-foreground: oklch(0.709 0.01 56.259);
+  --pilot-text-primary: var(--pilot-foreground);
+  --pilot-text-secondary: color-mix(in oklch, var(--pilot-foreground) 72%, transparent);
+  --pilot-text-muted: var(--pilot-muted-foreground);
+  --pilot-text-caption: color-mix(in oklch, var(--pilot-foreground) 46%, transparent);
   --pilot-accent: oklch(0.268 0.007 34.298);
   --pilot-accent-foreground: oklch(0.985 0.001 106.423);
   --pilot-border: oklch(1 0 0 / 10%);
   --pilot-input: oklch(1 0 0 / 15%);
   --pilot-ring: oklch(0.985 0.001 106.423);
   --pilot-sidebar: oklch(0.216 0.006 56.043);
+  --pilot-shadow-diffuse: 0 12px 40px -8px rgb(0 0 0 / 45%), 0 4px 12px -4px rgb(0 0 0 / 25%);
+  --pilot-platform-surface-window: var(--pilot-background);
+  --pilot-platform-surface-sidebar: var(--pilot-sidebar);
+  --pilot-platform-surface-popover: var(--pilot-popover);
   background: var(--pilot-platform-surface-window);
   color: var(--pilot-foreground);
   --dsw-alias-bg-base: var(--pilot-background);
   --dsw-alias-bg-layer-1: var(--pilot-card);
   --dsw-alias-bg-layer-2: var(--pilot-card);
   --dsw-alias-bg-layer-3: var(--pilot-secondary);
+  --dsw-alias-bg-mask-1: rgb(0 0 0 / 50%);
+  --dsw-alias-bg-mask-2: rgb(0 0 0 / 20%);
+  --dsw-alias-bg-mask-3: rgb(0 0 0 / 48%);
+  --dsw-alias-bg-mask-drop: rgb(23 23 23 / 78%);
   --dsw-alias-bg-module-platform: var(--pilot-sidebar);
+  --dsw-alias-bg-multi-select: var(--pilot-muted);
   --dsw-alias-bg-overlay: var(--pilot-popover);
+  --dsw-alias-bg-skeleton: rgb(255 255 255 / 8%);
+  --dsw-alias-border-inverted2: rgb(255 255 255 / 8%);
+  --dsw-alias-border-inverted: rgb(255 255 255 / 6%);
   --dsw-alias-border-l1: rgb(255 255 255 / 6%);
   --dsw-alias-border-l2-darkmode-thin: rgb(255 255 255 / 10%);
   --dsw-alias-border-l2: rgb(255 255 255 / 10%);
   --dsw-alias-border-l3: rgb(255 255 255 / 16%);
   --dsw-alias-border-l4: rgb(255 255 255 / 24%);
+  --dsw-alias-brand-primary-invert: var(--pilot-primary);
+  --dsw-alias-brand-primary-new-colorprimary-new-color: var(--pilot-primary);
   --dsw-alias-brand-primary: var(--pilot-primary);
   --dsw-alias-brand-text: var(--pilot-foreground);
+  --dsw-alias-button-contrast-fill: var(--pilot-primary);
   --dsw-alias-button-elevated-fill: var(--pilot-card);
   --dsw-alias-button-floating-fill: var(--pilot-card);
   --dsw-alias-button-floating-hover: #303030;
+  --dsw-alias-button-ghost-active-border: #737373;
+  --dsw-alias-button-ghost-active-fill: #343434;
+  --dsw-alias-button-ghost-active-hover: #404040;
+  --dsw-alias-button-info-fill: var(--pilot-primary);
+  --dsw-alias-button-info-hover: #dedede;
+  --dsw-alias-button-primary-dimmed: #525252;
   --dsw-alias-button-primary-fill: var(--pilot-primary);
   --dsw-alias-button-primary-hover: #dedede;
   --dsw-alias-interactive-bg-active: #343434;
   --dsw-alias-interactive-bg-hover-accent: #303030;
+  --dsw-alias-interactive-bg-hover-danger: rgb(242 90 90 / 15%);
   --dsw-alias-interactive-bg-hover-solid: #303030;
   --dsw-alias-interactive-bg-hover: rgb(255 255 255 / 7%);
   --dsw-alias-label-caption: var(--pilot-text-caption);
@@ -222,17 +248,47 @@ html[data-codepilot-theme] body[data-ds-dark-theme] {
   --dsw-alias-label-primary: var(--pilot-text-primary);
   --dsw-alias-label-secondary: var(--pilot-text-secondary);
   --dsw-alias-label-tertiary: var(--pilot-text-muted);
+  --dsw-alias-markdown-citation: #343434;
+  --dsw-alias-markdown-code-block-banner: #252525;
+  --dsw-alias-markdown-code-block: #171717;
+  --dsw-alias-markdown-code-segment-selected: #343434;
+  --dsw-alias-markdown-code-segment-unselected: #171717;
+  --dsw-alias-markdown-inline-code: #303030;
+  --dsw-alias-markdown-placeholder: #252525;
+  --dsw-alias-markdown-tag: #303030;
+  --dsw-alias-scrollbar-bg-l1: #404040;
+  --dsw-alias-scrollbar-bg-l2: #525252;
+  --dsw-alias-scrollbar-hover-l1: #737373;
+  --dsw-alias-scrollbar-hover-l2: #737373;
+  --dsw-alias-state-business-primary: var(--pilot-primary);
+  --dsw-alias-state-business-tertiary: var(--pilot-accent);
+  --dsw-alias-toast-bg: #404040;
+  --dsw-alias-tooltip-bg: #404040;
+  --dsw-specific-bubble-highlight: #404040;
   --dsw-specific-bubble: #303030;
   --dsw-specific-input-major: var(--pilot-card);
+  --dsw-specific-login-input: #252525;
   --dsw-specific-menu: var(--pilot-popover);
   --dsw-specific-selector: var(--pilot-secondary);
   --dsw-specific-sidebar-fill: var(--pilot-platform-surface-sidebar);
+  --dsw-specific-sidebar-nav-item-active-accent: #343434;
   --dsw-specific-sidebar-nav-item-active: #343434;
   --dsw-specific-sidebar-nav-item-hover: #2b2b2b;
+  --dsw-specific-tip: #252525;
+  --dsw-shadow-lv1: 0 1px 2px rgb(0 0 0 / 24%);
+  --dsw-shadow-lv1-blur: 0 4px 14px rgb(0 0 0 / 28%);
+  --dsw-shadow-lv2: 0 2px 8px rgb(0 0 0 / 30%), 0 12px 32px rgb(0 0 0 / 32%);
+  --dsw-shadow-lv3: 0 6px 20px rgb(0 0 0 / 38%), 0 24px 64px rgb(0 0 0 / 45%);
 }
 
 html[data-codepilot-theme][data-pilot-platform='darwin'] body {
   padding-top: 0;
+}
+
+html[data-codepilot-theme][data-pilot-platform='darwin'] body[data-ds-dark-theme] {
+  --pilot-platform-surface-window: transparent;
+  --pilot-platform-surface-sidebar: color-mix(in oklch, var(--pilot-sidebar) 78%, transparent);
+  --pilot-platform-surface-popover: color-mix(in oklch, var(--pilot-popover) 92%, transparent);
 }
 
 html[data-codepilot-theme][data-pilot-platform='win32'] body {
@@ -241,6 +297,7 @@ html[data-codepilot-theme][data-pilot-platform='win32'] body {
 
 html[data-codepilot-theme] #root { height: 100%; }
 html[data-codepilot-theme] ::selection { background: rgb(37 37 37 / 16%); }
+html[data-codepilot-theme] body[data-ds-dark-theme] ::selection { background: rgb(255 255 255 / 22%); }
 
 /* Native drag strip: Windows reserves the full caption band, while macOS
  * only needs a slim always-available strip above the app chrome. Component
@@ -721,8 +778,8 @@ html[data-codepilot-theme] [data-pilot-provider-search] input:focus-visible {
   box-shadow: none;
 }
 html[data-codepilot-theme] [role='tooltip'] {
-  background: var(--pilot-primary);
-  color: var(--pilot-primary-foreground);
+  background: var(--dsw-alias-tooltip-bg);
+  color: var(--dsw-static-neutral-00);
 }
 
 /* Provider/model cards, toolbar inputs and actions share the same component

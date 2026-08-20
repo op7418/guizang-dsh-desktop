@@ -4,6 +4,8 @@ Status: implemented
 
 [English](2026-07-30-versioned-gui-welcome-onboarding.md) | 中文
 
+> 引导协调器仍在使用，但版本化欢迎步骤及其确认 store 已被[不显示官方声明的 profile 级服务商引导](2026-08-18-profile-scoped-provider-onboarding.md)取代。
+
 ## 问题
 
 GUI 的凭据引导从 DeepSeek 专用的就绪状态检查开始，但内部测试通知适用于每位用户，即使凭据已经配置，也必须先于提供方设置显示。若把两者作为独立浮层处理，多个对话框可能同时出现；仅存于进程内的关闭标记既无法区分通知已完成确认还是窗口在确认前已关闭，也无法在文案有意修订后重新显示一次通知。

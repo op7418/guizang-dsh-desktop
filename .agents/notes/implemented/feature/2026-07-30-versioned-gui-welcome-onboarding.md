@@ -4,6 +4,8 @@ Status: implemented
 
 English | [中文](2026-07-30-versioned-gui-welcome-onboarding.zh.md)
 
+> The coordinator remains in use, but the versioned welcome step and its acknowledgement store are superseded by [Profile-scoped provider onboarding without an official notice](2026-08-18-profile-scoped-provider-onboarding.md).
+
 ## Problem
 
 The GUI's credential onboarding begins with a DeepSeek-specific readiness check, but the internal-test notice applies to every user and must precede provider setup even when a credential is already configured. Treating both as independent overlays permits simultaneous dialogs, while a process-local dismissal cannot distinguish a completed notice from a window closed before acknowledgement or intentionally present revised copy once.

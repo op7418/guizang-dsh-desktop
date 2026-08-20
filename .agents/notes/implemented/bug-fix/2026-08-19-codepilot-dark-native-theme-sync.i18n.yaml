@@ -1,0 +1,6 @@
+# Bilingual-pair consistency record (docs/i18n/README.md): the git blob hash of each
+# side as of the last confirmed-consistent state. Both languages carry equal authority;
+# after editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write .agents/notes/implemented/bug-fix/2026-08-19-codepilot-dark-native-theme-sync.md
+2026-08-19-codepilot-dark-native-theme-sync.md: dbae7cedd10169a63eb6c56737f33f6ebda7780c
+2026-08-19-codepilot-dark-native-theme-sync.zh.md: f9d1ecf90032c770be5824a74a31c0b53f5ddf53

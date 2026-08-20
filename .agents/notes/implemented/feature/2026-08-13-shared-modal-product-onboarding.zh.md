@@ -4,6 +4,8 @@ Status: implemented
 
 [English](2026-08-13-shared-modal-product-onboarding.md) | 中文
 
+> 共用弹窗仍在使用，但本文记录的欢迎声明与 DeepSeek 专属步骤已被[不显示官方声明的 profile 级服务商引导](2026-08-18-profile-scoped-provider-onboarding.md)取代。
+
 ## 问题
 
 首次使用引导混用了两种交互：产品背景说明占满整个视口，凭据提示则先把用户带进「设置」，之后才能输入密钥。一个很短的有序流程因此像两个互不相关的界面，引导 UI 的归属也分散在多个包中。产品仍需要在提供方配置之前显示版本化的测试阶段声明，但恢复它不能增加第二个独立浮层，也不能改变 Host 的设置与凭据边界。

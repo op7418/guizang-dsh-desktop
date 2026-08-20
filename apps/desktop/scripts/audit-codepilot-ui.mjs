@@ -30,6 +30,32 @@ function near(actual, expected, tolerance = 0.5) {
   return typeof actual === 'number' && typeof expected === 'number' && Math.abs(actual - expected) <= tolerance
 }
 
+function cssBlock(sourceText, selector) {
+  const selectorIndex = sourceText.indexOf(selector)
+  if (selectorIndex === -1) return ''
+  const start = sourceText.indexOf('{', selectorIndex) + 1
+  let depth = 1
+  let end = start
+  while (depth > 0 && end < sourceText.length) {
+    if (sourceText[end] === '{') depth += 1
+    if (sourceText[end] === '}') depth -= 1
+    end += 1
+  }
+  return sourceText.slice(start, end - 1)
+}
+
+function semanticPaletteTokens(block) {
+  return [...block.matchAll(/^\s*(--(?:dsw-alias|dsw-specific|dsw-shadow)-[^:]+):/gm)]
+    .map(match => match[1])
+}
+
+function pilotPaletteTokens(block) {
+  const palette = /^--pilot-(?:background|foreground|card(?:-foreground)?|popover(?:-foreground)?|primary(?:-foreground)?|secondary(?:-foreground)?|muted(?:-foreground)?|text-(?:primary|secondary|muted|caption)|accent(?:-foreground)?|border|input|ring|sidebar|shadow-diffuse|platform-surface-(?:window|sidebar|popover))$/
+  return [...block.matchAll(/^\s*(--pilot-[^:]+):/gm)]
+    .map(match => match[1])
+    .filter(token => palette.test(token))
+}
+
 const [
   desktopTheme,
   desktopMain,
@@ -104,6 +130,13 @@ const referenceAnchors = {
   semanticIcons: includesAll(referenceIcons, ['@hugeicons/react', '@hugeicons/core-free-icons', 'SEMANTIC_MAP']),
 }
 
+const codePilotLightTokens = semanticPaletteTokens(cssBlock(desktopTheme, 'html[data-codepilot-theme] body {'))
+const codePilotDarkTokens = new Set(semanticPaletteTokens(cssBlock(desktopTheme, 'html[data-codepilot-theme] body[data-ds-dark-theme] {')))
+const missingCodePilotDarkTokens = codePilotLightTokens.filter(token => !codePilotDarkTokens.has(token))
+const pilotLightTokens = pilotPaletteTokens(cssBlock(desktopTheme, 'html[data-codepilot-theme] {'))
+const pilotDarkTokens = new Set(pilotPaletteTokens(cssBlock(desktopTheme, 'html[data-codepilot-theme] body[data-ds-dark-theme] {')))
+const missingPilotDarkTokens = pilotLightTokens.filter(token => !pilotDarkTokens.has(token))
+
 const workspaceRows = await source(repoRoot, 'packages/client/ui-workspace/src/client/rows/Rows.tsx')
 
 const [themePackage, themeClient, conversationApply, conversationStyles, contextMeter, providerCatalog, providerBrand, worktreeClient] = await Promise.all([
@@ -132,7 +165,7 @@ const checks = [
   check('tokens', 'diffuse-shadow', '输入区使用 CodePilot diffuse shadow', desktopTheme.includes('--pilot-shadow-diffuse:') && referenceAnchors.composerShadow, '--pilot-shadow-diffuse'),
   check('tokens', 'platform-surfaces', '窗口/侧栏/浮层使用平台表面 token', includesAll(desktopTheme, ['--pilot-platform-surface-window:', '--pilot-platform-surface-sidebar:', '--pilot-platform-surface-popover:']) && referenceAnchors.platformTokens, 'platform surface tokens'),
   check('tokens', 'platform-font', 'macOS UI 字体栈单独适配', desktopTheme.includes('--pilot-platform-font-ui: -apple-system'), 'platform font'),
-  check('tokens', 'dark-parity', '深色模式具有同构 CodePilot token', includesAll(desktopTheme, ["body[data-ds-dark-theme]", '--pilot-background: oklch(0.147 0.004 49.25);', '--pilot-primary: oklch(0.985 0.001 106.423);']), 'dark token block'),
+  check('tokens', 'dark-parity', '深色模式逐项覆盖 Pilot 与 Harness 语义 Token、平台表面和阴影', missingCodePilotDarkTokens.length === 0 && missingPilotDarkTokens.length === 0 && includesAll(desktopTheme, ["body[data-ds-dark-theme]", '--pilot-background: oklch(0.147 0.004 49.25);', '--pilot-primary: oklch(0.985 0.001 106.423);', '--pilot-shadow-diffuse: 0 12px 40px -8px rgb(0 0 0 / 45%)', 'body[data-ds-dark-theme] ::selection']), missingCodePilotDarkTokens.length === 0 && missingPilotDarkTokens.length === 0 ? `${pilotDarkTokens.size}/${pilotLightTokens.length} Pilot + ${codePilotDarkTokens.size}/${codePilotLightTokens.length} Harness dark token pairs` : `missing: ${[...missingPilotDarkTokens, ...missingCodePilotDarkTokens].join(', ')}`),
 
   check('components', 'composer-position', 'Token/缓存/性能统计全部进入上下文浮层', contextMeter.includes('<StatsLine') && contextMeter.includes('display="context"') && !conversationApply.includes("id: 'stats'"), 'ContextMeter + conversation apply'),
   check('components', 'composer-radius', '输入框使用统一 14px 容器圆角', desktopTheme.includes('--pilot-composer-radius: 14px;') && desktopTheme.includes('border-radius: var(--pilot-composer-radius);'), 'composer radius'),
@@ -185,6 +218,7 @@ const checks = [
   check('platform', 'mac-transparent', 'macOS 使用透明原生窗口背板', includesAll(desktopMain, ["'#00ffffff'", 'transparent: true']), 'transparent BrowserWindow'),
   check('platform', 'mac-effect-state', 'macOS 原生材质跟随窗口状态', desktopMain.includes("visualEffectState: 'followWindow'"), 'visualEffectState'),
   check('platform', 'windows-overlay', 'Windows 使用 44px 透明标题栏叠层', includesAll(desktopMain, ["color: '#00000000'", 'height: 44']) && referenceAnchors.windowsOverlay, 'titleBarOverlay'),
+  check('platform', 'native-theme-sync', '网页主题偏好同步到 Electron 原生窗口材质', includesAll(themeClient, ['setThemeSource', "ctx.on('theme/change'"]) && includesAll(desktopMain, ["pilot-harness:set-theme-source", 'isNativeThemeSource(source)', 'nativeTheme.themeSource = source', 'applyNativeTheme()']), 'theme client bridge + validated main IPC'),
   check('platform', 'integrated-topbar', 'macOS 内容与窗口栏融合并保留 8px 可拖动命中带', desktopTheme.includes("[data-pilot-platform='darwin'] body {\n  padding-top: 0;") && includesAll(desktopTheme, ['html[data-codepilot-theme][data-pilot-desktop] body::before', 'height: 8px;', '-webkit-app-region: drag;']), 'desktop top area'),
   check('platform', 'windows-safe-area', 'Windows 标题栏安全区不遮挡内容', includesAll(desktopTheme, ["[data-pilot-platform='win32'] body", 'padding-top: 44px;']), 'Windows safe area'),
 ]
@@ -250,6 +284,7 @@ if (runtimeArgument !== undefined) {
     check('runtime', 'model-row-density', '模型行实际压缩到 50px 以内', Number(models?.elements?.modelRow?.box?.height) <= 50, `${String(models?.elements?.modelRow?.box?.height)}px`),
     check('runtime', 'thinking-surface', 'Thinking 展开态为单一色块，标题与正文都不再拥有独立描边或底色', runtime.states?.thinking?.elements?.disclosure?.background !== 'rgba(0, 0, 0, 0)' && runtime.states?.thinking?.elements?.row?.borderWidth === '0px' && runtime.states?.thinking?.elements?.row?.background === 'rgba(0, 0, 0, 0)' && runtime.states?.thinking?.elements?.body?.borderWidth === '0px' && runtime.states?.thinking?.elements?.body?.background === 'rgba(0, 0, 0, 0)', JSON.stringify(runtime.states?.thinking?.elements)),
     check('runtime', 'general-card', '通用设置卡片不超过 820px 上限、保持 14px 并在内容列居中', Number(runtime.states?.general?.elements?.generalCard?.box?.width) > 0 && Number(runtime.states?.general?.elements?.generalCard?.box?.width) <= 820.5 && runtime.states?.general?.elements?.generalCard?.borderRadius === '14px' && Math.abs(centerX(runtime.states?.general?.elements?.generalCard) - clientCenterX(runtime.states?.general?.elements?.settingsOptions)) <= 2, JSON.stringify(runtime.states?.general?.elements)),
+    check('runtime', 'dark-theme', '深色模式切换根配色、文字、平台表面、Markdown、滚动条与阴影，并同步原生窗口材质', runtime.states?.darkTheme?.body?.darkTheme === true && runtime.states?.darkTheme?.body?.colorScheme === 'dark' && runtime.states?.darkTheme?.nativeThemeSource === 'dark' && Boolean(runtime.states?.darkTheme?.tokens?.['--pilot-background']) && runtime.states?.darkTheme?.tokens?.['--pilot-background'] !== 'oklch(100% 0 0)' && runtime.states?.darkTheme?.tokens?.['--pilot-text-primary'] !== 'oklch(14.7% .004 49.25)' && runtime.states?.darkTheme?.tokens?.['--dsw-alias-markdown-code-block'] === '#171717' && runtime.states?.darkTheme?.tokens?.['--dsw-specific-login-input'] === '#252525' && runtime.states?.darkTheme?.elements?.generalCard?.background !== 'rgb(255, 255, 255)' && runtime.states?.darkTheme?.elements?.settingsNav?.background !== 'oklch(0.985 0.001 106.423 / 0.78)', JSON.stringify(runtime.states?.darkTheme)),
     check('runtime', 'worktree-plugin', '文件树作为贴右全高侧栏渲染并挤压对话区', runtime.states?.worktree?.elements?.panel?.box?.width === 320 && Math.abs(runtime.states?.worktree?.elements?.panel?.box?.x + runtime.states?.worktree?.elements?.panel?.box?.width - runtime.states?.worktree?.viewport?.width) <= 1 && runtime.states?.worktree?.elements?.panel?.position === 'static' && runtime.states?.worktree?.elements?.panel?.borderRadius === '0px' && runtime.states?.worktree?.elements?.panel?.boxShadow === 'none' && runtime.states?.worktree?.elements?.conversation?.box?.width < runtime.states?.worktree?.conversationWidthClosed && runtime.states?.worktree?.elements?.toolbarButton?.box?.width === 28 && runtime.states?.worktree?.elements?.treeRow?.borderRadius === '8px', JSON.stringify(runtime.states?.worktree)),
     check('runtime', 'worktree-row-menu', '文件树三点菜单使用 28px 操作区、16px 图标、14px 菜单与 8px 菜单项圆角', runtime.states?.worktree?.elements?.rowAction?.box?.width === 28 && runtime.states?.worktree?.elements?.rowAction?.box?.height === 28 && runtime.states?.worktree?.elements?.rowActionIcon?.box?.width === 16 && runtime.states?.worktree?.elements?.rowActionIcon?.box?.height === 16 && runtime.states?.worktree?.elements?.menu?.borderRadius === '14px' && runtime.states?.worktree?.elements?.menuItem?.borderRadius === '8px', JSON.stringify(runtime.states?.worktree?.elements)),
     check('runtime', 'conversation-tabs', '对话/轨迹切换实际呈现 14px muted 底板、30px/8px 页签和清晰选中态', conversationTabs?.elements?.group?.borderRadius === '14px' && conversationTabs?.elements?.group?.background !== 'rgba(0, 0, 0, 0)' && near(conversationTabs?.elements?.active?.box?.height, 30) && conversationTabs?.elements?.active?.borderRadius === '8px' && conversationTabs?.elements?.active?.background !== conversationTabs?.elements?.group?.background && conversationTabs?.elements?.inactive?.background === 'rgba(0, 0, 0, 0)', JSON.stringify(conversationTabs?.elements)),
