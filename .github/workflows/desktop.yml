@@ -142,7 +142,10 @@ jobs:
 
       - name: Run packaged desktop smoke on Linux
         if: ${{ runner.os == 'Linux' && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')) }}
-        run: xvfb-run --auto-servernum pnpm --filter @deepseek-ai/dsh-desktop run test:packaged
+        # GitHub-hosted runners cannot chown the packaged Chromium SUID helper
+        # to root:4755. Disable Chromium's sandbox only for this isolated smoke;
+        # the shipped application still launches with its default sandbox.
+        run: xvfb-run --auto-servernum pnpm --filter @deepseek-ai/dsh-desktop run test:packaged -- --no-sandbox
 
       - name: Run packaged desktop smoke
         if: ${{ runner.os != 'Linux' && ((github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')) }}

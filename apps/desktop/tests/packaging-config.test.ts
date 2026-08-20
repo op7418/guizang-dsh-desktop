@@ -56,6 +56,7 @@ void test('online previews are ad-hoc signed while formal releases require Devel
     upstreamState,
     rootReadme,
     rootReadmeZh,
+    packagedSmoke,
   ] = await Promise.all([
     readFile(resolve(appRoot, 'electron-builder.yml'), 'utf8'),
     readFile(resolve(appRoot, 'electron-builder.adhoc.yml'), 'utf8'),
@@ -67,6 +68,7 @@ void test('online previews are ad-hoc signed while formal releases require Devel
     readFile(resolve(appRoot, '../../.github/upstream.json'), 'utf8'),
     readFile(resolve(appRoot, '../../README.md'), 'utf8'),
     readFile(resolve(appRoot, '../../README.zh.md'), 'utf8'),
+    readFile(resolve(appRoot, 'scripts/smoke-packaged.mjs'), 'utf8'),
   ])
 
   assert.doesNotMatch(builderConfig, /^  identity: null$/m)
@@ -87,6 +89,9 @@ void test('online previews are ad-hoc signed while formal releases require Devel
   assert.match(workflow, /PILOT_HARNESS_REQUIRE_DEVELOPER_ID: '1'/)
   assert.match(workflow, /verify-macos-signature\.mjs apps\/desktop\/release 1/)
   assert.match(workflow, /run test:packaged/)
+  assert.match(workflow, /run test:packaged -- --no-sandbox/)
+  assert.match(packagedSmoke, /process\.platform === 'linux' && process\.argv\.includes\('--no-sandbox'\)/)
+  assert.doesNotMatch(packagedSmoke, /ELECTRON_DISABLE_SANDBOX/)
   assert.match(workflow, /release-quality:/)
   assert.match(workflow, /needs: \[native-package, plugin-bundles, release-quality\]/)
   assert.match(workflow, /pnpm run check:ci:linux-primary/)

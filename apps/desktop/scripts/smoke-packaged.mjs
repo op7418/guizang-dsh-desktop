@@ -48,8 +48,12 @@ try {
     PILOT_HARNESS_SMOKE_SCREENSHOT: screenshot,
   }
   delete childEnv.ELECTRON_RUN_AS_NODE
+  const launchArgs = [`--user-data-dir=${join(smokeRoot, 'profile')}`]
+  if (process.platform === 'linux' && process.argv.includes('--no-sandbox')) {
+    launchArgs.push('--no-sandbox')
+  }
   const exitCode = await new Promise((resolveExit, rejectExit) => {
-    const child = spawn(executable, [`--user-data-dir=${join(smokeRoot, 'profile')}`], {
+    const child = spawn(executable, launchArgs, {
       cwd: smokeRoot,
       env: childEnv,
       stdio: 'inherit',
