@@ -28,14 +28,14 @@ async function alphaBounds(file: string): Promise<{
   return { width: maxX - minX + 1, height: maxY - minY + 1, left: minX, top: minY }
 }
 
-test('native launcher art uses the macOS optical inset', async () => {
+void test('native launcher art uses the macOS optical inset', async () => {
   assert.deepEqual(
     await alphaBounds(resolve(appRoot, 'assets/icons/1024x1024.png')),
     { width: 856, height: 856, left: 84, top: 84 },
   )
 })
 
-test('in-app brand art does not inherit launcher padding', async () => {
+void test('in-app brand art does not inherit launcher padding', async () => {
   assert.deepEqual(
     await alphaBounds(resolve(appRoot, 'assets/brand-icon.png')),
     { width: 256, height: 256, left: 0, top: 0 },

@@ -193,7 +193,7 @@ function createWindow(): BrowserWindow {
   installNavigationPolicy(window)
   window.once('ready-to-show', () => { window.show() })
   window.on('closed', () => { if (mainWindow === window) mainWindow = null })
-  window.webContents.on('did-finish-load', async () => {
+  window.webContents.on('did-finish-load', () => {
     const current = window.webContents.getURL()
     if (harnessUrl === null || !isAllowedNavigation(current)) return
     try {
@@ -440,7 +440,7 @@ if (!app.requestSingleInstanceLock()) {
     mainWindow = createWindow()
     await showShell('loading')
     await restartHarness()
-  }).catch((error) => {
+  }).catch((error: unknown) => {
     rememberLog('desktop', `fatal startup error: ${String(error)}`)
     app.quit()
   })

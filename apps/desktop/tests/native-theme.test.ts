@@ -4,25 +4,25 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { decodeNativeThemeSource, isNativeThemeSource, nativeThemeBackgroundColor } from '../src/native-theme.ts'
 
-test('native theme IPC accepts only Electron theme sources', () => {
+void test('native theme IPC accepts only Electron theme sources', () => {
   for (const source of ['system', 'light', 'dark']) assert.equal(isNativeThemeSource(source), true)
   for (const source of [undefined, null, '', 'auto', 'sepia', 1, {}]) {
     assert.equal(isNativeThemeSource(source), false)
   }
 })
 
-test('persisted native theme source falls back safely after corruption', () => {
+void test('persisted native theme source falls back safely after corruption', () => {
   assert.equal(decodeNativeThemeSource(' dark\n'), 'dark')
   assert.equal(decodeNativeThemeSource('sepia'), 'system')
   assert.equal(decodeNativeThemeSource(undefined), 'system')
 })
 
-test('native theme selects the matching opaque backing color', () => {
+void test('native theme selects the matching opaque backing color', () => {
   assert.equal(nativeThemeBackgroundColor(false), '#ffffff')
   assert.equal(nativeThemeBackgroundColor(true), '#171717')
 })
 
-test('desktop theme bridge validates renderer input before mutating nativeTheme', () => {
+void test('desktop theme bridge validates renderer input before mutating nativeTheme', () => {
   const root = resolve(import.meta.dirname, '..')
   const preload = readFileSync(resolve(root, 'src/preload.ts'), 'utf8')
   const main = readFileSync(resolve(root, 'src/main.ts'), 'utf8')

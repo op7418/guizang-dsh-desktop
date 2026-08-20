@@ -120,6 +120,8 @@ describe.skipIf(MODE === 'record')('web e2e: background job list', () => {
     // which is also the proof that settlement reached the browser unprompted.
     const idle = page.getByRole('button', { name: '1 background job' })
     await idle.waitFor({ timeout: 20_000 })
+    const row = page.getByRole('list', { name: 'Background jobs' }).getByRole('listitem').first()
+    await expect.poll(() => row.textContent(), { timeout: 20_000 }).toContain('signal: SIGTERM')
 
     const snapshot = await captureStableAria(page, '[class*="menu"]', scaffold.workspaceCwd)
     await compareOrRefreshGolden(SETTLED_EXPECTED, snapshot, MODE)

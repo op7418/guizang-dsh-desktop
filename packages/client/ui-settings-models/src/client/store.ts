@@ -141,7 +141,7 @@ export class ModelsSettingsStore {
           .then(response => response.result.ok
             ? { groups: response.result.value.groups, failures: response.result.value.failures, error: null }
             : { groups: [], failures: [], error: response.result.error.message })
-          .catch(error => ({ groups: [], failures: [], error: messageOf(error) }))
+          .catch((error: unknown) => ({ groups: [], failures: [], error: messageOf(error) }))
         : Promise.resolve({ groups: [], failures: [], error: null })
       const [providersResponse, settingsResponse, catalogResult] = await Promise.all([
         this.api.llm.providers({}),

@@ -47,6 +47,10 @@ describe.skipIf(MODE === 'record')('web e2e: another usable provider ends first-
     await connectFreshWorkspaceZh(page, scaffold.workspaceCwd, 'onboarding-provider')
     // Provider-neutral onboarding never forces the official DeepSeek key.
     expect(await page.getByRole('dialog', { name: '添加一个 API Key 开始使用' }).count()).toBe(0)
+    const onboarding = page.getByRole('dialog', { name: '添加模型服务商' })
+    await onboarding.waitFor({ timeout: 10_000 })
+    await onboarding.getByRole('button', { name: '暂时跳过' }).click()
+    await onboarding.waitFor({ state: 'detached', timeout: 10_000 })
 
     await page.getByRole('button', { name: '设置', exact: true }).click()
     const settings = page.getByRole('dialog', { name: '设置' })

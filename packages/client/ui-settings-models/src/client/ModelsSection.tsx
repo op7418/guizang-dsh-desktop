@@ -52,6 +52,21 @@ export interface ProviderIdentity {
   displayName: string
 }
 
+/**
+ * Render a provider-model section once every slot dependency is available.
+ * @param props - slot-delivered optional dependencies.
+ * @param render - section renderer receiving the complete injection.
+ * @returns the rendered section, or null until the shell provides every dependency.
+ */
+export function renderModelsSection(
+  props: ModelsSectionProps,
+  render: (injected: ModelsSectionInjected) => ReactNode,
+): ReactNode {
+  const { controller, useSnapshot, api, t } = props
+  if (controller === undefined || useSnapshot === undefined || api === undefined || t === undefined) return null
+  return render({ controller, useSnapshot, api, t })
+}
+
 /** One existing row or dormant directory entry addressed by an editor action. */
 interface EditorTarget extends ProviderIdentity {
   settingsNs: string
@@ -163,17 +178,6 @@ export function providerTargetLabel(target: ProviderIdentity): string {
 /** Replace the one provider placeholder in localized destructive-action copy. */
 export function providerCopy(template: string, target: ProviderIdentity): string {
   return template.replace('{provider}', () => providerTargetLabel(target))
-}
-
-/**
- * Render the Models section content column.
- * @param props - slot-delivered injected dependencies.
- * @returns the section, or null while the shell has not injected yet.
- */
-export function ModelsSection(props: ModelsSectionProps): ReactNode {
-  const { controller, useSnapshot, api, t } = props
-  if (controller === undefined || useSnapshot === undefined || api === undefined || t === undefined) return null
-  return <Loaded injected={{ controller, useSnapshot, api, t }} />
 }
 
 function Loaded({ injected }: { injected: ModelsSectionInjected }): ReactNode {
@@ -608,4 +612,13 @@ function Loaded({ injected }: { injected: ModelsSectionInjected }): ReactNode {
       </Modal>
     </div>
   )
+}
+
+/**
+ * Render the Models section content column.
+ * @param props - slot-delivered injected dependencies.
+ * @returns the section, or null while the shell has not injected yet.
+ */
+export function ModelsSection(props: ModelsSectionProps): ReactNode {
+  return renderModelsSection(props, injected => <Loaded injected={injected} />)
 }

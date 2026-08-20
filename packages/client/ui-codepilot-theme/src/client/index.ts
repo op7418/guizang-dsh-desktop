@@ -11,9 +11,10 @@ interface PilotDesktopThemeBridge {
 }
 
 function nativeThemeSource(snapshot: ThemeSnapshot): 'system' | 'light' | 'dark' {
-  if (snapshot.preference === 'system' || snapshot.preference === 'light' || snapshot.preference === 'dark') {
-    return snapshot.preference
-  }
+  // Custom theme ids can still appear from the runtime registry even though
+  // only built-in preferences cross the persisted settings interface.
+  const preference: unknown = snapshot.preference
+  if (preference === 'system' || preference === 'light' || preference === 'dark') return preference
   return snapshot.active.colorScheme
 }
 

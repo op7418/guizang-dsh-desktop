@@ -28,8 +28,8 @@ function onboardingScope(): SettingsScope<ProviderOnboardingSettings> {
     revision: 0, writable: true, mode: 'host',
   })
   return {
-    getSnapshot: store.getSnapshot,
-    subscribe: store.subscribe,
+    getSnapshot: () => store.getSnapshot(),
+    subscribe: listener => store.subscribe(listener),
     async set(_field, value) {
       store.update((snapshot) => {
         snapshot.value = { dismissed: value === true }

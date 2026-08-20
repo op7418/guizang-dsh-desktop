@@ -241,7 +241,7 @@ function mount(slots: SlotRegistry, nodes: ConversationSnapshot['nodes'] = NODES
   const renderSlot = ((key: string, _owner: object, opts?: { only?: string }): ReactNode => {
     const entry = slots.entries('conversation.view').find(e => e.options.id === opts?.only)
     if (entry === undefined) return null
-    const View = entry.component as FC<ConvViewProps>
+    const View = entry.component as FC<ConvViewProps & PropsRenderSlots<'conversation.trajectory.toolbar'>>
     const injectEntry = entry.inject as ((sessionId: SessionId) => object) | undefined
     const injected = injectEntry === undefined
       ? {}
@@ -261,6 +261,8 @@ function mount(slots: SlotRegistry, nodes: ConversationSnapshot['nodes'] = NODES
       <View
         {...injectedProps}
         {...({ sessionId: SID, useSession, useSessions: emptySessions(), useWorkspaces: emptyWorkspaces() } as unknown as ConvViewProps)}
+        SessionProvider={({ children }) => children(SID)}
+        renderSlot={() => null}
         key={key}
       />
     )

@@ -6,7 +6,7 @@ import { test } from 'node:test'
 
 const require = createRequire(import.meta.url)
 const appRoot = resolve(import.meta.dirname, '..')
-const { resolveMacosSigningMode } = require('../scripts/macos-signing-policy.cjs') as {
+const signingPolicy = require('../scripts/macos-signing-policy.cjs') as {
   resolveMacosSigningMode(input: {
     signatureOutput: string
     requireDeveloperId: boolean
@@ -14,6 +14,9 @@ const { resolveMacosSigningMode } = require('../scripts/macos-signing-policy.cjs
     expectedTeamId: string
   }): { mode: 'developer_id' | 'adhoc'; teamId: string | null }
 }
+const resolveMacosSigningMode = (input: Parameters<typeof signingPolicy.resolveMacosSigningMode>[0]) => (
+  signingPolicy.resolveMacosSigningMode(input)
+)
 
 const developerIdSignature = [
   'CodeDirectory v=20500 size=123 flags=0x10000(runtime) hashes=1+7 location=embedded',
@@ -21,7 +24,7 @@ const developerIdSignature = [
   'TeamIdentifier=TEAM123456',
 ].join('\n')
 
-test('macOS release signatures require the configured Developer ID Team', () => {
+void test('macOS release signatures require the configured Developer ID Team', () => {
   assert.deepEqual(resolveMacosSigningMode({
     signatureOutput: developerIdSignature,
     requireDeveloperId: true,
@@ -37,7 +40,7 @@ test('macOS release signatures require the configured Developer ID Team', () => 
   }), /TeamIdentifier mismatch/)
 })
 
-test('macOS release policy rejects unsigned and ad-hoc artifacts', () => {
+void test('macOS release policy rejects unsigned and ad-hoc artifacts', () => {
   assert.throws(() => resolveMacosSigningMode({
     signatureOutput: 'CodeDirectory flags=0x10000(runtime)\nSignature=adhoc\nTeamIdentifier=not set',
     requireDeveloperId: true,
@@ -46,7 +49,7 @@ test('macOS release policy rejects unsigned and ad-hoc artifacts', () => {
   }), /Developer ID Application signature required/)
 })
 
-test('macOS non-release policy accepts ad-hoc signing only when selected', () => {
+void test('macOS non-release policy accepts ad-hoc signing only when selected', () => {
   assert.throws(() => resolveMacosSigningMode({
     signatureOutput: 'CodeDirectory flags=0x10000(runtime)\nSignature=adhoc\nTeamIdentifier=not set',
     requireDeveloperId: false,
@@ -62,7 +65,7 @@ test('macOS non-release policy accepts ad-hoc signing only when selected', () =>
   }), { mode: 'adhoc', teamId: null })
 })
 
-test('macOS signing policy rejects signatures without hardened runtime', () => {
+void test('macOS signing policy rejects signatures without hardened runtime', () => {
   assert.throws(() => resolveMacosSigningMode({
     signatureOutput: 'Authority=Developer ID Application: Pilot Harness (TEAM123456)\nTeamIdentifier=TEAM123456',
     requireDeveloperId: true,
@@ -71,7 +74,7 @@ test('macOS signing policy rejects signatures without hardened runtime', () => {
   }), /missing the hardened runtime/)
 })
 
-test('macOS signing hooks use the shared policy and bounded strict verification', async () => {
+void test('macOS signing hooks use the shared policy and bounded strict verification', async () => {
   const [afterSign, verifier] = await Promise.all([
     readFile(resolve(appRoot, 'scripts/after-sign.cjs'), 'utf8'),
     readFile(resolve(appRoot, 'scripts/verify-macos-signature.mjs'), 'utf8'),

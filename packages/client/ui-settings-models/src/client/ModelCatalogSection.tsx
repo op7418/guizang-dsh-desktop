@@ -8,6 +8,7 @@ import { useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { IApiClient } from '@deepseek-ai/dsh-api-remotes/client'
 import { CodePilotIcon } from '@deepseek-ai/dsh-client-ui-primitives'
+import { renderModelsSection } from './ModelsSection.tsx'
 import type { ModelsSectionInjected, ModelsSectionProps } from './ModelsSection.tsx'
 import type { ModelsSettingsStore, ModelsSettingsState } from './store.ts'
 import { messageOf } from './store.ts'
@@ -60,9 +61,7 @@ function matchesFilter(model: ModelCatalogModel, filter: CatalogFilter): boolean
 
 /** Model catalog settings section registered beside Providers. */
 export function ModelCatalogSection(props: ModelsSectionProps): ReactNode {
-  const { controller, useSnapshot, api, t } = props
-  if (controller === undefined || useSnapshot === undefined || api === undefined || t === undefined) return null
-  return <Loaded injected={{ controller, useSnapshot, api, t }} />
+  return renderModelsSection(props, injected => <Loaded injected={injected} />)
 }
 
 function Loaded({ injected }: { injected: ModelsSectionInjected }): ReactNode {

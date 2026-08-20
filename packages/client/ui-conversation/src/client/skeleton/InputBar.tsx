@@ -212,9 +212,8 @@ export function InputBar({
   // collapsed selection, but honoring direction keeps a future range-preserving
   // path from revealing its anchor instead of its focus.
   const revealSelectionFocus = (el: HTMLTextAreaElement): void => {
-    // selectionStart/End are number|null in lib.dom; the type-aware lint program narrows them.
     const caret = el.selectionDirection === 'backward' ? el.selectionStart : el.selectionEnd
-    revealCaret(caret ?? el.value.length)
+    revealCaret(caret)
   }
 
   // Unlock (mount / session switch) returns focus to the box, and owns the
@@ -296,7 +295,8 @@ export function InputBar({
     // IME guard so a composition-closing Shift+Enter still breaks the line.
     if (e.key === 'Enter' && e.shiftKey) return
     // keyCode 229 is the legacy IME-composition signal engines emit without isComposing.
-    const composing = composingRef.current || e.nativeEvent.isComposing || e.nativeEvent.keyCode === 229
+    const legacyKeyCode = Reflect.get(e.nativeEvent, 'keyCode')
+    const composing = composingRef.current || e.nativeEvent.isComposing || legacyKeyCode === 229
     if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
       if (keyboard.arbitrate(e.key === 'ArrowUp' ? 'up' : 'down', composing) === 'consumed') e.preventDefault()
       return
@@ -358,8 +358,7 @@ export function InputBar({
     const next = e.target.value
     safariNativeShrinkRef.current = safari && next.length < draft.length
     keyboard.setDraft(next)
-    // selectionStart is number|null in lib.dom; the type-aware lint program narrows it.
-    keyboard.track(next, e.target.selectionStart ?? next.length)
+    keyboard.track(next, e.target.selectionStart)
   }
 
   // ---- chip atomicity (DOM layer; the machine sees only transactions) ----
@@ -370,10 +369,9 @@ export function InputBar({
   // too (one char = one step). Mouse selection of a chip is handled in the
   // backdrop click handler below. Undo/redo must NOT reach the browser: the
   // machine owns the transaction log.
-  // selectionStart/End are number|null in lib.dom; the type-aware lint program narrows them.
   const selectionOf = (el: HTMLTextAreaElement) => ({
-    start: el.selectionStart ?? 0,
-    end: el.selectionEnd ?? el.selectionStart ?? 0,
+    start: el.selectionStart,
+    end: el.selectionEnd,
   })
 
   const onCopyOrCut = (e: React.ClipboardEvent<HTMLTextAreaElement>, cut: boolean): void => {

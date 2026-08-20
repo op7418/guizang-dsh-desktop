@@ -7,7 +7,7 @@ import { test } from 'node:test'
 const appRoot = resolve(import.meta.dirname, '..')
 const require = createRequire(import.meta.url)
 
-test('Linux packages use an RPM-safe identity and a valid maintainer', async () => {
+void test('Linux packages use an RPM-safe identity and a valid maintainer', async () => {
   const builderConfig = await readFile(resolve(appRoot, 'electron-builder.yml'), 'utf8')
   const packageJson = JSON.parse(await readFile(resolve(appRoot, 'package.json'), 'utf8')) as {
     author?: { name?: string; email?: string }
@@ -21,7 +21,7 @@ test('Linux packages use an RPM-safe identity and a valid maintainer', async () 
   assert.match(packageJson.author?.email ?? '', /@users\.noreply\.github\.com$/)
 })
 
-test('online previews are ad-hoc signed while formal releases require Developer ID', async () => {
+void test('online previews are ad-hoc signed while formal releases require Developer ID', async () => {
   const [
     builderConfig,
     adhocConfig,
@@ -128,7 +128,7 @@ test('online previews are ad-hoc signed while formal releases require Developer 
   assert.match(ciWorkflow, /node apps\/desktop\/scripts\/audit-codepilot-ui\.mjs/)
 })
 
-test('native macOS signing separates recursive bootstrap from Helper entitlements', () => {
+void test('native macOS signing separates recursive bootstrap from Helper entitlements', () => {
   const signer = require(resolve(appRoot, 'scripts/native-macos-sign.cjs')) as {
     buildCodesignArgs: (
       options: { app: string; identity: string; keychain?: string },

@@ -21,7 +21,7 @@ import { globSync, readFileSync } from 'node:fs'
 import { dirname, join, resolve, sep } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { buildWithConfigs, resolveUserConfig } from 'tsdown'
-import type { InlineConfig, TsdownBundle, UserConfig, UserConfigExport } from 'tsdown'
+import type { BuildContext, InlineConfig, TsdownBundle, UserConfig, UserConfigExport } from 'tsdown'
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url))
 
@@ -90,22 +90,20 @@ export async function watchClientPlugins(
       ...config,
       cwd: config.cwd === undefined ? packageRoot : resolve(packageRoot, config.cwd),
       watch: true,
-      hooks: {
-        ...config.hooks,
-        'build:done': ({ options }) => {
+      hooks: Object.assign({}, config.hooks, {
+        'build:done': ({ options }: BuildContext) => {
           if (initialized.has(options)) return
           initialized.add(options)
           readiness.initializedBuilds += 1
           if (readiness.initializedBuilds >= readiness.expectedBuilds) resolveInitialBuilds?.()
         },
-      },
+      }),
       ...pollInterval === undefined
         ? {}
         : {
-          inputOptions: {
-            ...config.inputOptions,
+          inputOptions: Object.assign({}, config.inputOptions, {
             watch: { watcher: { usePolling: true, pollInterval } },
-          },
+          }),
         },
     }))
   }))).flat()

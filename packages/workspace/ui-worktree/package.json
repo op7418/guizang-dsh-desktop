@@ -1,7 +1,7 @@
 {
   "name": "@deepseek-ai/dsh-ui-worktree",
   "description": "Plugin-owned workspace file tree and row actions for DeepSeek Harness",
-  "version": "0.1.0-rc.5",
+  "version": "0.1.0-rc.7",
   "publishConfig": { "access": "public" },
   "repository": {
     "type": "git",

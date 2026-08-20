@@ -464,7 +464,7 @@ export function TrajectoryView({
         onToggleAllAssistants={toggleAllAssistants}
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
-        utilities={renderSlot?.('conversation.trajectory.toolbar', {})}
+        utilities={renderSlot('conversation.trajectory.toolbar', {})}
         t={t}
       />
       <TrajectoryTimeline

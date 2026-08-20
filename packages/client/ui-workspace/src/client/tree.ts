@@ -235,7 +235,7 @@ function sessionNode(
     workspaceTitle: workspace.title,
     ...(workspace.cwd === undefined ? {} : { cwd: workspace.cwd }),
     ...(s.agentPreset === undefined ? {} : { agentPreset: s.agentPreset }),
-    projections: (s.projectionValues ?? {}) as Readonly<Record<string, unknown>>,
+    projections: s.projectionValues ?? {},
     ...(s.pendingInteraction === undefined ? {} : { pendingInteraction: s.pendingInteraction }),
   }
 }
