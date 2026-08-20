@@ -94,6 +94,10 @@ void test('online previews are ad-hoc signed while formal releases require Devel
   assert.doesNotMatch(packagedSmoke, /ELECTRON_DISABLE_SANDBOX/)
   assert.match(workflow, /release-quality:/)
   assert.match(workflow, /needs: \[native-package, plugin-bundles, release-quality\]/)
+  assert.match(
+    workflow,
+    /publish-release:[\s\S]*?steps:\n\s+- uses: actions\/checkout@v6[\s\S]*?- uses: actions\/download-artifact@v5/,
+  )
   assert.match(workflow, /pnpm run check:ci:linux-primary/)
   assert.match(workflow, /node apps\/desktop\/scripts\/audit-codepilot-ui\.mjs/)
   assert.match(workflow, /prerelease: \$\{\{/)

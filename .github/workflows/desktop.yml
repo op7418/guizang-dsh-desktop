@@ -261,6 +261,8 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v6
+
       - uses: actions/download-artifact@v5
         with:
           pattern: pilot-harness-*
