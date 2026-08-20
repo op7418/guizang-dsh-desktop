@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict'
+import { spawnSync } from 'node:child_process'
 import { createRequire } from 'node:module'
 import { readFile } from 'node:fs/promises'
 import { resolve } from 'node:path'
@@ -6,6 +7,28 @@ import { test } from 'node:test'
 
 const appRoot = resolve(import.meta.dirname, '..')
 const require = createRequire(import.meta.url)
+
+void test('UI audit enforces the repository contract without an external CodePilot checkout', () => {
+  const result = spawnSync(process.execPath, [
+    resolve(appRoot, 'scripts/audit-codepilot-ui.mjs'),
+    '--json',
+  ], {
+    cwd: appRoot,
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      CODEPILOT_REFERENCE_ROOT: resolve(appRoot, 'tests/fixtures/missing-codepilot-reference'),
+    },
+  })
+
+  assert.equal(result.status, 0, result.stderr || result.stdout)
+  const report = JSON.parse(result.stdout) as {
+    referenceAvailability: { globals: boolean; main: boolean; icons: boolean }
+    summary: { passed: number; total: number }
+  }
+  assert.deepEqual(report.referenceAvailability, { globals: false, main: false, icons: false })
+  assert.equal(report.summary.passed, report.summary.total)
+})
 
 void test('Linux packages use an RPM-safe identity and a valid maintainer', async () => {
   const builderConfig = await readFile(resolve(appRoot, 'electron-builder.yml'), 'utf8')

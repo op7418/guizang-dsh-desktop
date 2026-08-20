@@ -129,6 +129,20 @@ const referenceAnchors = {
   windowsOverlay: includesAll(referenceMain, ["titleBarStyle = 'hidden'", 'height: 44']),
   semanticIcons: includesAll(referenceIcons, ['@hugeicons/react', '@hugeicons/core-free-icons', 'SEMANTIC_MAP']),
 }
+const referenceAvailability = {
+  globals: referenceGlobals.length > 0,
+  main: referenceMain.length > 0,
+  icons: referenceIcons.length > 0,
+}
+
+// The CodePilot checkout is an optional local design reference, not part of
+// this repository's release closure. When it is available, corroborate the
+// stable in-repo contract against it; on clean CI runners, keep enforcing the
+// explicit tokens, dependencies, and platform values below without requiring
+// an untracked absolute path.
+function optionalReference(available, anchor) {
+  return !available || anchor
+}
 
 const codePilotLightTokens = semanticPaletteTokens(cssBlock(desktopTheme, 'html[data-codepilot-theme] body {'))
 const codePilotDarkTokens = new Set(semanticPaletteTokens(cssBlock(desktopTheme, 'html[data-codepilot-theme] body[data-ds-dark-theme] {')))
@@ -162,8 +176,8 @@ const checks = [
   check('tokens', 'border-input', '边框与输入 token 对齐', includesAll(desktopTheme, ['--pilot-border: oklch(0.923 0.003 48.717);', '--pilot-input: oklch(0.923 0.003 48.717);']), 'border/input'),
   check('tokens', 'sidebar', '侧栏 token 对齐', desktopTheme.includes('--pilot-sidebar: oklch(0.985 0.001 106.423);'), '--pilot-sidebar'),
   check('tokens', 'focus-ring', '焦点环 token 对齐', desktopTheme.includes('--pilot-ring: oklch(0.262 0 0);'), '--pilot-ring'),
-  check('tokens', 'diffuse-shadow', '输入区使用 CodePilot diffuse shadow', desktopTheme.includes('--pilot-shadow-diffuse:') && referenceAnchors.composerShadow, '--pilot-shadow-diffuse'),
-  check('tokens', 'platform-surfaces', '窗口/侧栏/浮层使用平台表面 token', includesAll(desktopTheme, ['--pilot-platform-surface-window:', '--pilot-platform-surface-sidebar:', '--pilot-platform-surface-popover:']) && referenceAnchors.platformTokens, 'platform surface tokens'),
+  check('tokens', 'diffuse-shadow', '输入区使用 CodePilot diffuse shadow', desktopTheme.includes('--pilot-shadow-diffuse:') && optionalReference(referenceAvailability.globals, referenceAnchors.composerShadow), '--pilot-shadow-diffuse'),
+  check('tokens', 'platform-surfaces', '窗口/侧栏/浮层使用平台表面 token', includesAll(desktopTheme, ['--pilot-platform-surface-window:', '--pilot-platform-surface-sidebar:', '--pilot-platform-surface-popover:']) && optionalReference(referenceAvailability.globals, referenceAnchors.platformTokens), 'platform surface tokens'),
   check('tokens', 'platform-font', 'macOS UI 字体栈单独适配', desktopTheme.includes('--pilot-platform-font-ui: -apple-system'), 'platform font'),
   check('tokens', 'dark-parity', '深色模式逐项覆盖 Pilot 与 Harness 语义 Token、平台表面和阴影', missingCodePilotDarkTokens.length === 0 && missingPilotDarkTokens.length === 0 && includesAll(desktopTheme, ["body[data-ds-dark-theme]", '--pilot-background: oklch(0.147 0.004 49.25);', '--pilot-primary: oklch(0.985 0.001 106.423);', '--pilot-shadow-diffuse: 0 12px 40px -8px rgb(0 0 0 / 45%)', 'body[data-ds-dark-theme] ::selection']), missingCodePilotDarkTokens.length === 0 && missingPilotDarkTokens.length === 0 ? `${pilotDarkTokens.size}/${pilotLightTokens.length} Pilot + ${codePilotDarkTokens.size}/${codePilotLightTokens.length} Harness dark token pairs` : `missing: ${[...missingPilotDarkTokens, ...missingCodePilotDarkTokens].join(', ')}`),
 
@@ -194,7 +208,7 @@ const checks = [
   check('components', 'focus-visible', '键盘焦点使用高对比语义 outline 与柔和外环', includesAll(desktopTheme, [':focus-visible', 'outline: 2px solid', 'outline-offset: 2px', 'var(--pilot-ring)']), 'focus visible'),
   check('components', 'reduced-motion', '减少动态效果偏好受支持', desktopTheme.includes('@media (prefers-reduced-motion: reduce)'), 'reduced motion'),
 
-  check('icons', 'same-dependencies', '使用 CodePilot 的 HugeIcons 语义图标依赖', includesAll(uiPrimitivesPackage, ['@hugeicons/core-free-icons', '@hugeicons/react']) && referenceAnchors.semanticIcons, 'ui-primitives package dependencies'),
+  check('icons', 'same-dependencies', '使用 CodePilot 的 HugeIcons 语义图标依赖', includesAll(uiPrimitivesPackage, ['@hugeicons/core-free-icons', '@hugeicons/react']) && optionalReference(referenceAvailability.icons, referenceAnchors.semanticIcons), 'ui-primitives package dependencies'),
   check('icons', 'semantic-layer', '具备统一 CodePilotIcon 语义映射层', includesAll(semanticIcons, ['HugeiconsIcon', 'SEMANTIC_MAP', 'CodePilotIconName']), 'CodePilotIcon.tsx'),
   check('icons', 'sidebar-icons', '侧栏核心图标迁到语义层', sidebarRoot.includes('CodePilotIcon') && !sidebarRoot.includes('IconNewChatOutline16'), 'SidebarRoot.tsx'),
   check('icons', 'settings-icons', '设置导航图标迁到语义层', settingsRoot.includes('CodePilotIcon') && !settingsRoot.includes('IconSettingsOutline16'), 'SettingsRoot.tsx'),
@@ -213,11 +227,11 @@ const checks = [
   check('plugins', 'curated-provider-catalog', 'Azure、Anthropic 等非 CodePilot 目录不会进入新增服务商选择器', includesAll(providerCatalog, ["'azure-openai-responses'", "'anthropic'", 'EXCLUDED_PI_AI_PROVIDERS']), 'CodePilotProviderCatalog.ts'),
 
   check('platform', 'mac-titlebar', 'macOS 使用 hiddenInset', desktopMain.includes("titleBarStyle: 'hiddenInset'"), 'BrowserWindow titleBarStyle'),
-  check('platform', 'mac-traffic-lights', 'macOS 红绿灯位置为 CodePilot 20/21', desktopMain.includes('trafficLightPosition: { x: 20, y: 21 }') && referenceAnchors.macTrafficLights, 'trafficLightPosition'),
-  check('platform', 'mac-vibrancy', 'macOS 使用 under-window vibrancy', desktopMain.includes("vibrancy: 'under-window'") && referenceAnchors.macVibrancy, 'vibrancy'),
+  check('platform', 'mac-traffic-lights', 'macOS 红绿灯位置为 CodePilot 20/21', desktopMain.includes('trafficLightPosition: { x: 20, y: 21 }') && optionalReference(referenceAvailability.main, referenceAnchors.macTrafficLights), 'trafficLightPosition'),
+  check('platform', 'mac-vibrancy', 'macOS 使用 under-window vibrancy', desktopMain.includes("vibrancy: 'under-window'") && optionalReference(referenceAvailability.main, referenceAnchors.macVibrancy), 'vibrancy'),
   check('platform', 'mac-transparent', 'macOS 使用透明原生窗口背板', includesAll(desktopMain, ["'#00ffffff'", 'transparent: true']), 'transparent BrowserWindow'),
   check('platform', 'mac-effect-state', 'macOS 原生材质跟随窗口状态', desktopMain.includes("visualEffectState: 'followWindow'"), 'visualEffectState'),
-  check('platform', 'windows-overlay', 'Windows 使用 44px 透明标题栏叠层', includesAll(desktopMain, ["color: '#00000000'", 'height: 44']) && referenceAnchors.windowsOverlay, 'titleBarOverlay'),
+  check('platform', 'windows-overlay', 'Windows 使用 44px 透明标题栏叠层', includesAll(desktopMain, ["color: '#00000000'", 'height: 44']) && optionalReference(referenceAvailability.main, referenceAnchors.windowsOverlay), 'titleBarOverlay'),
   check('platform', 'native-theme-sync', '网页主题偏好同步到 Electron 原生窗口材质', includesAll(themeClient, ['setThemeSource', "ctx.on('theme/change'"]) && includesAll(desktopMain, ["pilot-harness:set-theme-source", 'isNativeThemeSource(source)', 'nativeTheme.themeSource = source', 'applyNativeTheme()']), 'theme client bridge + validated main IPC'),
   check('platform', 'integrated-topbar', 'macOS 内容与窗口栏融合并保留 8px 可拖动命中带', desktopTheme.includes("[data-pilot-platform='darwin'] body {\n  padding-top: 0;") && includesAll(desktopTheme, ['html[data-codepilot-theme][data-pilot-desktop] body::before', 'height: 8px;', '-webkit-app-region: drag;']), 'desktop top area'),
   check('platform', 'windows-safe-area', 'Windows 标题栏安全区不遮挡内容', includesAll(desktopTheme, ["[data-pilot-platform='win32'] body", 'padding-top: 44px;']), 'Windows safe area'),
@@ -306,6 +320,7 @@ const result = {
   generatedAt: new Date().toISOString(),
   target: repoRoot,
   reference: referenceRoot,
+  referenceAvailability,
   referenceAnchors,
   summary: {
     passed: totalPassed,
