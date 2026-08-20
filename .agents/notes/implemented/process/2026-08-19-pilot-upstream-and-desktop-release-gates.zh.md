@@ -12,7 +12,7 @@ Pilot Harness 跟踪更新频繁的上游发布线，并通过 GitHub Actions �
 
 主 CI 工作流会在每次 `main` 推送上运行完整的托管 Linux 聚合检查和 CodePilot UI 静态审计。定时上游同步只能从 `main` 运行，读取配置中的上游仓库，使用严格的 DSH tag SemVer 解析 GitHub 最新的非 draft、非 prerelease 发布，拒绝降级，并拒绝 commit 已变化的已记录 tag。无冲突合并会在 fast-forward 推送前运行 `check:ci:linux-primary`、桌面构建、桌面测试、桌面 typecheck 和同一份 UI 静态审计。版本元数据使用独立 commit 落库，不会 amend 无关的 Pilot commit。合并冲突与签名配置缺失 issue 使用精确标题，条件消失后会关闭。
 
-Pilot 自身修复使用 `main` 上的手动 `Release Pilot Harness changes` 工作流。该流程要求当前跟踪的发布已存在，在同一上游版本下选择高于全部已发布 `pilot.N` 的下一个修订号，运行同样的完整源码检查，提交两个版本字段，然后派发原生发布。它与上游同步共用一个不取消的 concurrency group，两个写入者不会竞争。
+Pilot 自身修复使用 `main` 上的手动 `Release Pilot Harness changes` 工作流。该流程要求当前跟踪的发布已存在，在同一上游版本下选择高于全部已发布 `pilot.N` 的下一个修订号，运行同样的完整源码检查，提交两个版本字段，然后派发原生发布。发布发现直接消费 GitHub API 的原始分页响应，不再组合 CLI 中互斥的 `--slurp` 与 `--jq` 模式。它与上游同步共用一个不取消的 concurrency group，两个写入者不会竞争。
 
 每个发布在桌面工作流中都有独立的完整 Linux 源码质量 job，并与原生平台 matrix 和插件 bundle 安装校验并列。每个原生 runner 都使用隔离的 Harness home 启动打包应用，且必须让内置 DSH runtime 加载到能捕获真实 renderer 截图的阶段。发布 job 依赖全部原生 leg、插件 bundle 和源码质量 job。经测试的发布产物解析器会在生成稳定下载名之前，要求每个平台的预期输出恰好出现一次。含 prerelease 段的上游版本保持为 GitHub prerelease，不会成为 `latest`。
 

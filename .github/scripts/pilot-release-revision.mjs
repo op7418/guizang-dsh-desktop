@@ -17,9 +17,13 @@ export function resolveNextPilotRevision(tracked, releases) {
   const currentMatch = pattern.exec(`v${current}`)
   if (currentMatch === null) throw new Error(`tracked Pilot version does not match ${upstream.tag}: ${current}`)
 
-  const tags = Array.isArray(releases)
-    ? releases.map(entry => typeof entry === 'string' ? entry : String(entry?.tagName ?? ''))
+  const entries = Array.isArray(releases)
+    ? releases.flatMap(entry => Array.isArray(entry) ? entry : [entry])
     : []
+  const tags = entries.map((entry) => {
+    if (typeof entry === 'string') return entry
+    return String(entry?.tagName ?? entry?.tag_name ?? '')
+  })
   if (!tags.includes(`v${current}`)) {
     throw new Error(`current Pilot release v${current} is missing; retry that release before incrementing`)
   }

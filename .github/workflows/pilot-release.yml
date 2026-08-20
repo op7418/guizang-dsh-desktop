@@ -54,8 +54,7 @@ jobs:
           set -euo pipefail
           releases_json="$RUNNER_TEMP/pilot-releases.json"
           gh api --paginate --slurp \
-            "repos/$GITHUB_REPOSITORY/releases?per_page=100" \
-            --jq '[.[][] | {tagName: .tag_name}]' > "$releases_json"
+            "repos/$GITHUB_REPOSITORY/releases?per_page=100" > "$releases_json"
           node .github/scripts/pilot-release-revision.mjs \
             .github/upstream.json "$releases_json" >> "$GITHUB_OUTPUT"
 
