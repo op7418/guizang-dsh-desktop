@@ -35,7 +35,7 @@
     },
     {
       "name": "job_kill",
-      "description": "Request cancellation of a running background job by job id. Returns immediately; the task settles as killed once its work actually stops.",
+      "description": "Request cancellation of a running background job by job id. Returns immediately; the job settles as killed once its work actually stops.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -45,7 +45,7 @@
           },
           "reason": {
             "type": "string",
-            "description": "Optional short reason, recorded in the log and forwarded to the task."
+            "description": "Optional short reason, recorded in the log and forwarded to the job."
           }
         },
         "required": [
@@ -63,7 +63,7 @@
     },
     {
       "name": "job_output",
-      "description": "Read a background job. Stream tasks return only output since the previous read; final-output tasks return their result after settlement. Every response ends with `[status: ...]`. Reads are non-blocking unless `wait: true`, which waits up to the configured cap.",
+      "description": "Read a background job. Stream jobs return only output since the previous read; final-output jobs return their result after settlement. Every response ends with `[status: ...]`. Reads are non-blocking unless `wait: true`, which waits up to the configured cap.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -73,7 +73,7 @@
           },
           "wait": {
             "type": "boolean",
-            "description": "Block until the task reaches a terminal status or the timeout expires. A timed-out wait returns [status: running] and leaves the task alive."
+            "description": "Block until the job reaches a terminal status or the timeout expires. A timed-out wait returns [status: running] and leaves the job alive."
           },
           "timeout_ms": {
             "type": "number",

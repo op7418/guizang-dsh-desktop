@@ -243,6 +243,19 @@ async function nextPaint(page: Page): Promise<void> {
   })
 }
 
+async function settleAppFrame(page: Page): Promise<void> {
+  await page.locator('[data-pilot-shell="frame"]').evaluate(async (frame) => {
+    await Promise.all(frame.getAnimations().map(async (animation) => {
+      try {
+        await animation.finished
+      } catch {
+        // A superseded responsive transition is already settled for layout.
+      }
+    }))
+  })
+  await nextPaint(page)
+}
+
 function scrollGeometry(page: Page): Promise<ScrollGeometry> {
   return page.locator('[data-conversation-scroll]').evaluate(host => ({
     distanceFromBottom: host.scrollHeight - host.clientHeight - host.scrollTop,
@@ -660,6 +673,7 @@ describe('web e2e: long Chat scroll contract', () => {
       // The narrow breakpoint auto-collapses the sidebar. Re-open it because
       // this scenario switches sessions while pinning the narrow Chat scroll owner.
       await world.page.getByRole('button', { name: 'Open sidebar', exact: true }).click()
+      await settleAppFrame(world.page)
       await world.page.getByRole('tab', { name: 'Chat', exact: true }).click()
       await nextPaint(world.page)
       await expectSameFlowTop(world.page, sessionAnchor)

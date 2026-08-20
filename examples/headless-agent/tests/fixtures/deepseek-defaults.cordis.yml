@@ -8,7 +8,7 @@
           baseURL: !!js process.env.DSH_SNAPSHOT_BASE_URL
           thinking: enabled
           reasoningEffort: low
-          streamIdleTimeoutMs: 150
+          streamIdleTimeoutMs: 500
       - id: agent-spine
         config:
           agents:

@@ -562,6 +562,7 @@ describe('boot', () => {
     const dir = tmp()
     const harness = tmp()
     const absolutePlugin = join(dir, 'absolute.mjs')
+    const urlPlugin = join(dir, 'url.mjs')
     const shadow = join(dir, 'node_modules', '@deepseek-ai', 'dsh-system-prompt')
     const harnessPlugin = join(harness, 'node_modules', '@deepseek-ai', 'dsh-system-prompt')
     mkdirSync(shadow, { recursive: true })
@@ -590,6 +591,7 @@ describe('boot', () => {
     ].join('\n'))
     writeFileSync(join(dir, 'relative.mjs'), 'export function apply(ctx) { ctx.provide("relativePluginLoaded", true) }\n')
     writeFileSync(absolutePlugin, 'export function apply(ctx) { ctx.provide("absolutePluginLoaded", true) }\n')
+    writeFileSync(urlPlugin, 'export function apply(ctx) { ctx.provide("urlPluginLoaded", true) }\n')
     const entries = [
       '- id: prompt',
       "  name: '@deepseek-ai/dsh-system-prompt'",
@@ -603,6 +605,8 @@ describe('boot', () => {
       ...entries,
       '- id: absolute',
       `  name: ${JSON.stringify(absolutePlugin)}`,
+      '- id: url',
+      `  name: ${JSON.stringify(pathToFileURL(urlPlugin).href)}`,
       '',
     ].join('\n'))
     const configOwned = await boot(NAME, configOwnedPath)
@@ -620,6 +624,7 @@ describe('boot', () => {
       expect(ctx.get('shadowPluginLoaded')).toBeUndefined()
       expect(ctx.get('relativePluginLoaded')).toBe(true)
       expect(ctx.get('absolutePluginLoaded')).toBe(true)
+      expect(ctx.get('urlPluginLoaded')).toBe(true)
     } finally {
       await ctx.fiber.dispose()
     }
@@ -628,6 +633,8 @@ describe('boot', () => {
   it('falls back to standard package resolution when Loader internals are unavailable', async () => {
     const dir = tmp()
     const plugin = join(dir, 'node_modules', 'portable-loader-plugin')
+    const absolutePlugin = join(dir, 'portable-absolute.mjs')
+    const urlPlugin = join(dir, 'portable-url.mjs')
     mkdirSync(plugin, { recursive: true })
     writeFileSync(join(plugin, 'package.json'), JSON.stringify({
       name: 'portable-loader-plugin',
@@ -635,6 +642,8 @@ describe('boot', () => {
       exports: './index.mjs',
     }))
     writeFileSync(join(plugin, 'index.mjs'), 'export function apply(ctx) { ctx.provide("portablePluginLoaded", true) }\n')
+    writeFileSync(absolutePlugin, 'export function apply(ctx) { ctx.provide("portableAbsoluteLoaded", true) }\n')
+    writeFileSync(urlPlugin, 'export function apply(ctx) { ctx.provide("portableUrlLoaded", true) }\n')
     writeFileSync(join(dir, 'cordis.yml'), [
       '- id: portable-group',
       '  name: cordis:group',
@@ -642,6 +651,10 @@ describe('boot', () => {
       '  config:',
       '    - id: portable',
       '      name: portable-loader-plugin',
+      '- id: portable-absolute',
+      `  name: ${JSON.stringify(absolutePlugin)}`,
+      '- id: portable-url',
+      `  name: ${JSON.stringify(pathToFileURL(urlPlugin).href)}`,
       '',
     ].join('\n'))
 
@@ -650,6 +663,12 @@ describe('boot', () => {
     })
     try {
       expect(ctx.get('portablePluginLoaded')).toBe(true)
+      expect(ctx.get('portableAbsoluteLoaded')).toBe(true)
+      expect(ctx.get('portableUrlLoaded')).toBe(true)
+      const fallbackImport = ctx.loader.fallbackImport
+      expect(fallbackImport).toBeTypeOf('function')
+      await expect(fallbackImport!(absolutePlugin, pathToFileURL(join(dir, 'cordis.yml')).href))
+        .resolves.toBeDefined()
     } finally {
       await ctx.fiber.dispose()
     }

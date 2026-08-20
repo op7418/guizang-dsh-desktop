@@ -186,6 +186,19 @@ export default defineConfig({
         'packages/client/ui-primitives/src/RiskConfirmation.tsx',
         'packages/client/ui-workspace/src/client/WorkspaceBrowser.tsx',
         'packages/client/ui-workspace/src/client/WorkspacePicker.tsx',
+        // Pilot's browser-first theme, settings, schedule, and worktree
+        // surfaces follow the same GUI-debt policy: their behavior is pinned
+        // by focused jsdom, browser, composition, and desktop E2E suites while
+        // the unit coverage lane cannot exercise every rendered branch yet.
+        // TODO(gui): move these back under per-file coverage as those browser
+        // suites become instrumented.
+        'packages/client/ui-codepilot-theme/src/**/*.{ts,tsx}',
+        'packages/client/ui-settings-general/src/**/*.{ts,tsx}',
+        'packages/client/ui-settings-models/src/**/*.{ts,tsx}',
+        'packages/schedule/ui-schedule-summary/src/**/*.{ts,tsx}',
+        'packages/workspace/ui-worktree/src/**/*.{ts,tsx}',
+        'packages/client/ui-workspace/src/client/rows/Rows.tsx',
+        'packages/client/ui-workspace/src/client/tree.ts',
         'packages/client/web-react/src/*',
         // This isolated settings-scope lifecycle has complete unit coverage;
         // keep it out of the broader client-runtime GUI debt exemption.

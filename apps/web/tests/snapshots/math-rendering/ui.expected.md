@@ -44,6 +44,5 @@
   - text: DeepSeek-V4-Flash
   - img
 - button "Context details" [expanded]
-- tooltip "Context details"
 - dialog "Context details": Context details 1 turns · 1 steps LLM {{duration}}
 - button "Send message" [disabled]

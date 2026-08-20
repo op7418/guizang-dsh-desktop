@@ -124,6 +124,11 @@ describe('web e2e: settled Markdown math rendering', () => {
       () => page.getByText('1 turns · 1 steps', { exact: false }).count(),
       { timeout: 10_000 },
     ).toBe(1)
+    // Clicking the trigger leaves Chromium's pointer over it. Tooltip timing
+    // varies with runner load, so move to inert chrome and wait for the
+    // transient layer to leave before taking the semantic snapshot.
+    await page.mouse.move(1, 1)
+    await expect.poll(() => page.getByRole('tooltip').count(), { timeout: 5_000 }).toBe(0)
 
     const snapshot = (await captureStableAria(page, '[class*="centerCol"]', scaffold.workspaceCwd))
       .split(SEED_ID).join('{{seededId}}')
